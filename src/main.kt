@@ -1,10 +1,10 @@
-import expressions.*
-import expressions.binary.*
+import expressions.monomials.*
+
+//import expressions.*
 
 fun main() {
-    val n1 = NumberExp(1)
-    val n2 = NumberExp(2)
-    var a: Expression = Sum(n1 to n2)
-    println(a)
-    print(a.simplify())
+    val str = "b*2*3*5*c*d*c"
+    println(str.split(' '))
+    val m = str.toMonomial()
+    println(m.body.first.numerator)
 }

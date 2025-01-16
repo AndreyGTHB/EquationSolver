@@ -1,9 +1,10 @@
-package expressions.binary
+package expressions.longs
 
 import expressions.Expression
 import expressions.numerical.Integer
 
-class Difference(body: Pair<Expression, Expression>): BinaryExpression(body) {
+class Product(body: MutableList<Expression>) : LongExpression(body) {
+
     override fun simplify() {
 
     }

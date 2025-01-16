@@ -1,11 +1,13 @@
 package expressions
 
 import expressions.binary.*
+import expressions.longs.Product
+import expressions.longs.Sum
 
 abstract class Expression {
     abstract val body: Any
 
-    abstract fun simplify(): Expression
+    abstract fun simplify()
 
     operator fun plus(exp: Expression): Sum {
         return Sum(this to exp)
@@ -13,10 +15,10 @@ abstract class Expression {
     operator fun minus(exp: Expression): Difference {
         return Difference(this to exp)
     }
-    operator fun times(exp: Expression): Product {
-        return Product(this to exp)
-    }
-    operator fun div(exp: Expression): Fraction {
-        return Fraction(this to exp)
+//    operator fun times(exp: Expression): Product {
+//        return Product(this to exp)
+//    }
+    operator fun div(exp: Expression): Quotient {
+        return Quotient(this to exp)
     }
 }
