@@ -1,10 +1,11 @@
-package expressions
+package expressions.binary
 
-import expressions.binary.BinaryExpression
+import expressions.Expression
 
 open class Quotient(body: Pair<Expression, Expression>) : BinaryExpression(body) {
-    override fun simplify() {
+    override fun simplified(): Expression {
         val numerator = body.first
         val denominator = body.second
+        return this
     }
 }

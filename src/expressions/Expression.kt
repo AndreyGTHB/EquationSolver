@@ -1,13 +1,13 @@
 package expressions
 
 import expressions.binary.*
-import expressions.longs.Product
 import expressions.longs.Sum
 
 abstract class Expression {
     abstract val body: Any
 
-    abstract fun simplify()
+    abstract fun simplified(): Expression
+    abstract fun simplifyBody()
 
     operator fun plus(exp: Expression): Sum {
         return Sum(this to exp)

@@ -1,10 +1,9 @@
 package expressions.binary
 
 import expressions.Expression
-import expressions.numerical.Integer
 
 class Difference(body: Pair<Expression, Expression>): BinaryExpression(body) {
-    override fun simplify() {
-
+    override fun simplified(): Expression {
+        return this
     }
 }
