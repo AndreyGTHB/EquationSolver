@@ -8,8 +8,18 @@ import utils.isInt
 class Monomial(private var _body: Pair<NumFraction, MutableMap<Char, Int>>) : Expression() {
     override val body
         get() = _body
+
+    val coefficient
+        get() = _body.first
+    val variables
+        get() = _body.second
+
     override fun simplified(): Expression { return this }
     override fun simplifyBody() {  }
+
+    operator fun unaryMinus(): Monomial {
+        return Monomial(-coefficient to variables)
+    }
 }
 
 

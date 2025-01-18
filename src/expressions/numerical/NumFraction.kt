@@ -2,6 +2,7 @@ package expressions.numerical
 
 import expressions.Expression
 import utils.LCD
+import kotlin.math.abs
 
 data class NumFraction(private var _body: Pair<Int, Int>) : Expression() {
     override val body
@@ -13,10 +14,13 @@ data class NumFraction(private var _body: Pair<Int, Int>) : Expression() {
 
     override fun simplified(): NumFraction {
         val lcd = LCD(numerator, denominator)
-        return NumFraction(numerator / lcd to denominator / lcd)
+        val new = NumFraction(_body)
+        new.simplifyBody()
+        return new
     }
     override fun simplifyBody() {
-        val lcd = LCD(numerator, denominator)
+        val isNegative = (numerator < 0) xor (denominator < 0)
+        val lcd = abs(LCD(numerator, denominator))
         _body = numerator / lcd to denominator / lcd
     }
 
@@ -51,5 +55,13 @@ data class NumFraction(private var _body: Pair<Int, Int>) : Expression() {
     }
     operator fun div(other: NumFraction): NumFraction {
         return NumFraction(this.numerator * other.denominator to this.denominator * other.numerator)
+    }
+
+    operator fun unaryMinus(): NumFraction {
+        return NumFraction(-numerator to denominator)
+    }
+
+    operator fun inc(): NumFraction {
+        return this + 1
     }
 }

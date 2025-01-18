@@ -2,7 +2,8 @@ package expressions.longs
 
 import expressions.Expression
 
-abstract class LongExpression(protected var _body: MutableList<Expression>) : Expression() {
+abstract class LongExpression(body: Collection<Expression>) : Expression() {
+    protected var _body = body.toMutableList()
     override val body: List<Expression>
         get() = _body
 
