@@ -13,11 +13,18 @@ class Sum(body: Collection<Expression>) : LongExpression(body) {
         return Sum(_body + listOf(other))
     }
 
-//    operator fun minus(other: NumFraction): Sum {
-//        val opposite = NumFraction(0 - other.numerator to other.denominator)
-//        return this + opposite
-//    }
-//    operator fun minus(other: Monomial): Sum {
-//        val opposite = Monomial(-other.coefficient to other.variables)
-//    }
+    override fun simplifyBody() {
+        super.simplifyBody()
+
+        val monomialVarMaps: MutableMap<Map<Char, Int>, NumFraction>
+        var currVarMap: Map<Char, Int> = mapOf()
+        var currCoeff: NumFraction = NumFraction(0 to 1)
+        for (exp in _body) {
+            if (exp is Monomial) {
+                currVarMap = exp.varMap
+                currCoeff = exp.coefficient
+                monomialVarMaps[currVarMap] = monomialVarMaps.getOrDefault(currVarMap)
+            }
+        }
+    }
 }

@@ -4,11 +4,8 @@ import expressions.numerical.NumFraction
 //import expressions.*
 
 fun main() {
-    val fr1 = NumFraction(4 to 3)
-    var fr2 = fr1 / 2
-    ++fr2
-    println("Fr1: $fr1      Fr2: $fr2")
-    val s = -(fr1 + fr2)
-    println("Opposite sum: $s")
-    println("Simplified opposite sum: ${s.simplified()}")
+    val m1 = "9*a*a*b".toMonomial()
+    val m2 = "4*b*c*c".toMonomial()
+    val m3 = m1 * m2
+    println(m3)
 }
