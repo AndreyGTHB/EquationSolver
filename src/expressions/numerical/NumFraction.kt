@@ -4,24 +4,20 @@ import expressions.Expression
 import utils.LCD
 import kotlin.math.abs
 
-data class NumFraction(private var _body: Pair<Int, Int>) : Expression() {
-    override val body
-        get() = _body
+data class NumFraction(override val body: Pair<Int, Int>) : Expression() {
     val numerator: Int
-        get() = _body.first
+        get() = body.first
     val denominator: Int
-        get() = _body.second
+        get() = body.second
 
     override fun simplified(): NumFraction {
-        val lcd = LCD(numerator, denominator)
-        val new = NumFraction(_body)
-        new.simplifyBody()
-        return new
+        return simplifiedSoftly()
     }
-    override fun simplifyBody() {
-        val isNegative = (numerator < 0) xor (denominator < 0)
-        val lcd = abs(LCD(numerator, denominator))
-        _body = numerator / lcd to denominator / lcd
+    override fun simplifiedSoftly(): NumFraction {
+        val lcd = LCD(numerator, denominator)
+        val newNumerator = (if (denominator < 0) -numerator else numerator) / lcd
+        val newDenominator = abs(denominator) / lcd
+        return NumFraction(newNumerator to newDenominator)
     }
 
 

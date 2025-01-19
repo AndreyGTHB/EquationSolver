@@ -2,20 +2,16 @@ package expressions.monomials
 
 import expressions.Expression
 import expressions.numerical.NumFraction
-import utils.isInt
 
 
-data class Monomial(private var _body: Pair<NumFraction, MutableMap<Char, Int>>) : Expression() {
-    override val body
-        get() = _body
-
+data class Monomial(override val body: Pair<NumFraction, MutableMap<Char, Int>>) : Expression() {
     val coefficient
-        get() = _body.first
+        get() = body.first
     val varMap
-        get() = _body.second
+        get() = body.second
 
     override fun simplified(): Expression { return this }
-    override fun simplifyBody() {  }
+    override fun simplifiedSoftly(): Monomial { return this }
 
     operator fun unaryMinus(): Monomial {
         return Monomial(-coefficient to varMap)
@@ -29,19 +25,4 @@ data class Monomial(private var _body: Pair<NumFraction, MutableMap<Char, Int>>)
         }
         return Monomial(newCoefficient to newVarMap)
     }
-}
-
-
-fun String.toMonomial(): Monomial {
-    var coefficient = NumFraction(1 to 1)
-    val variables: MutableMap<Char, Int> = mutableMapOf()
-
-    val splited = this.split('*')
-    splited.forEach {
-        if (it.isInt()) coefficient *= it.toInt()
-        else {
-            variables[it.first()] = variables.getOrDefault(it.first(), 0) + 1
-        }
-    }
-    return Monomial(coefficient to variables)
 }

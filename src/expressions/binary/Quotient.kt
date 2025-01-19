@@ -4,12 +4,14 @@ import expressions.Expression
 
 open class Quotient(body: Pair<Expression, Expression>) : BinaryExpression(body) {
     val numerator
-        get() = _body.first
+        get() = body.first
     val denominator
-        get() = _body.second
+        get() = body.second
 
     override fun simplified(): Expression {
-        simplifyBody()
+        simplifiedSoftly()
         return this
     }
+
+    override fun simplifiedSoftly(): Quotient { return this }
 }

@@ -1,5 +1,6 @@
 import expressions.monomials.*
 import expressions.numerical.NumFraction
+import utils.toMonomial
 
 //import expressions.*
 
