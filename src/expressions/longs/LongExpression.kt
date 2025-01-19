@@ -8,4 +8,8 @@ abstract class LongExpression(override val body: List<Expression>) : Expression(
             .toList()
         return newBody
     }
+
+    override fun toString(): String {
+        return body.toString()
+    }
 }
