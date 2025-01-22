@@ -1,5 +1,7 @@
 package expressions
 
+import expressions.binary.Quotient
+import expressions.longs.Product
 import expressions.longs.Sum
 
 abstract class Expression {
@@ -8,16 +10,18 @@ abstract class Expression {
     abstract fun simplified(): Expression
     abstract fun simplifiedSoftly(): Expression
 
-    open operator fun plus(override: Expression): Sum {
-        return Sum(listOf(this, override))
+    abstract operator fun unaryMinus(): Expression
+
+    open operator fun plus(other: Expression): Sum {
+        return Sum(listOf(this, other))
     }
-//    operator fun minus(exp: Expression): Difference {
-//        return Difference(this to exp)
-//    }
-////    operator fun times(exp: Expression): Product {
-////        return Product(this to exp)
-////    }
-//    operator fun div(exp: Expression): Quotient {
-//        return Quotient(this to exp)
-//    }
+    open operator fun minus(other: Expression): Sum {
+        return Sum(listOf(this, -other))
+    }
+    open operator fun times(other: Expression): Product {
+        return Product(listOf(this, other))
+    }
+    open operator fun div(other: Expression): Quotient {
+        return Quotient(this to other)
+    }
 }

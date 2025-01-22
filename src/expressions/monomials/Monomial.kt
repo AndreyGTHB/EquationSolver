@@ -5,15 +5,13 @@ import expressions.numerical.NumFraction
 
 
 data class Monomial(override val body: Pair<NumFraction, Map<Char, Int>>) : Expression() {
-    val coeff
-        get() = body.first
-    val varMap
-        get() = body.second
+    val coeff = body.first
+    val varMap = body.second
 
     override fun simplified(): Expression { return this }
     override fun simplifiedSoftly(): Monomial { return this }
 
-    operator fun unaryMinus(): Monomial {
+    override operator fun unaryMinus(): Monomial {
         return Monomial(-coeff to varMap)
     }
 
@@ -26,6 +24,9 @@ data class Monomial(override val body: Pair<NumFraction, Map<Char, Int>>) : Expr
         return Monomial(newCoeff to newVarMap)
     }
     operator fun times(other: Int): Monomial {
+        return Monomial(coeff * other to varMap)
+    }
+    operator fun times(other: NumFraction): Monomial {
         return Monomial(coeff * other to varMap)
     }
 

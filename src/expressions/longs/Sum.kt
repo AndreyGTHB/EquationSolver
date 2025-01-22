@@ -32,6 +32,11 @@ class Sum(body: List<Expression>) : LongExpression(body) {
     }
 
 
+    override operator fun unaryMinus(): Sum {
+        val newBody = body.map { -it }.toList()
+        return Sum(newBody)
+    }
+
     override operator fun plus(other: Expression):  Sum {
         return Sum(body + listOf(other))
     }

@@ -15,4 +15,12 @@ fun main() {
     sum += mon2 * 2
     println("Softly: ${sum.simplifiedSoftly()}")
     println("Fully: ${sum.simplified()}")
+
+    var currMon = mon1
+    for (i in 0..10000) {
+        currMon *= "a".toMonomial() * NumFraction(1 to 2)
+        sum += currMon
+    }
+    sum = sum.simplifiedSoftly()
+    println(1)
 }
