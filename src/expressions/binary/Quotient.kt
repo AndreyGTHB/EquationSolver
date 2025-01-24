@@ -1,6 +1,7 @@
 package expressions.binary
 
 import expressions.Expression
+import expressions.longs.LongExpression
 import expressions.longs.Sum
 import expressions.monomials.Monomial
 import expressions.numerical.NumFraction
@@ -10,25 +11,41 @@ class Quotient(body: Pair<Expression, Expression>) : BinaryExpression(body) {
     val denom = body.second
 
     override fun simplified(): Expression {
-        simplifiedSoftly()
-        return this
+        val simplifiedQuotient = simplifiedSoftly()
+        if (simplifiedQuotient.denom !is LongExpression) return simplifiedQuotient.singleDenomSimp()
+        return simplifiedQuotient
     }
 
-    override fun simplifiedSoftly(): Quotient { return this }
+    override fun simplifiedSoftly(): Quotient {
+        val simplifiedBody = simplifiedBody()
+        return Quotient(simplifiedBody)
+    }
 
 
-    private fun singleDenomBodySimp(): Pair<Expression, Expression> {
-        var newBody = emptyBody()
-        when (denom) {
-            is NumFraction -> newBody = numer / denom to NumFraction(1 to 1)
-            is Monomial -> {}
+    private fun singleDenomSimp(): Expression {
+        return when (denom) {
+            is NumFraction ->  numer / denom
+            is Monomial -> monomialDenomSimp()
+            else -> throw RuntimeException("The denominator is not single")
         }
     }
-    private fun monomialDenomBodySimp(): Pair<Expression, Expression> {
+    private fun monomialDenomSimp(): Expression {
         denom as Monomial
-        when (numer) {
-            is Monomial -> return numer /
+        return when (numer) {
+            is Monomial -> numer.divByMonomialOrNull(denom) ?: this
+            is Sum -> sumNumerMonomialDenomSimp()
+            else -> return this
         }
+    }
+    private fun sumNumerMonomialDenomSimp(): Expression {
+        numer as Sum
+        denom as Monomial
+        val newBody = mutableListOf<Expression>()
+        for (term in numer.body) {
+            if (term !is Monomial) return this
+            newBody.add(term.divByMonomialOrNull(denom) ?: return this)
+        }
+        return Sum(newBody)
     }
 
 
