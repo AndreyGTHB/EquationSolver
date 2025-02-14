@@ -12,9 +12,4 @@ abstract class LongExpression(override val body: List<Expression>) : Expression(
     override fun toString(): String {
         return body.toString()
     }
-
-
-    override operator fun unaryMinus(): Sum {
-        TODO("to implement")
-    }
 }

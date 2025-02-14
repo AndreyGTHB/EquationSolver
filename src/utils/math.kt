@@ -2,7 +2,7 @@ package utils
 
 import kotlin.math.abs
 
-fun LCD(a: Int, b: Int): Int {
+fun GCD(a: Int, b: Int): Int {
     var (big, small) = abs(a) to abs(b)
     var t = big
     if (big < small) {

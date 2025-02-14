@@ -1,7 +1,7 @@
 package expressions.numerical
 
 import expressions.Expression
-import utils.LCD
+import utils.GCD
 import kotlin.math.abs
 
 data class NumFraction(override val body: Pair<Int, Int>) : Expression() {
@@ -12,9 +12,9 @@ data class NumFraction(override val body: Pair<Int, Int>) : Expression() {
         return simplifiedSoftly()
     }
     override fun simplifiedSoftly(): NumFraction {
-        val lcd = LCD(numer, denom)
-        val newNumerator = (if (denom < 0) -numer else numer) / lcd
-        val newDenominator = abs(denom) / lcd
+        val gcd = GCD(numer, denom)
+        val newNumerator = (if (denom < 0) -numer else numer) / gcd
+        val newDenominator = abs(denom) / gcd
         return NumFraction(newNumerator to newDenominator)
     }
 

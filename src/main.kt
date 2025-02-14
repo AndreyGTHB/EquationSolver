@@ -10,17 +10,5 @@ fun main() {
     mon2 /= 3
     println("$mon1 $mon2")
 
-    var sum = mon1 + mon2
-    println(sum)
-    sum += mon2 * 2
-    println("Softly: ${sum.simplifiedSoftly()}")
-    println("Fully: ${sum.simplified()}")
-
-    var currMon = mon1
-    for (i in 0..10000) {
-        currMon *= "a".toMonomial() * NumFraction(1 to 2)
-        sum += currMon
-    }
-    sum = sum.simplifiedSoftly()
-    println(1)
+    val mon3 = "24*a*a*c*d"
 }
