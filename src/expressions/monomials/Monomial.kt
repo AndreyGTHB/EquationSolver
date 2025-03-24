@@ -38,11 +38,11 @@ data class Monomial(override val body: Pair<NumFraction, Map<Char, Int>>) : Expr
     }
     fun divByMonomialOrNull(other: Monomial): Monomial? {
         val newCoeff = this.coeff / other.coeff
-        val newVarMap = mutableMapOf<Char, Int>()
-        for ((k, v) in this.varMap) {
-            val newPower = v - (other.varMap[k] ?: 0)
-            if (newPower < 0) return null
-            if (newPower != 0) newVarMap[k] = newPower
+        val newVarMap = this.varMap.toMutableMap()
+        for ((k, v) in other.varMap) {
+            newVarMap[k] = (this.varMap[k] ?: 0) - v
+            if (newVarMap[k]!! < 0) return null
+            if (newVarMap[k]!! == 0) newVarMap.remove(k)
         }
         return Monomial(newCoeff to newVarMap)
     }
