@@ -17,8 +17,7 @@ class Quotient(body: Pair<Expression, Expression>) : BinaryExpression(body) {
     }
 
     override fun simplifiedSoftly(): Quotient {
-        val simplifiedBody = simplifiedBody()
-        return Quotient(simplifiedBody)
+        return Quotient(simplifiedBody())
     }
 
 

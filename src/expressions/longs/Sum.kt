@@ -10,31 +10,40 @@ class Sum(body: List<Expression>) : LongExpression(body) {
         return when (simplifiedSum.body.size) {
             0 -> NumFraction(0 to 1)
             1 -> simplifiedSum.body.first()
-            else -> { return simplifiedSum }
+            else -> simplifiedSum
         }
     }
 
     override fun simplifiedSoftly(): Sum {
         val simplifiedBody = simplifiedBody()
         val newBody = mutableListOf<Expression>()
+        var number = NumFraction(0 to 1)
         val varMaps: MutableMap<Map<Char, Int>, NumFraction> = mutableMapOf()
 
         for (exp in simplifiedBody) {
-            if (exp !is Monomial) { newBody.add(exp); continue }
-            val (coeff, vm) = exp.body
-            varMaps[vm] = varMaps.getOrDefault(vm, NumFraction(0 to 1)) + coeff
+            when (exp) {
+                is Monomial    -> {
+                    val (coeff, vm) = exp.body
+                    varMaps[vm] = (varMaps[vm] ?: NumFraction(0 to 1)) + coeff
+                }
+                is Sum         -> {
+                    for (term in exp.body) { newBody.add(term) }
+                }
+                is NumFraction -> { number += exp }
+                else           -> { newBody.add(exp) }
+            }
         }
+
+        newBody.add(number)
         varMaps.forEach { (vm, coeff) ->
             newBody.add(Monomial(coeff to vm))
         }
-
         return Sum(newBody)
     }
 
-//    fun factorOut(): Product {
-////        val commonFactor = body.first()
-////
-//    }
+    fun factorOut(): Product {
+        var commonFactor = body.first()
+    }
 
 
     override operator fun unaryMinus(): Sum {
