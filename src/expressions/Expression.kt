@@ -4,11 +4,20 @@ import expressions.binary.Quotient
 import expressions.longs.Product
 import expressions.longs.Sum
 
-abstract class Expression {
+abstract class Expression (open val final: Boolean = false) {
     abstract val body: Any
 
-    abstract fun simplified(): Expression
-    abstract fun simplifiedSoftly(): Expression
+    abstract fun simplify(): Expression
+    abstract fun simplifySoftly(): Expression
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null) return false
+        if (other::class == this::class) {
+            other as Expression
+            return other.body == this.body
+        }
+        return false
+    }
 
     abstract operator fun unaryMinus(): Expression
 
@@ -23,5 +32,9 @@ abstract class Expression {
     }
     open operator fun div(other: Expression): Quotient {
         return Quotient(this to other)
+    }
+
+    override fun hashCode(): Int {
+        return javaClass.hashCode()
     }
 }

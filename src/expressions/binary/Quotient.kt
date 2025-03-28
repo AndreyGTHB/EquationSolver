@@ -4,26 +4,30 @@ import expressions.Expression
 import expressions.longs.LongExpression
 import expressions.longs.Sum
 import expressions.monomials.Monomial
-import expressions.numerical.NumFraction
+import expressions.numerical.Fraction
 
-class Quotient(body: Pair<Expression, Expression>) : BinaryExpression(body) {
+class Quotient private constructor(body: Pair<Expression, Expression>, final: Boolean) : BinaryExpression(body, final) {
     val numer = body.first
     val denom = body.second
 
-    override fun simplified(): Expression {
-        val simplifiedQuotient = simplifiedSoftly()
+    constructor(body: Pair<Expression, Expression>) : this(body, false)
+
+    override fun simplify(): Expression {
+        if (final) return this
+
+        val simplifiedQuotient = simplifySoftly()
         if (simplifiedQuotient.denom !is LongExpression) return simplifiedQuotient.singleDenomSimp()
         return simplifiedQuotient
     }
 
-    override fun simplifiedSoftly(): Quotient {
+    override fun simplifySoftly(): Quotient {
         return Quotient(simplifiedBody())
     }
 
 
     private fun singleDenomSimp(): Expression {
         return when (denom) {
-            is NumFraction ->  numer / denom
+            is Fraction ->  numer / denom
             is Monomial -> monomialDenomSimp()
             else -> throw RuntimeException("The denominator is not single")
         }
@@ -48,7 +52,7 @@ class Quotient(body: Pair<Expression, Expression>) : BinaryExpression(body) {
     }
 
 
-    override operator fun unaryMinus(): Sum {
-        TODO("to implement")
+    override operator fun unaryMinus(): Quotient {
+        return Quotient(-numer to denom)
     }
 }

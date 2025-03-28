@@ -1,4 +1,3 @@
-import expressions.monomials.Monomial
 import utils.toMonomial
 
 fun main() {
@@ -6,6 +5,6 @@ fun main() {
     val mon2 = "-1*d*a*d*b*c".toMonomial()
     var quot = mon1 / mon2
     println("${quot.numer} ${quot.denom}")
-    quot = quot.simplifiedSoftly()
+    quot = quot.simplifySoftly()
     println(quot)
 }

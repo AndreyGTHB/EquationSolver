@@ -1,5 +1,6 @@
 package utils
 
+import expressions.numerical.Fraction
 import kotlin.math.abs
 
 fun GCD(a: Int, b: Int): Int {
@@ -16,4 +17,9 @@ fun GCD(a: Int, b: Int): Int {
         small = t % small
     }
     return big
+}
+
+
+fun Int.toFraction(): Fraction {
+    return Fraction(this to 1)
 }
