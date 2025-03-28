@@ -1,10 +1,9 @@
 package expressions.longs
 
-import expressions.Reducible
 import expressions.Expression
 import expressions.numerical.Fraction
 
-class Product private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final), Reducible {
+class Product private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
     constructor(body: List<Expression>) : this(body, false)
 
     override fun simplify(): Expression {

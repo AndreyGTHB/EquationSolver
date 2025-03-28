@@ -1,6 +1,5 @@
 package expressions.numerical
 
-import expressions.Reducible
 import expressions.Expression
 import expressions.longs.Product
 import utils.GCD

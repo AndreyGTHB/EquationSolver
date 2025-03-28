@@ -3,6 +3,7 @@ package expressions.longs
 import expressions.Expression
 import expressions.monomials.Monomial
 import expressions.numerical.Fraction
+import utils.toFraction
 
 class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
     constructor(body: List<Expression>) : this(body, false)
@@ -48,9 +49,12 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
         return Sum(newBody)
     }
 
-//    fun factorOut(): Product {
-//        var commonFactor = body.first()
-//    }
+    fun factorOut(): Expression {
+        var totalCF: Expression = 0.toFraction()
+        body.forEach {
+            if (it is Reducible) totalCF = it.commonFactor(totalCF)
+        }
+    }
 
 
     override operator fun unaryMinus(): Sum {

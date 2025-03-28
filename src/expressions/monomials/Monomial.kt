@@ -1,7 +1,7 @@
 package expressions.monomials
 
-import expressions.Reducible
 import expressions.Expression
+import expressions.ReducibleExpression
 import expressions.binary.Quotient
 import expressions.longs.Product
 import expressions.longs.Sum
@@ -13,7 +13,7 @@ import kotlin.math.min
 class Monomial private constructor(
     override val body: Pair<Fraction, Map<Char, Int>>,
     final: Boolean
-) : Expression(final), Reducible {
+) : ReducibleExpression(final) {
     val coeff = body.first
     val varMap = body.second
 
@@ -35,8 +35,9 @@ class Monomial private constructor(
         return Monomial(sortedBody, true)
     }
 
-    override fun commonFactor(other: Expression): Expression {
-        if(!(this.final && other.final)) throw RuntimeException ("Cannot process a non-simplified expression")
+    override fun commonFactor(o: ReducibleExpression): Expression {
+        if(!final) throw RuntimeException ("Cannot be called on a non-simplified expression")
+        val other = o.simplify()
         if (other is Fraction) {
             return if (other.isNull()) this else 1.toFraction()
         }
@@ -73,7 +74,7 @@ class Monomial private constructor(
         return commonFactorWithMonomial(totalMonomial)
     }
     private fun commonFactorWithSum(other: Sum): Expression {
-        val commonSumFactor = other.factorOut().simpllify()
+        val commonSumFactor = other.factorOut()
         return commonFactor(commonSumFactor)
     }
 
