@@ -1,6 +1,7 @@
 package expressions.longs
 
 import expressions.Expression
+import expressions.ReducibleExpression
 import expressions.monomials.Monomial
 import expressions.numerical.Fraction
 import utils.toFraction
@@ -11,23 +12,31 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
     override fun simplify(): Expression {
         if (final) return this
 
-        val simplifiedSum = simplifySoftly()
-        return when (simplifiedSum.body.size) {
+        val simpleSum = simplifySoftly()
+        return when (simpleSum.body.size) {
             0 -> Fraction(0 to 1)
-            1 -> simplifiedSum.body.first()
-            else -> Sum(simplifiedSum.body, true)
+            1 -> simpleSum.body.first()
+            else -> Sum(simpleSum.body, true)
         }
     }
 
     override fun simplifySoftly(): Sum {
         if (final) return this
 
-        val simplifiedBody = simplifiedBody()
-        val newBody = mutableListOf<Expression>()
+        val newBody = simplifiedBody().toMutableList()
         var freeTerm = Fraction(0 to 1)
         val varMaps: MutableMap<Map<Char, Int>, Fraction> = mutableMapOf()
 
-        for (exp in simplifiedBody) {
+        // Associativity
+        for ((i, exp) in newBody.withIndex()) { // A bad moment
+            if (exp is Sum) {
+                newBody.removeAt(i)
+                exp.body.forEach { newBody.add(it) }
+            }
+            else newBody.add(exp)
+        }
+        // Reduction of similar terms
+        for (exp in newBody) {
             when (exp) {
                 is Monomial    -> {
                     val (coeff, vm) = exp.body
@@ -50,10 +59,11 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
     }
 
     fun factorOut(): Expression {
-        var totalCF: Expression = 0.toFraction()
+        var newCF: Expression = 0.toFraction()
         body.forEach {
-            if (it is Reducible) totalCF = it.commonFactor(totalCF)
+            if (it is ReducibleExpression) newCF = it.commonFactor(newCF)
         }
+        return newCF
     }
 
 

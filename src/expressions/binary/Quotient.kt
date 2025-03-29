@@ -35,7 +35,7 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
     private fun monomialDenomSimp(): Expression {
         denom as Monomial
         return when (numer) {
-            is Monomial -> numer.divByMonomialOrNull(denom) ?: this
+            is Monomial -> numer.reduceByMonomialOrNull(denom) ?: this
             is Sum -> sumNumerMonomialDenomSimp()
             else -> return this
         }
@@ -46,7 +46,7 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
         val newBody = mutableListOf<Expression>()
         for (term in numer.body) {
             if (term !is Monomial) return this
-            newBody.add(term.divByMonomialOrNull(denom) ?: return this)
+            newBody.add(term.reduceByMonomialOrNull(denom) ?: return this)
         }
         return Sum(newBody)
     }

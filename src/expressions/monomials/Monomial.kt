@@ -22,34 +22,28 @@ class Monomial private constructor(
     override fun simplify(): Expression {
         if (final) { return this }
 
-        val simplifiedMonomial = simplifySoftly()
-        if (simplifiedMonomial.coeff.isNull()) return Fraction(0 to 1)
-        return simplifiedMonomial
+        val simpleMonomial = simplifySoftly()
+        if (simpleMonomial.coeff.isNull()) return Fraction(0 to 1)
+        return simpleMonomial
     }
     override fun simplifySoftly(): Monomial {
         if (final) { return this }
 
-        val simplifiedCoeff = coeff.simplify()
+        val simpleCoeff = coeff.simplify()
         val sortedVarMap = varMap.toSortedMap()
-        val sortedBody = simplifiedCoeff to sortedVarMap
+        val sortedBody = simpleCoeff to sortedVarMap
         return Monomial(sortedBody, true)
     }
 
-    override fun commonFactor(o: ReducibleExpression): Expression {
-        if(!final) throw RuntimeException ("Cannot be called on a non-simplified expression")
-        val other = o.simplify()
-        if (other is Fraction) {
-            return if (other.isNull()) this else 1.toFraction()
-        }
-
-        val commonFactor = when (other) {
-            is Monomial -> commonFactorWithMonomial(other)
-            is Product -> commonFactorWithProduct(other)
-            is Sum -> commonFactorWithSum(other)
-            is Quotient -> commonFactor(other.numer)
+    override fun commonFactor(other: Expression): Expression {
+        if (!final) throw RuntimeException("A non-simplified monomial cannot be reduced")
+        return when (val simpleOther = other.simplify()) {
+            is Monomial -> commonFactorWithMonomial(simpleOther)
+            is Product -> commonFactorWithProduct(simpleOther)
+            is Sum -> commonFactorWithSum(simpleOther)
+            is Quotient -> commonFactor(simpleOther.numer)
             else -> 1.toFraction()
         }
-        return commonFactor
 
     }
     private fun commonFactorWithMonomial(other: Monomial): Expression {
@@ -63,19 +57,38 @@ class Monomial private constructor(
         return Monomial(1.toFraction() to commonVarMap)
     }
     private fun commonFactorWithProduct(other: Product): Expression {
-        val totalVarMap = mutableMapOf<Char, Int>()
+        val finalVarMap = mutableMapOf<Char, Int>()
         other.body.forEach {
             val currCF = commonFactor(it)
             if (currCF is Monomial) {
-                currCF.varMap.forEach {(v, d) -> totalVarMap[v] = (totalVarMap[v] ?: 0) + d }
+                currCF.varMap.forEach {(v, d) -> finalVarMap[v] = (finalVarMap[v] ?: 0) + d }
             }
         }
-        val totalMonomial = Monomial(1.toFraction() to totalVarMap)
-        return commonFactorWithMonomial(totalMonomial)
+        val finalMonomial = Monomial(1.toFraction() to finalVarMap)
+        return commonFactorWithMonomial(finalMonomial)
     }
     private fun commonFactorWithSum(other: Sum): Expression {
         val commonSumFactor = other.factorOut()
         return commonFactor(commonSumFactor)
+    }
+
+    override fun reduceOrNull(other: Expression): Expression? {
+        if (this.final) throw RuntimeException("A non-simplified monomial cannot be reduced")
+        return when (val simpleOther = other.simplify()) {
+            is Fraction -> 1.toFraction()
+            is Monomial -> reduceByMonomialOrNull(simpleOther)
+            else -> null
+        }
+    }
+    private fun reduceByMonomialOrNull(other: Monomial): Monomial? {
+        val newCoeff = this.coeff / other.coeff
+        val newVarMap = this.varMap.toMutableMap()
+        for ((v, d) in other.varMap) {
+            newVarMap[v] = (this.varMap[v] ?: 0) - d
+            if (newVarMap[v]!! < 0) return null
+            if (newVarMap[v]!! == 0) newVarMap.remove(v)
+        }
+        return Monomial(newCoeff to newVarMap)
     }
 
     override operator fun unaryMinus(): Monomial {
@@ -102,16 +115,6 @@ class Monomial private constructor(
     }
     operator fun div(other: Fraction): Monomial {
         return Monomial(coeff / other to varMap)
-    }
-    fun divByMonomialOrNull(other: Monomial): Monomial? {
-        val newCoeff = this.coeff / other.coeff
-        val newVarMap = this.varMap.toMutableMap()
-        for ((v, d) in other.varMap) {
-            newVarMap[v] = (this.varMap[v] ?: 0) - d
-            if (newVarMap[v]!! < 0) return null
-            if (newVarMap[v]!! == 0) newVarMap.remove(v)
-        }
-        return Monomial(newCoeff to newVarMap)
     }
 
 
