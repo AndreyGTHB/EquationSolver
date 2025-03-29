@@ -1,9 +1,9 @@
 package expressions.longs
 
 import expressions.Expression
-import expressions.ReducibleExpression
 import expressions.monomials.Monomial
 import expressions.numerical.Fraction
+import expressions.commonFactor
 import utils.toFraction
 
 class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
@@ -19,7 +19,6 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
             else -> Sum(simpleSum.body, true)
         }
     }
-
     override fun simplifySoftly(): Sum {
         if (final) return this
 
@@ -58,14 +57,21 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
         return Sum(newBody)
     }
 
-    fun factorOut(): Expression {
-        var newCF: Expression = 0.toFraction()
+    override fun commonFactor(other: Expression): Expression {
+        return commonFactor(factorOut(), other)
+    }
+    private fun factorOut(): Expression {
+        var cf: Expression = 0.toFraction()
         body.forEach {
-            if (it is ReducibleExpression) newCF = it.commonFactor(newCF)
+            cf = commonFactor(cf, it)
         }
-        return newCF
+        return cf
     }
 
+    override fun reduceOrNull(other: Expression): Expression? {
+        val newBody = body.map { it.reduceOrNull(other) ?: return null }
+        return Sum(newBody).simplify()
+    }
 
     override operator fun unaryMinus(): Sum {
         val newBody = body.map { -it }.toList()

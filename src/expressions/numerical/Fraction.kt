@@ -6,34 +6,46 @@ import utils.GCD
 import utils.toFraction
 import kotlin.math.abs
 
-data class Fraction(override val body: Pair<Int, Int>) : Expression(), Reducible {
+class Fraction private constructor(override val body: Pair<Int, Int>, final: Boolean) : Expression(final) {
+    constructor(body: Pair<Int, Int>) : this(body, false)
+    override val final: Boolean
+        get() = GCD(numer, denom) == 1
+
+    companion object {
+        fun nullFraction(): Fraction = Fraction(0 to 1, true)
+    }
+
     val numer = body.first
     val denom = body.second
-    override val final get() = GCD(numer, denom) == 1
 
     init {
         if (denom == 0) { throw RuntimeException("Zero division") }
     }
 
     override fun simplify(): Fraction {
+        if (final) return this
         return simplifySoftly()
     }
     override fun simplifySoftly(): Fraction {
+        if (isNull()) return nullFraction()
+
         val gcd = GCD(numer, denom)
-        val newNumerator = (if (denom < 0) -numer else numer) / gcd
-        val newDenominator = abs(denom) / gcd
-        return Fraction(newNumerator to newDenominator)
+        val newNumer = (if (denom < 0) -numer else numer) / gcd
+        val newDenom = abs(denom) / gcd
+        return Fraction(newNumer to newDenom, true)
     }
 
-    override fun commonFactor(other: Expression): Fraction {
-        if (other is Fraction) {
-            if (other.isNull()) return this
+    override fun commonFactor(other: Expression): Fraction? {
+        if (other is Fraction && other.isNull()) {
+            if (this.isNull()) throw RuntimeException("Two zeros")
+            return this
         }
-        return 1.toFraction()
+        return null
     }
-    override fun reduceBy(other: Expression): Fraction {
-        other as Fraction
-        return this / other
+    override fun reduceOrNull(other: Expression): Fraction? {
+        if (isNull()) return this
+        if (other is Fraction) return (this / other).simplify()
+        return null
     }
 
     fun isNull(): Boolean = numer == 0
