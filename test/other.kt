@@ -22,4 +22,6 @@ fun main() {
     a.method(b)
     a.method(c)
     a.method(cb)
+    val x = 0
+
 }
