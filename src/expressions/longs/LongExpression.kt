@@ -1,12 +1,11 @@
 package expressions.longs
 
 import expressions.Expression
-import expressions.ReducibleExpression
 
 abstract class LongExpression (
     override val body: List<Expression>,
     final: Boolean
-) : ReducibleExpression(final) {
+) : Expression(final) {
     protected fun simplifiedBody(): List<Expression> {
         val newBody = body.map { it.simplify() }
             .toList()
