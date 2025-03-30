@@ -1,9 +1,6 @@
 package expressions.binary
 
 import expressions.Expression
-import expressions.longs.LongExpression
-import expressions.longs.Sum
-import expressions.monomials.Monomial
 import expressions.numerical.Fraction
 import expressions.commonFactor
 
@@ -21,7 +18,7 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
         return simpleThis
     }
     override fun simplifySoftly(): Quotient {
-        val (simpleNumer, simpleDenom) = simplifiedBody()
+        val (simpleNumer, simpleDenom) = simplifyBody()
         val cf = commonFactor(simpleNumer, simpleDenom)
         val reducedNumer = simpleNumer.reduceOrNull(cf)!!
         val reducedDenom = simpleDenom.reduceOrNull(cf)!!

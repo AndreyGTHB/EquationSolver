@@ -2,18 +2,14 @@ package expressions.numerical
 
 import expressions.Expression
 import expressions.longs.Product
+import expressions.nullFraction
 import utils.GCD
 import utils.toFraction
 import kotlin.math.abs
 
-class Fraction private constructor(override val body: Pair<Int, Int>, final: Boolean) : Expression(final) {
-    constructor(body: Pair<Int, Int>) : this(body, false)
+class Fraction (override val body: Pair<Int, Int>) : Expression() {
     override val final: Boolean
         get() = GCD(numer, denom) == 1
-
-    companion object {
-        fun nullFraction(): Fraction = Fraction(0 to 1, true)
-    }
 
     val numer = body.first
     val denom = body.second
@@ -32,7 +28,7 @@ class Fraction private constructor(override val body: Pair<Int, Int>, final: Boo
         val gcd = GCD(numer, denom)
         val newNumer = (if (denom < 0) -numer else numer) / gcd
         val newDenom = abs(denom) / gcd
-        return Fraction(newNumer to newDenom, true)
+        return Fraction(newNumer to newDenom)
     }
 
     override fun commonFactor(other: Expression): Fraction? {
@@ -48,8 +44,23 @@ class Fraction private constructor(override val body: Pair<Int, Int>, final: Boo
         return null
     }
 
-    fun isNull(): Boolean = numer == 0
     fun flip(): Fraction = Fraction(denom to numer)
+
+    fun isNull(): Boolean = equals(0)
+    fun isUnit(): Boolean = equals(1)
+    override fun equals(other: Any?): Boolean {
+        other ?: return false
+        return when (other) {
+            is Fraction -> equalsToFraction(other)
+            is Int -> equalsToFraction(other.toFraction())
+            else -> false
+        }
+    }
+    private fun equalsToFraction(other: Fraction): Boolean {
+        val (thisNumer, thisDenom) = this.simplify().body
+        val (otherNumer, otherDenom) = other.simplify().body
+        return thisNumer == otherNumer && thisDenom == otherDenom
+    }
 
     operator fun plus(other: Int): Fraction {
         return Fraction(numer + other * denom to denom)

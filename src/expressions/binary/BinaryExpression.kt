@@ -7,7 +7,7 @@ abstract class BinaryExpression (
     override val body: Pair<Expression, Expression>,
     final: Boolean
 ) : Expression(final) {
-    protected fun simplifiedBody(): Pair<Expression, Expression> {
+    protected fun simplifyBody(): Pair<Expression, Expression> {
         return body.first.simplify() to body.second.simplify()
     }
     protected fun emptyBody(): Pair<Expression, Expression> {

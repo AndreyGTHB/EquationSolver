@@ -1,37 +1,70 @@
 package expressions.longs
 
-import expressions.Expression
-import expressions.commonFactor
+import expressions.*
 import expressions.monomials.Monomial
 import expressions.numerical.Fraction
-import expressions.unitFraction
-import expressions.unitMonomial
 import utils.toFraction
 
 class Product private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
     constructor(body: List<Expression>) : this(body, false)
 
-    override fun simplify(): Expression {
-        if (final) return this
-        val simplifiedProduct = simplifySoftly()
+    companion object {
+        fun nullProduct(): Product = Product(listOf(nullFraction()), true)
+    }
 
-        // Expanding brackets
-        for ((i, exp) in simplifiedProduct.body.withIndex()) {
-            if (exp is Sum) {
-                val expandedBody: MutableList<Expression> = mutableListOf()
-                for (term in exp.body) {
-                    val productBody = mutableListOf(term)
-                    productBody += simplifiedProduct.body.slice(0 until i)
-                    productBody += simplifiedProduct.body.slice(i+1 until simplifiedProduct.body.size)
-                    expandedBody.add(Product(productBody))
-                }
-                return Sum(expandedBody).simplify()
-            }
-        }
-        return Product(simplifiedProduct.body, true)
+    override fun simplify(): Expression {
+        return simplify(false)
+    }
+    fun simplify(expandBrackets: Boolean): Expression {
+        if (final) return this
+        val simpleThis = simplifySoftly()
+        val simpleBody = simpleThis.body
+
+        if (simpleBody.size == 1) simpleBody.first()
+        if (expandBrackets) return simpleThis.expandBrackets().simplify()
+        return Product(simpleBody, true)
     }
     override fun simplifySoftly(): Product {
-        return Product(simplifiedBody())
+        var prevBody = simplifyBody()
+        var currBody = mutableListOf<Expression>()
+        prevBody.forEach {fact ->
+            if (fact is Product) fact.body.forEach { subFact -> currBody.add(subFact) }
+            else                                                currBody.add(fact)
+        }
+
+        prevBody = currBody
+        currBody = mutableListOf<Expression>()
+        var numFactor = unitFraction()
+        var monomialFactor = unitMonomial()
+        prevBody.forEach { fact ->
+            when (fact) {
+                is Fraction -> {
+                    if (fact.isNull()) return nullProduct()
+                    numFactor *= fact
+                }
+                is Monomial -> monomialFactor *= fact
+                else        -> currBody.add(fact)
+            }
+        }
+        if (!numFactor.isUnit()) currBody.add(numFactor.simplify())
+        if (!monomialFactor.isUnit()) currBody.add(monomialFactor.simplify())
+        return Product(currBody)
+    }
+
+    private fun expandBrackets(): Sum {
+        for ((i, fact) in body.withIndex()) {
+            if (fact is Sum) {
+                val expandedBody: MutableList<Expression> = mutableListOf()
+                for (term in fact.body) {
+                    val productBody = mutableListOf(term)
+                    productBody += body.slice(0 until i)
+                    productBody += body.slice(i+1 until body.size)
+                    expandedBody.add(Product(productBody))
+                }
+                return Sum(expandedBody)
+            }
+        }
+        return Sum(body)
     }
 
     override fun commonFactor(other: Expression): Expression? {

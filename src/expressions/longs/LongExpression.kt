@@ -6,7 +6,7 @@ abstract class LongExpression (
     override val body: List<Expression>,
     final: Boolean
 ) : Expression(final) {
-    protected fun simplifiedBody(): List<Expression> {
+    protected fun simplifyBody(): List<Expression> {
         val newBody = body.map { it.simplify() }
             .toList()
         return newBody

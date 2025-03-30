@@ -22,7 +22,7 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
     override fun simplifySoftly(): Sum {
         if (final) return this
 
-        val newBody = simplifiedBody().toMutableList()
+        val newBody = simplifyBody().toMutableList()
         var freeTerm = Fraction(0 to 1)
         val varMaps: MutableMap<Map<Char, Int>, Fraction> = mutableMapOf()
 
