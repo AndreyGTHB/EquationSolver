@@ -58,9 +58,9 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
     }
 
     override fun commonFactor(other: Expression): Expression {
-        return commonFactor(factorOut(), other)
+        return commonFactor(commonInternalFactor(), other)
     }
-    private fun factorOut(): Expression {
+    fun commonInternalFactor(): Expression {
         var cf: Expression = 0.toFraction()
         body.forEach {
             cf = commonFactor(cf, it)
