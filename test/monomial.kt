@@ -1,10 +1,12 @@
+import expressions.monomials.Monomial
+import utils.toFraction
 import utils.toMonomial
 
 fun main() {
-    val m1 = "32*a*d*d*n*n*n*c".toMonomial()
-    val m2 = "32*d*a*d*n*n*c*n".toMonomial()
-    println(m1)
-    println(m2)
-    println(m1*m2)
-    println((m1 / m2).simplify())
+    val m1 = "5*a".toMonomial().simplify()
+    val m2 = "a".toMonomial().simplify()
+    println(m2.reduceOrNull(m1))
+
+    val m3 = Monomial(3.toFraction() to mapOf('v' to 0))
+    println(m3.simplify())
 }

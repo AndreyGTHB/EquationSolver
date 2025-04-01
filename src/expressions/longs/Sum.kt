@@ -82,4 +82,7 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
     override operator fun plus(other: Expression):  Sum {
         return Sum(body + listOf(other))
     }
+    override operator fun minus(other: Expression): Sum {
+        return Sum(body + listOf(-other))
+    }
 }

@@ -41,6 +41,7 @@ fun String.toVarMap(): Map<Char, Int> {
         }
         else { degree += c }
     }
+    varMap[currLetter] = degree.toInt()
 
     return varMap
 }

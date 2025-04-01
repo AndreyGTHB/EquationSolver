@@ -18,15 +18,16 @@ class Monomial private constructor(override val body: Pair<Fraction, Map<Char, I
 
         val simpleMonomial = simplifySoftly()
         if (simpleMonomial.coeff.isNull()) return nullFraction()
+        if (simpleMonomial.varMap.isEmpty()) return simpleMonomial.coeff
         return simpleMonomial
     }
     override fun simplifySoftly(): Monomial {
         if (final) { return this }
 
         val simpleCoeff = coeff.simplify()
-//        val sortedVarMap = varMap.toSortedMap()
+        val simpleVarMap = varMap.filterValues { it != 0 }
 //        val sortedBody = simpleCoeff to sortedVarMap
-        return Monomial(simpleCoeff to varMap, true)
+        return Monomial(simpleCoeff to simpleVarMap, true)
     }
 
     override fun commonFactor(other: Expression): Expression? {
