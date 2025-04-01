@@ -19,3 +19,28 @@ fun String.toMonomial(): Monomial {
     }
     return Monomial(coefficient to variables)
 }
+
+fun varMapToString(varMap: Map<Char, Int>): String {
+    var str = ""
+    varMap.toSortedMap().forEach { v, d ->
+        str += "$v$d"
+    }
+    return str
+}
+fun String.toVarMap(): Map<Char, Int> {
+    val varMap = mutableMapOf<Char, Int>()
+    var degree = ""
+    var currLetter: Char = this.first()
+    this.forEachIndexed { i, c ->
+        if (c.isLetter()) {
+            if (i != 0) {
+                varMap[currLetter] = degree.toInt()
+                degree = ""
+            }
+            currLetter = c
+        }
+        else { degree += c }
+    }
+
+    return varMap
+}

@@ -28,26 +28,19 @@ class Fraction (override val body: Pair<Int, Int>) : Expression() {
         val gcd = GCD(numer, denom)
         val newNumer = (if (denom < 0) -numer else numer) / gcd
         val newDenom = abs(denom) / gcd
+        if (newNumer == 0) return nullFraction()
         return Fraction(newNumer to newDenom)
     }
 
-    override fun commonFactor(other: Expression): Fraction? {
-        if (other is Fraction && other.isNull()) {
-            if (this.isNull()) throw RuntimeException("Two zeros")
-            return this
-        }
-        return null
-    }
     override fun reduceOrNull(other: Expression): Fraction? {
-        if (isNull()) return this
         if (other is Fraction) return (this / other).simplify()
         return null
     }
 
     fun flip(): Fraction = Fraction(denom to numer)
 
-    fun isNull(): Boolean = equals(0)
-    fun isUnit(): Boolean = equals(1)
+    fun isNull(): Boolean = numer == 0
+    fun isUnit(): Boolean = numer == denom
     override fun equals(other: Any?): Boolean {
         other ?: return false
         return when (other) {
@@ -61,6 +54,9 @@ class Fraction (override val body: Pair<Int, Int>) : Expression() {
         val (otherNumer, otherDenom) = other.simplify().body
         return thisNumer == otherNumer && thisDenom == otherDenom
     }
+
+    fun isPositive(): Boolean = numer * denom > 0
+    fun isNegative(): Boolean = !(isPositive() || isNull())
 
     operator fun plus(other: Int): Fraction {
         return Fraction(numer + other * denom to denom)
@@ -101,7 +97,6 @@ class Fraction (override val body: Pair<Int, Int>) : Expression() {
     operator fun inc(): Fraction {
         return this + 1
     }
-
 
     override fun toString(): String = "$numer/$denom"
     fun toFloat(): Float = numer.toFloat() / denom

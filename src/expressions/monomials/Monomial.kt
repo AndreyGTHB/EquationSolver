@@ -1,9 +1,6 @@
 package expressions.monomials
 
 import expressions.Expression
-import expressions.binary.Quotient
-import expressions.longs.Product
-import expressions.longs.Sum
 import expressions.nullFraction
 import expressions.numerical.Fraction
 import utils.toFraction
@@ -72,7 +69,7 @@ class Monomial private constructor(override val body: Pair<Fraction, Map<Char, I
     fun isUnit(): Boolean = simplify().equals(1)
 
     override operator fun unaryMinus(): Monomial {
-        return Monomial(-coeff to varMap)
+        return Monomial(-coeff to varMap, final)
     }
 
     operator fun times(other: Monomial): Monomial {

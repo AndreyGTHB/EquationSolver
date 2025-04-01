@@ -26,28 +26,34 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
     override fun simplifySoftly(): Product {
         if (final) return this
 
+        // Associativity
         var prevBody = simplifyBody()
         var currBody = mutableListOf<Expression>()
-        prevBody.forEach {fact ->
+        prevBody.forEach { fact ->
             if (fact is Product) fact.body.forEach { subFact -> currBody.add(subFact) }
             else                                                currBody.add(fact)
         }
 
+        // Extracting common factors from the sums
+        prevBody = currBody
+        currBody = Product(prevBody)
+            .factorOutSums()
+            .body.toMutableList()
+
+        // Simplifying
         prevBody = currBody
         currBody = mutableListOf()
-        var numFactor = unitFraction()
         var monomialFactor = unitMonomial()
         prevBody.forEach { fact ->
             when (fact) {
                 is Fraction -> {
                     if (fact.isNull()) return nullProduct()
-                    numFactor *= fact
+                    monomialFactor *= fact
                 }
                 is Monomial -> monomialFactor *= fact
                 else        -> currBody.add(fact)
             }
         }
-        if (!numFactor.isUnit()) currBody.add(numFactor.simplify())
         if (!monomialFactor.isUnit()) currBody.add(monomialFactor.simplify())
         return Product(currBody)
     }
@@ -76,8 +82,8 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
                     newBody.add(cf)
                     newBody.add(it.reduceOrNull(cf)!!)
                 }
-                else newBody.add(it)
             }
+            else newBody.add(it)
         }
         return Product(newBody)
     }
@@ -89,7 +95,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
             else -> null
         }
     }
-    private fun commonFactorWithMonomial(other: Monomial): Monomial? {
+    private fun commonFactorWithMonomial(other: Monomial): Monomial {
         var cf = unitMonomial()
         var currOther = other
         for (it in body) {
@@ -102,7 +108,6 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
                 currOther = reduced
             }
         }
-        if (cf.varMap.isEmpty()) return null
         return cf
     }
     private fun commonFactorWithProduct(other: Product): Expression {
@@ -119,7 +124,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
                 }
             }
         }
-        return Product(cfBody).simplify()
+        return Product(cfBody)
     }
 
     override fun reduceOrNull(other: Expression): Expression? {
@@ -135,7 +140,9 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
             newBody.add(it.reduceOrNull(cf)!!)
             currOther = currOther.reduceOrNull(cf)!!
         }
-        if (currOther is Fraction) return Product(newBody).simplify()
+        if (currOther is Fraction) return Product(newBody)
+                                              .reduceOrNull(currOther)!!
+                                              .simplify()
         return null
     }
 

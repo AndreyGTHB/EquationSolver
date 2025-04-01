@@ -4,7 +4,10 @@ import expressions.Expression
 import expressions.monomials.Monomial
 import expressions.numerical.Fraction
 import expressions.commonFactor
+import expressions.nullFraction
 import utils.toFraction
+import utils.toVarMap
+import utils.varMapToString
 
 class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
     constructor(body: List<Expression>) : this(body, false)
@@ -22,39 +25,37 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
     override fun simplifySoftly(): Sum {
         if (final) return this
 
-        val newBody = simplifyBody().toMutableList()
-        var freeTerm = Fraction(0 to 1)
-        val varMaps: MutableMap<Map<Char, Int>, Fraction> = mutableMapOf()
-
+        var prevBody = simplifyBody()
+        var currBody = mutableListOf<Expression>()
         // Associativity
-        for ((i, exp) in newBody.withIndex()) { // A bad moment
-            if (exp is Sum) {
-                newBody.removeAt(i)
-                exp.body.forEach { newBody.add(it) }
-            }
-            else newBody.add(exp)
+        prevBody.forEach { term ->
+            if (term is Sum) { term.body.forEach { subTerm -> currBody.add(subTerm) } }
+            else                                              currBody.add(term)
         }
+
         // Reduction of similar terms
-        for (exp in newBody) {
-            when (exp) {
-                is Monomial    -> {
-                    val (coeff, vm) = exp.body
-                    varMaps[vm] = (varMaps[vm] ?: Fraction(0 to 1)) + coeff
+        prevBody = currBody
+        currBody = mutableListOf()
+        var freeTerm = Fraction(0 to 1)
+        val varMapStrings: MutableMap<String, Fraction> = mutableMapOf()
+        prevBody.forEach { term ->
+            when (term) {
+                is Fraction -> { freeTerm += term }
+                is Monomial -> {
+                    val varMapString = varMapToString(term.varMap)
+                    varMapStrings[varMapString] = (varMapStrings[varMapString] ?: nullFraction()) + term.coeff
                 }
-                is Sum         -> {
-                    for (term in exp.body) { newBody.add(term) }
-                }
-                is Fraction -> { freeTerm += exp }
-                else           -> { newBody.add(exp) }
+                else ->        { currBody.add(term) }
             }
         }
 
         freeTerm = freeTerm.simplify()
-        if (!freeTerm.isNull()) newBody.add(freeTerm)
-        varMaps.forEach { (vm, coeff) ->
-            newBody.add(Monomial(coeff to vm))
+        if (!freeTerm.isNull()) currBody.add(freeTerm)
+        varMapStrings.forEach { (vms, coeff) ->
+            val vm = vms.toVarMap()
+            if (!coeff.isNull()) { currBody.add(Monomial(coeff to vm).simplify()) }
         }
-        return Sum(newBody)
+        return Sum(currBody)
     }
 
     override fun commonFactor(other: Expression): Expression {

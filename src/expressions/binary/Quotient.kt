@@ -14,10 +14,12 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
         if (final) return this
 
         val simpleThis = simplifySoftly()
-        if (simpleThis.denom is Fraction) return simpleThis.numer.reduceOrNull(simpleThis.denom) ?: simpleThis
+        if (simpleThis.denom is Fraction) return simpleThis.numer.reduceOrNull(simpleThis.denom)!!
         return simpleThis
     }
     override fun simplifySoftly(): Quotient {
+        if (final) return this
+
         val (simpleNumer, simpleDenom) = simplifyBody()
         val cf = commonFactor(simpleNumer, simpleDenom)
         val reducedNumer = simpleNumer.reduceOrNull(cf)!!
