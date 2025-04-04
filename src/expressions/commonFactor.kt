@@ -1,7 +1,6 @@
 package expressions
 
 import expressions.numerical.Fraction
-import utils.toFraction
 
 fun commonFactor(a: Expression, b: Expression): Expression {
     if (!(a.final && b.final)) throw RuntimeException("Extracting a factor from a non-simplified expression")

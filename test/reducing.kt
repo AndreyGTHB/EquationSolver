@@ -52,7 +52,15 @@ fun main() {
 
     // Product
     val p1 = s4 * s5
-    println(p1)
-    println(p1.simplify())
-    println(p1.simplify(true))
+//    println(p1)
+//    println(p1.simplify())
+//    println(p1.simplify(true))
+
+    // Quotient
+    val q1 = m1 / m2
+//    println(q1); println(q1.simplify())
+    val q2 = (m2 * f2) / m4
+//    println(q2); println(q2.simplify())
+    val q3 = (q2 *  s5) / m3
+    println(q3); println(q3.simplify())
 }

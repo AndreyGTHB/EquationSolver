@@ -1,7 +1,6 @@
 package expressions.numerical
 
 import expressions.Expression
-import expressions.longs.Product
 import expressions.nullFraction
 import utils.GCD
 import utils.toFraction

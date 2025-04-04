@@ -140,7 +140,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
             newBody.add(it.reduceOrNull(cf)!!)
             currOther = currOther.reduceOrNull(cf)!!
         }
-        if (currOther is Fraction) return Product(newBody)
+        if (currOther is Fraction) return Product(newBody, true)
                                               .reduceOrNull(currOther)!!
                                               .simplify()
         return null

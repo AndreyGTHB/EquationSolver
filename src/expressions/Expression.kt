@@ -10,8 +10,8 @@ abstract class Expression (open val final: Boolean = false) {
     abstract fun simplify(): Expression
     abstract fun simplifySoftly(): Expression
 
-    open fun reduceOrNull(other: Expression): Expression? = null
     internal open fun commonFactor(other: Expression): Expression? = null
+    open fun reduceOrNull(other: Expression): Expression? = null
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
