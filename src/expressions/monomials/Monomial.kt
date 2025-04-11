@@ -1,14 +1,14 @@
 package expressions.monomials
 
 import expressions.Expression
-import expressions.nullFraction
-import expressions.numerical.Fraction
+import expressions.zero
+import expressions.numerical.Rational
 import utils.toFraction
 import kotlin.math.min
 
 
-class Monomial private constructor(override val body: Pair<Fraction, Map<Char, Int>>, final: Boolean) : Expression(final) {
-    constructor(body: Pair<Fraction, Map<Char, Int>>) : this(body, false)
+class Monomial private constructor(override val body: Pair<Rational, Map<Char, Int>>, final: Boolean) : Expression(final) {
+    constructor(body: Pair<Rational, Map<Char, Int>>) : this(body, false)
 
     val coeff = body.first
     val varMap = body.second
@@ -17,7 +17,7 @@ class Monomial private constructor(override val body: Pair<Fraction, Map<Char, I
         if (final) { return this }
 
         val simpleMonomial = simplifySoftly()
-        if (simpleMonomial.coeff.isNull()) return nullFraction()
+        if (simpleMonomial.coeff.isNull()) return zero()
         if (simpleMonomial.varMap.isEmpty()) return simpleMonomial.coeff
         return simpleMonomial
     }
@@ -51,7 +51,7 @@ class Monomial private constructor(override val body: Pair<Fraction, Map<Char, I
     override fun reduceOrNull(other: Expression): Expression? {
         if (!(this.final && other.final)) throw RuntimeException("A non-simplified monomial cannot be reduced")
         return when (other) {
-            is Fraction -> Monomial(coeff / other to varMap).simplify()
+            is Rational -> Monomial(coeff / other to varMap).simplify()
             is Monomial -> reduceByMonomialOrNull(other)
             else -> null
         }
@@ -84,14 +84,14 @@ class Monomial private constructor(override val body: Pair<Fraction, Map<Char, I
     operator fun times(other: Int): Monomial {
         return Monomial(coeff * other to varMap)
     }
-    operator fun times(other: Fraction): Monomial {
+    operator fun times(other: Rational): Monomial {
         return Monomial(coeff * other to varMap)
     }
 
     operator fun div(other: Int): Monomial {
         return Monomial(coeff / other to varMap)
     }
-    operator fun div(other: Fraction): Monomial {
+    operator fun div(other: Rational): Monomial {
         return Monomial(coeff / other to varMap)
     }
 

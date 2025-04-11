@@ -2,9 +2,9 @@ package expressions.longs
 
 import expressions.Expression
 import expressions.monomials.Monomial
-import expressions.numerical.Fraction
+import expressions.numerical.Rational
 import expressions.commonFactor
-import expressions.nullFraction
+import expressions.zero
 import utils.toFraction
 import utils.toVarMap
 import utils.varMapToString
@@ -17,7 +17,7 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
 
         val simpleSum = simplifySoftly()
         return when (simpleSum.body.size) {
-            0 -> Fraction(0 to 1)
+            0 -> zero()
             1 -> simpleSum.body.first()
             else -> Sum(simpleSum.body, true)
         }
@@ -36,14 +36,14 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
         // Reduction of similar terms
         prevBody = currBody
         currBody = mutableListOf()
-        var freeTerm = Fraction(0 to 1)
-        val varMapStrings: MutableMap<String, Fraction> = mutableMapOf()
+        var freeTerm = zero()
+        val varMapStrings: MutableMap<String, Rational> = mutableMapOf()
         prevBody.forEach { term ->
             when (term) {
-                is Fraction -> { freeTerm += term }
+                is Rational -> { freeTerm += term }
                 is Monomial -> {
                     val varMapString = varMapToString(term.varMap)
-                    varMapStrings[varMapString] = (varMapStrings[varMapString] ?: nullFraction()) + term.coeff
+                    varMapStrings[varMapString] = (varMapStrings[varMapString] ?: zero()) + term.coeff
                 }
                 else ->        { currBody.add(term) }
             }

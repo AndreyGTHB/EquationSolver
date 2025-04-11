@@ -1,7 +1,7 @@
 package expressions.binary
 
 import expressions.Expression
-import expressions.numerical.Fraction
+import expressions.numerical.Rational
 import expressions.commonFactor
 
 class Quotient private constructor(body: Pair<Expression, Expression>, final: Boolean) : BinaryExpression(body, final) {
@@ -14,7 +14,7 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
         if (final) return this
 
         val simpleThis = simplifySoftly()
-        if (simpleThis.denom is Fraction) return simpleThis.numer.reduceOrNull(simpleThis.denom)!!
+        if (simpleThis.denom is Rational) return simpleThis.numer.reduceOrNull(simpleThis.denom)!!
         return simpleThis
     }
     override fun simplifySoftly(): Quotient {
@@ -36,6 +36,18 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
         val reducedNumer = numer.reduceOrNull(other) ?: return null
         val reducedThis = Quotient(reducedNumer to denom)
         return reducedThis.simplify()
+    }
+
+    fun sumAsQuotient(other: Quotient): Quotient {
+        val newNumer = this.numer * other.denom + other.numer * this.denom
+        val newDenom = this.denom * other.denom
+        return Quotient(newNumer to newDenom)
+    }
+
+    operator fun times(other: Quotient): Quotient {
+        val newNumer = this.numer * other.numer
+        val newDenom = this.denom * other.denom
+        return Quotient(newNumer to newDenom)
     }
 
     override operator fun unaryMinus(): Quotient {

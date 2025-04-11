@@ -1,13 +1,13 @@
 package utils
 
 import expressions.monomials.Monomial
-import expressions.numerical.Fraction
+import expressions.unit
 
 fun String.isInt(): Boolean { return this.toIntOrNull() != null }
 
 
 fun String.toMonomial(): Monomial {
-    var coefficient = Fraction(1 to 1)
+    var coefficient = unit()
     val variables: MutableMap<Char, Int> = mutableMapOf()
 
     val splited = this.split('*')

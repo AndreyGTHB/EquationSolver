@@ -1,10 +1,12 @@
 package expressions
 
+import expressions.binary.Quotient
 import expressions.monomials.Monomial
-import expressions.numerical.Fraction
+import expressions.numerical.Rational
 import utils.toFraction
 
 fun unitMonomial(): Monomial = Monomial(1.toFraction() to mapOf())
-fun unitFraction(): Fraction = 1.toFraction()
+fun unit(): Rational = 1.toFraction()
+fun unitQuotient(): Quotient = Quotient(unit() to unit())
 
-fun nullFraction(): Fraction = 0.toFraction()
+fun zero(): Rational = 0.toFraction()

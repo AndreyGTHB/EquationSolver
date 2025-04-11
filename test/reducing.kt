@@ -1,12 +1,17 @@
+import com.sun.org.apache.xpath.internal.operations.Variable
 import expressions.Expression
+import expressions.binary.Quotient
 import expressions.longs.Sum
-import expressions.numerical.Fraction
+import expressions.numerical.Rational
+import expressions.unit
+import expressions.unitMonomial
 import utils.toMonomial
+import utils.over
 
 fun main() {
     // Fraction
-    val f1 = Fraction(6 to 13)
-    val f2 = Fraction(2 to 3)
+    val f1 = Rational(6 to 13)
+    val f2 = Rational(2 to 3)
     val m1 = "2*a*b*c*c".toMonomial().simplify()
 //    println(f1.reduceOrNull(f2))
 //    println(f1.reduceOrNull(f1))
@@ -21,8 +26,8 @@ fun main() {
 //    println(m1.reduceOrNull(m3))
 //    println(m1.reduceOrNull(m4))
 
-    var m5: Expression = Fraction(8 to 6) * m3
-    val m6 = Fraction(-3 to 4) * m1
+    var m5: Expression = Rational(8 to 6) * m3
+    val m6 = Rational(-3 to 4) * m1
 //    println(m5)
     m5 = m5.simplify()
 //    println(m5)
@@ -41,7 +46,7 @@ fun main() {
     val s1 = Sum(listOf(f1, f2))
     val s3 = m1 + s1
 //    println(s3); println(s3.simplify())
-    val s4 = s3 - Fraction(23 to 39) - Fraction(21 to 39)
+    val s4 = s3 - (23 over 39) - (21 over 39)
 //    println(s4.simplify())
     val s5 = s4 + m8 + m7
 //    println(s5); println(s5.simplify())
@@ -49,12 +54,14 @@ fun main() {
     val cif_s6 = s6.commonInternalFactor()
 //    println(cif_s6)
 //    println(s6.reduceOrNull(cif_s6))
+    val s7 = unit() / "a".toMonomial() + unit()*2 / "a".toMonomial()
+    println(s7.simplify())
 
     // Product
     val p1 = s4 * s5
 //    println(p1)
 //    println(p1.simplify())
-//    println(p1.simplify(true))
+//    println(p1.simplify(false))
 
     // Quotient
     val q1 = m1 / m2
@@ -62,5 +69,5 @@ fun main() {
     val q2 = (m2 * f2) / m4
 //    println(q2); println(q2.simplify())
     val q3 = (q2 *  s5) / m3
-    println(q3); println(q3.simplify())
+//    println(q3); println(q3.simplifySoftly())
 }

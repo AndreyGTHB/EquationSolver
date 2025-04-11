@@ -1,6 +1,6 @@
 package utils
 
-import expressions.numerical.Fraction
+import expressions.numerical.Rational
 import kotlin.math.abs
 
 fun GCD(a: Int, b: Int): Int {
@@ -20,6 +20,5 @@ fun GCD(a: Int, b: Int): Int {
 }
 
 
-fun Int.toFraction(): Fraction {
-    return Fraction(this to 1)
-}
+infix fun Int.over(other: Int) = Rational(this to other)
+fun Int.toFraction() = this over 1
