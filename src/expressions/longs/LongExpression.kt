@@ -12,14 +12,6 @@ abstract class LongExpression (
         return newBody
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (other == null) return false
-        if (other::class == this::class) {
-            other as LongExpression
-//            return this.body.sorted
-        }
-    }
-
     override fun toString(): String {
         var asString = "${this::class.simpleName}:\n"
         body.forEach { subExp ->

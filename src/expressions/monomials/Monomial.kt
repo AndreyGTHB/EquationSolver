@@ -25,7 +25,7 @@ class Monomial private constructor(override val body: Pair<Rational, Map<Char, I
         if (final) { return this }
 
         val simpleCoeff = coeff.simplify()
-        val simpleVarMap = varMap.filterValues { it != 0 }
+        val simpleVarMap = varMap.filterValues { it != 0 } .toSortedMap()
 //        val sortedBody = simpleCoeff to sortedVarMap
         return Monomial(simpleCoeff to simpleVarMap, true)
     }

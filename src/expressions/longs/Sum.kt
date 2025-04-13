@@ -1,6 +1,7 @@
 package expressions.longs
 
 import expressions.Expression
+import expressions.binary.Quotient
 import expressions.monomials.Monomial
 import expressions.numerical.Rational
 import expressions.commonFactor
@@ -37,7 +38,8 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
         prevBody = currBody
         currBody = mutableListOf()
         var freeTerm = zero()
-        val varMapStrings: MutableMap<String, Rational> = mutableMapOf()
+        val varMapStrings = mutableMapOf<String, Rational>()
+        val quotientMap = mutableMapOf<Expression, Expression>()
         prevBody.forEach { term ->
             when (term) {
                 is Rational -> { freeTerm += term }
@@ -45,16 +47,24 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
                     val varMapString = varMapToString(term.varMap)
                     varMapStrings[varMapString] = (varMapStrings[varMapString] ?: zero()) + term.coeff
                 }
+                is Quotient -> {
+                    quotientMap[term.denom] = (quotientMap[term.denom] ?: zero()) + term.numer
+                }
                 else ->        { currBody.add(term) }
             }
         }
-
         freeTerm = freeTerm.simplify()
         if (!freeTerm.isNull()) currBody.add(freeTerm)
-        varMapStrings.forEach { (vms, coeff) ->
+        varMapStrings.forEach { vms, coeff ->
             val vm = vms.toVarMap()
             if (!coeff.isNull()) { currBody.add(Monomial(coeff to vm).simplify()) }
         }
+        quotientMap.forEach { denom, numer ->
+            val qt = Quotient(numer to denom)
+            currBody.add(qt.simplify())
+        }
+
+        currBody.sort()
         return Sum(currBody)
     }
 

@@ -74,8 +74,10 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         }
         val simpleMf = monomialFactor.simplify()
         val simpleQf = quotientFactor.simplify()
-        if (!simpleMf.isUnitFraction()) currBody.add(simpleMf)
-        if (!simpleQf.isUnitFraction()) currBody.add(simpleQf)
+        if (!simpleMf.isUnitRational()) currBody.add(simpleMf)
+        if (!simpleQf.isUnitRational()) currBody.add(simpleQf)
+
+        currBody.sort()
         return Product(currBody)
     }
 
@@ -101,7 +103,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
                 val cf = it.commonInternalFactor()
                 if (cf !is Rational) {
                     newBody.add(cf)
-                    newBody.add(it.reduceOrNull(cf)!!)
+                    newBody.add(it.reduce(cf))
                 }
             }
             else newBody.add(it)
@@ -140,8 +142,8 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
                 val factCf = commonFactor(currFact1, fact2)
                 if (factCf !is Rational) {
                     cfBody.add(factCf)
-                    currFact1 = currFact1.reduceOrNull(factCf)!!
-                    currOtherBody[i] = currOtherBody[i].reduceOrNull(factCf)!!
+                    currFact1 = currFact1.reduce(factCf)
+                    currOtherBody[i] = currOtherBody[i].reduce(factCf)
                 }
             }
         }
@@ -158,11 +160,11 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         var currOther = other
         body.forEach {
             val cf = commonFactor(it, currOther)
-            newBody.add(it.reduceOrNull(cf)!!)
-            currOther = currOther.reduceOrNull(cf)!!
+            newBody.add(it.reduce(cf))
+            currOther = currOther.reduce(cf)
         }
         if (currOther is Rational) return Product(newBody, true)
-                                              .reduceOrNull(currOther)!!
+                                              .reduce(currOther)
                                               .simplify()
         return null
     }

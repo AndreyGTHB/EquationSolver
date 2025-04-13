@@ -5,7 +5,7 @@ import expressions.longs.Product
 import expressions.longs.Sum
 import expressions.numerical.Rational
 
-abstract class Expression (open val final: Boolean = false) {
+abstract class Expression (open val final: Boolean = false) : Comparable<Expression> {
     abstract val body: Any
 
     abstract fun simplify(): Expression
@@ -13,17 +13,25 @@ abstract class Expression (open val final: Boolean = false) {
 
     internal open fun commonFactor(other: Expression): Expression? = null
     open fun reduceOrNull(other: Expression): Expression? = null
+    fun reduce(other: Expression): Expression {
+        if (!(this.final && other.final)) TODO("Reducing non-simplified expressions")
+        if (other.isZeroRational()) TODO("Reducing by zero")
+        if (other.isUnitRational() || this.isZeroRational()) return this
+        return reduceOrNull(other)!!
+    }
 
-    fun isUnitFraction(): Boolean = this is Rational && this.isUnit()
-    fun isNullFraction(): Boolean = this is Rational && this.isNull()
+    fun isUnitRational(): Boolean = this is Rational && this.isUnit()
+    fun isZeroRational(): Boolean = this is Rational && this.isNull()
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
-        if (other::class == this::class) {
-            other as Expression
-            return other.body == this.body
-        }
-        return false
+        if (other::class != this::class) return false
+        other as Expression
+        return this.toString() == other.toString()
+    }
+
+    override fun compareTo(other: Expression): Int {
+        return this.toString() compareTo other.toString()
     }
 
     abstract operator fun unaryMinus(): Expression
@@ -41,6 +49,7 @@ abstract class Expression (open val final: Boolean = false) {
         return Quotient(this to other)
     }
 
+    abstract override fun toString(): String
     override fun hashCode(): Int {
         return javaClass.hashCode()
     }

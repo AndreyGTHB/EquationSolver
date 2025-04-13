@@ -41,19 +41,19 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
 
     fun isNull(): Boolean = numer == 0
     fun isUnit(): Boolean = numer == denom
-    override fun equals(other: Any?): Boolean {
-        other ?: return false
-        return when (other) {
-            is Rational -> equalsToFraction(other)
-            is Int -> equalsToFraction(other.toFraction())
-            else -> false
-        }
-    }
-    private fun equalsToFraction(other: Rational): Boolean {
-        val (thisNumer, thisDenom) = this.simplify().body
-        val (otherNumer, otherDenom) = other.simplify().body
-        return thisNumer == otherNumer && thisDenom == otherDenom
-    }
+//    override fun equals(other: Any?): Boolean {
+//        other ?: return false
+//        return when (other) {
+//            is Rational -> equalsToFraction(other)
+//            is Int -> equalsToFraction(other.toFraction())
+//            else -> false
+//        }
+//    }
+//    private fun equalsToFraction(other: Rational): Boolean {
+//        val (thisNumer, thisDenom) = this.simplify().body
+//        val (otherNumer, otherDenom) = other.simplify().body
+//        return thisNumer == otherNumer && thisDenom == otherDenom
+//    }
 
     fun isPositive(): Boolean = numer * denom > 0
     fun isNegative(): Boolean = !(isPositive() || isNull())

@@ -54,7 +54,7 @@ fun main() {
     val cif_s6 = s6.commonInternalFactor()
 //    println(cif_s6)
 //    println(s6.reduceOrNull(cif_s6))
-    val s7 = unit() / "a".toMonomial() + unit()*2 / "a".toMonomial()
+    val s7 = unit() / "a".toMonomial() + unit()*2 / "a".toMonomial() - unit()*4 / "a".toMonomial()
     println(s7.simplify())
 
     // Product
