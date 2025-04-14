@@ -15,7 +15,7 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
 
         val simpleThis = simplifySoftly()
         if (simpleThis.denom is Rational) return simpleThis.numer.reduce(simpleThis.denom)
-        return simpleThis
+        return Quotient(simpleThis.body, true)
     }
     override fun simplifySoftly(): Quotient {
         if (final) return this
@@ -24,7 +24,7 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
         val cf = commonFactor(simpleNumer, simpleDenom)
         val reducedNumer = simpleNumer.reduce(cf)
         val reducedDenom = simpleDenom.reduce(cf)
-        return Quotient(reducedNumer to reducedDenom, true)
+        return Quotient(reducedNumer to reducedDenom)
     }
 
     override fun commonFactor(other: Expression): Expression {
