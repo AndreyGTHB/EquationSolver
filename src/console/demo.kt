@@ -1,11 +1,28 @@
 package console
 
+import console.Clr.highlight
+
 fun main() {
-    demoColors256("${Clr.fg(121)}fg(color)${Clr.RC}", Clr::fg)
-    demoColors256("${Clr.fg(227)}bg(color)${Clr.RC}", Clr::bg)
+    println(
+        "Let's see what can we do with colors!".map { char ->
+            val color = Clr.fg(Clr.palette.random())
+            color + char
+        }.joinToString("")
+    )
+    println(Clr.RC)
+    println("⚠ Highlight special symbols using ${Clr.B+Clr.U+Clr.ORANGE}String${Clr.RC+Clr.B+Clr.YELLOW}.highlight()${Clr.RC} function. Works for: '❌', '⚠', '⮕', '⊗'".highlight())
+    println(Clr.RC)
+
+    demoColors256("${Clr.fg(121)}Foreground colors - ${Clr.U+Clr.B}fun fg(color)${Clr.RC}") {
+        color256Index -> Clr.fg(color256Index)
+    }
+
+    demoColors256("${Clr.fg(227)}Background colors - ${Clr.U+Clr.B}fun bg(color)${Clr.RC}") {
+        color256Index -> Clr.bg(color256Index)
+    }
 }
 
-private fun demoColors256(functionName: String, colorFunction: (Int) -> String ) { // When called shows all 256 colors and they respectively numbers. --> gnc.gnc.console.console.colorTest()
+private fun demoColors256(functionName: String, colorFunction: (Int) -> String,  ) { // When called shows all 256 colors and they respectively numbers. --> gnc.gnc.console.console.colorTest()
     val red = (0..255).random()
     val blue = (0..255).random()
     repeat(256) { green ->
@@ -14,31 +31,26 @@ private fun demoColors256(functionName: String, colorFunction: (Int) -> String )
         print("$color$background*")
     }
 
-    println("\n** ${Clr.U+ Clr.B}$functionName\n${Clr.RC}")
-    var color = 0
-    for (l in 0..15) {
-        for (c in 0..15) {
-            print("${colorFunction(color)}■${color.toString().padEnd(3, ' ')}   ${Clr.RC}")
-            color += 1
+    println("${Clr.RC}\n** $functionName\n${Clr.RC}")
+    var color256Index = 0
+    repeat(16) {
+        val color = colorFunction(color256Index)
+        val colorIndexFixedLength = color256Index.toString().padEnd(3, ' ')
+        print("${color} ■${colorIndexFixedLength} ${Clr.RC} ")
+        color256Index += 1
+    }
+    println()
+
+    repeat(36) { l ->
+        repeat(6) { c ->
+            val color = colorFunction(color256Index)
+            val colorIndexFixedLength = color256Index.toString().padEnd(3, ' ')
+            print("${color} ■${colorIndexFixedLength} ${Clr.RC} ")
+            color256Index += 1
         }
         println()
     }
 
     println()
 
-    color = 16
-    val step = 36 / 6
-    var tabs = ""
-
-    repeat(6) {
-        repeat(6) {
-            print(tabs)
-            repeat(step) {
-                print("${colorFunction(color)}■${color.toString().padEnd(3, ' ')} ${Clr.RC}")
-                color += 1
-            }; println()
-        }
-        tabs += "\t\t\t\t\t\t\t"
-    }
-    println()
 }
