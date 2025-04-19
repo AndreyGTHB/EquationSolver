@@ -4,7 +4,7 @@ import console.Clr.highlight
 
 fun main() {
     println(
-        "Let's see what can we do with colors!".map { char ->
+        "Let's see what we can do with colors!".map { char ->
             val color = Clr.fg(Clr.palette.random())
             color + char
         }.joinToString("")

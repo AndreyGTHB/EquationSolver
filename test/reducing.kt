@@ -55,7 +55,7 @@ fun main() {
 //    println(cif_s6)
 //    println(s6.reduceOrNull(cif_s6))
     val s7 = unit() / "a".toMonomial() + unit()*2 / "a".toMonomial() - unit()*4 / "a".toMonomial()
-    println(s7.simplify())
+//    println(s7.simplify())
 
     // Product
     val p1 = s4 * s5
@@ -69,5 +69,5 @@ fun main() {
     val q2 = (m2 * f2) / m4
 //    println(q2); println(q2.simplify())
     val q3 = (q2 *  s5) / m3
-//    println(q3); println(q3.simplifySoftly())
+    println(q3); println(q3.simplifySoftly())
 }

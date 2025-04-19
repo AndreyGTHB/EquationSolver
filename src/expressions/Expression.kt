@@ -34,7 +34,7 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
         return this.toString() compareTo other.toString()
     }
 
-    abstract operator fun unaryMinus(): Expression
+    open operator fun unaryMinus(): Expression = (-unit()) * this
 
     open operator fun plus(other: Expression): Sum {
         return Sum(listOf(this, other))
@@ -51,6 +51,6 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
 
     abstract override fun toString(): String
     override fun hashCode(): Int {
-        return javaClass.hashCode()
+        return body.hashCode()
     }
 }

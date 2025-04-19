@@ -1,5 +1,6 @@
 package expressions.longs
 
+import console.Clr
 import expressions.Expression
 import expressions.binary.Quotient
 import expressions.monomials.Monomial
@@ -60,8 +61,8 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
             if (!coeff.isNull()) { currBody.add(Monomial(coeff to vm).simplify()) }
         }
         quotientMap.forEach { denom, numer ->
-            val qt = Quotient(numer to denom)
-            currBody.add(qt.simplify())
+            val simpleQt = Quotient(numer to denom).simplify()
+            if (!simpleQt.isZeroRational()) currBody.add(simpleQt)
         }
 
         currBody.sort()
