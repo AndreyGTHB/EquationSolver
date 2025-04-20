@@ -50,7 +50,5 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
     }
 
     abstract override fun toString(): String
-    override fun hashCode(): Int {
-        return body.hashCode()
-    }
+    override fun hashCode(): Int = body.hashCode()
 }

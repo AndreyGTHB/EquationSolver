@@ -4,7 +4,6 @@ import expressions.Expression
 import expressions.zero
 import utils.GCD
 import utils.over
-import utils.toFraction
 import kotlin.math.abs
 
 class Rational (override val body: Pair<Int, Int>) : Expression() {
@@ -45,7 +44,7 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
 //        other ?: return false
 //        return when (other) {
 //            is Rational -> equalsToFraction(other)
-//            is Int -> equalsToFraction(other.toFraction())
+//            is Int -> equalsToFraction(other.toRational())
 //            else -> false
 //        }
 //    }
@@ -56,7 +55,7 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
 //    }
 
     fun isPositive(): Boolean = numer * denom > 0
-    fun isNegative(): Boolean = !(isPositive() || isNull())
+    fun isNegative(): Boolean = numer * denom < 0
 
     operator fun plus(other: Int) = numer + other * denom over denom
     operator fun plus(other: Rational): Rational {

@@ -3,12 +3,12 @@ package expressions.monomials
 import expressions.Expression
 import expressions.zero
 import expressions.numerical.Rational
-import utils.toFraction
-import kotlin.math.min
+import expressions.unit
+import utils.min
 
 
-class Monomial private constructor(override val body: Pair<Rational, Map<Char, Int>>, final: Boolean) : Expression(final) {
-    constructor(body: Pair<Rational, Map<Char, Int>>) : this(body, false)
+class Monomial private constructor(override val body: Pair<Rational, Map<Char, Rational>>, final: Boolean) : Expression(final) {
+    constructor(body: Pair<Rational, Map<Char, Rational>>) : this(body, false)
 
     val coeff = body.first
     val varMap = body.second
@@ -25,7 +25,10 @@ class Monomial private constructor(override val body: Pair<Rational, Map<Char, I
         if (final) { return this }
 
         val simpleCoeff = coeff.simplify()
-        val simpleVarMap = varMap.filterValues { it != 0 } .toSortedMap()
+        val simpleVarMap = varMap
+            .filterValues { !it.isNull() }
+            .mapValues { it.value.simplify() }
+            .toSortedMap()
 //        val sortedBody = simpleCoeff to sortedVarMap
         return Monomial(simpleCoeff to simpleVarMap, true)
     }
@@ -38,14 +41,14 @@ class Monomial private constructor(override val body: Pair<Rational, Map<Char, I
 
     }
     private fun commonFactorWithMonomial(other: Monomial): Monomial? {
-        val commonVarMap = mutableMapOf<Char, Int>()
+        val commonVarMap = mutableMapOf<Char, Rational>()
         varMap.forEach{ (v, thisDegree) ->
-            val otherDegree = other.varMap[v] ?: 0
+            val otherDegree = other.varMap[v] ?: zero()
             val newDegree = min(thisDegree, otherDegree)
-            if (newDegree != 0) commonVarMap[v] = newDegree
+            if (!newDegree.isNull()) commonVarMap[v] = newDegree
         }
         if (commonVarMap.isEmpty()) return null
-        return Monomial(1.toFraction() to commonVarMap)
+        return Monomial(unit() to commonVarMap)
     }
 
     override fun reduceOrNull(other: Expression): Expression? {
@@ -60,9 +63,9 @@ class Monomial private constructor(override val body: Pair<Rational, Map<Char, I
         val newCoeff = this.coeff / other.coeff
         val newVarMap = this.varMap.toMutableMap()
         for ((v, d) in other.varMap) {
-            newVarMap[v] = (this.varMap[v] ?: 0) - d
-            if (newVarMap[v]!! < 0) return null
-            if (newVarMap[v]!! == 0) newVarMap.remove(v)
+            newVarMap[v] = (this.varMap[v] ?: zero()) - d
+            if (newVarMap[v]!!.isNegative()) return null
+            if (newVarMap[v]!!.isNull()) newVarMap.remove(v)
         }
         return Monomial(newCoeff to newVarMap).simplify()
     }
@@ -77,7 +80,7 @@ class Monomial private constructor(override val body: Pair<Rational, Map<Char, I
         val newCoeff = this.coeff * other.coeff
         val newVarMap = varMap.toMutableMap()
         for ((v, d) in other.varMap) {
-            newVarMap[v] = (newVarMap[v] ?: 0) + d
+            newVarMap[v] = (newVarMap[v] ?: zero()) + d
         }
         return Monomial(newCoeff to newVarMap)
     }

@@ -1,13 +1,12 @@
 package expressions.longs
 
-import console.Clr
 import expressions.Expression
 import expressions.binary.Quotient
 import expressions.monomials.Monomial
 import expressions.numerical.Rational
 import expressions.commonFactor
 import expressions.zero
-import utils.toFraction
+import utils.toRational
 import utils.toVarMap
 import utils.varMapToString
 
@@ -73,7 +72,7 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
         return commonFactor(commonInternalFactor(), other)
     }
     fun commonInternalFactor(): Expression {
-        var cf: Expression = 0.toFraction()
+        var cf: Expression = zero()
         body.forEach {
             cf = commonFactor(cf, it)
         }

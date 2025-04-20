@@ -8,10 +8,6 @@ import expressions.numerical.Rational
 class Product private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
     constructor(body: List<Expression>) : this(body, false)
 
-    companion object {
-        fun nullProduct(): Product = Product(listOf(zero()), true)
-    }
-
     override fun simplify(): Expression {
         return simplify(true)
     }
@@ -28,7 +24,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
 
         simpleBody.forEachIndexed { i, fact ->
             if (fact is Quotient) {
-                val numerBody = mutableListOf<Expression>(fact.numer)
+                val numerBody = mutableListOf(fact.numer)
                 numerBody += simpleBody.slice(0 until i)
                 numerBody += simpleBody.slice(i+1 until simpleBody.size)
                 val numerProduct = Product(numerBody)
@@ -64,7 +60,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         prevBody.forEach { fact ->
             when (fact) {
                 is Rational -> {
-                    if (fact.isNull()) return nullProduct()
+                    if (fact.isNull()) return zeroProduct()
                     monomialFactor *= fact
                 }
                 is Monomial -> monomialFactor *= fact
@@ -126,7 +122,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
                 val currcf = commonFactor(it, currOther)
                 if (currcf !is Monomial) continue
                 cf *= currcf
-                val reduced = currOther.reduceOrNull(currOther)
+                val reduced = currOther.reduceOrNull(currcf)
                 if (reduced !is Monomial) return cf
                 currOther = reduced
             }

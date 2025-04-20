@@ -21,4 +21,6 @@ fun GCD(a: Int, b: Int): Int {
 
 
 infix fun Int.over(other: Int) = Rational(this to other)
-fun Int.toFraction() = this over 1
+fun Int.toRational() = this over 1
+
+fun min(a: Rational, b: Rational): Rational = if ((a - b).isNegative()) a else b
