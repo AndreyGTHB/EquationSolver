@@ -1,6 +1,6 @@
 package utils
 
-import expressions.numerical.Rational
+import expressions.number.Rational
 import kotlin.math.abs
 
 fun GCD(a: Int, b: Int): Int {
@@ -17,6 +17,37 @@ fun GCD(a: Int, b: Int): Int {
         small = t % small
     }
     return big
+}
+
+fun power(base: Int, exponent: Int): Int {
+    val exponentsOfTwo = mutableListOf<Int>()
+    var n = 0
+    var currPowerOfTwo = 1
+    var currExponentOfTwo = 0
+    var remainingExponent = exponent
+    while (currPowerOfTwo * 2 <= exponent) {
+        currPowerOfTwo *= 2
+        currExponentOfTwo++
+    }
+    while (remainingExponent > 0) {
+        if (remainingExponent >= currPowerOfTwo) {
+            exponentsOfTwo.add(currExponentOfTwo)
+            remainingExponent -= currPowerOfTwo
+        }
+        currPowerOfTwo /= 2
+        currExponentOfTwo -= 1
+    }
+
+    var result = 1
+    var currMultiple = base
+    for (exp in exponentsOfTwo) {
+        for (i in 1..exp) {
+            currMultiple *= currMultiple
+        }
+        result *= currMultiple
+        currMultiple = base
+    }
+    return result
 }
 
 

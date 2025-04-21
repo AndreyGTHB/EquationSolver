@@ -1,7 +1,7 @@
 package expressions.binary
 
 import expressions.Expression
-import expressions.numerical.Rational
+import expressions.number.Rational
 import expressions.commonFactor
 
 class Quotient private constructor(body: Pair<Expression, Expression>, final: Boolean) : BinaryExpression(body, final) {

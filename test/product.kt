@@ -1,6 +1,6 @@
 import expressions.longs.Product
 import expressions.longs.Sum
-import expressions.numerical.Rational
+import expressions.number.Rational
 import utils.toMonomial
 
 fun main() {

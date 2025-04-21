@@ -3,7 +3,7 @@ package expressions.longs
 import expressions.*
 import expressions.binary.Quotient
 import expressions.monomials.Monomial
-import expressions.numerical.Rational
+import expressions.number.Rational
 
 class Product private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
     constructor(body: List<Expression>) : this(body, false)

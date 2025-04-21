@@ -3,7 +3,7 @@ package expressions
 import expressions.binary.Quotient
 import expressions.longs.Product
 import expressions.longs.Sum
-import expressions.numerical.Rational
+import expressions.number.Rational
 
 abstract class Expression (open val final: Boolean = false) : Comparable<Expression> {
     abstract val body: Any
@@ -36,18 +36,10 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
 
     open operator fun unaryMinus(): Expression = (-unit()) * this
 
-    open operator fun plus(other: Expression): Sum {
-        return Sum(listOf(this, other))
-    }
-    open operator fun minus(other: Expression): Sum {
-        return Sum(listOf(this, -other))
-    }
-    open operator fun times(other: Expression): Product {
-        return Product(listOf(this, other))
-    }
-    open operator fun div(other: Expression): Quotient {
-        return Quotient(this to other)
-    }
+    open operator fun plus(other: Expression): Sum = Sum(listOf(this, other))
+    open operator fun minus(other: Expression): Sum = Sum(listOf(this, -other))
+    open operator fun times(other: Expression): Product = Product(listOf(this, other))
+    open operator fun div(other: Expression): Quotient = Quotient(this to other)
 
     abstract override fun toString(): String
     override fun hashCode(): Int = body.hashCode()

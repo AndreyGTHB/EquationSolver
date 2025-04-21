@@ -1,4 +1,4 @@
-package expressions.numerical
+package expressions.number
 
 import expressions.Expression
 import expressions.zero

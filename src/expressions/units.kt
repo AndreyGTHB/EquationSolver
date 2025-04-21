@@ -3,9 +3,8 @@ package expressions
 import expressions.binary.Quotient
 import expressions.longs.Product
 import expressions.monomials.Monomial
-import expressions.numerical.Rational
+import expressions.number.Rational
 import utils.over
-import utils.toRational
 
 fun unit(): Rational = 1 over 1
 fun unitMonomial(): Monomial = Monomial(unit() to mapOf())

@@ -2,7 +2,7 @@ package expressions.monomials
 
 import expressions.Expression
 import expressions.zero
-import expressions.numerical.Rational
+import expressions.number.Rational
 import expressions.unit
 import utils.min
 

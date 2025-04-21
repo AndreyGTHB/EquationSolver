@@ -3,10 +3,9 @@ package expressions.longs
 import expressions.Expression
 import expressions.binary.Quotient
 import expressions.monomials.Monomial
-import expressions.numerical.Rational
+import expressions.number.Rational
 import expressions.commonFactor
 import expressions.zero
-import utils.toRational
 import utils.toVarMap
 import utils.varMapToString
 

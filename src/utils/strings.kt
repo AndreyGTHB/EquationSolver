@@ -1,7 +1,7 @@
 package utils
 
 import expressions.monomials.Monomial
-import expressions.numerical.Rational
+import expressions.number.Rational
 import expressions.unit
 import expressions.zero
 
