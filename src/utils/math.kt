@@ -3,7 +3,9 @@ package utils
 import expressions.number.Rational
 import kotlin.math.abs
 
-fun GCD(a: Int, b: Int): Int {
+
+fun gcd(a: Int, b: Int): Int {
+    if (a * b == 0) TODO("Two zeros")
     var (big, small) = abs(a) to abs(b)
     var t = big
     if (big < small) {
@@ -17,6 +19,27 @@ fun GCD(a: Int, b: Int): Int {
         small = t % small
     }
     return big
+}
+fun Collection<Int>.gcd(): Int {
+    var cd = 0
+    this.forEach { if (it != 0) cd = gcd(it, cd) }
+    if (cd == 0) TODO("Zero collection")
+    return cd
+}
+
+fun Int.factorise(): Map<Int, Int> {
+    val decomp = mutableMapOf<Int, Int>()
+    var remainder = this
+    var i = 2
+    while (i * i <= remainder) {
+        while (remainder % i == 0) {
+            decomp[i] = (decomp[i] ?: 0) + 1
+            remainder /= i
+        }
+        i++
+    }
+    if (remainder != 1) decomp[remainder] = 1
+    return decomp
 }
 
 fun power(base: Int, exponent: Int): Int {

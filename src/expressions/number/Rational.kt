@@ -2,13 +2,13 @@ package expressions.number
 
 import expressions.Expression
 import expressions.zero
-import utils.GCD
+import utils.gcd
 import utils.over
 import kotlin.math.abs
 
 class Rational (override val body: Pair<Int, Int>) : Expression() {
     override val final: Boolean
-        get() = GCD(numer, denom) == 1
+        get() = gcd(numer, denom) == 1
 
     val numer = body.first
     val denom = body.second
@@ -24,7 +24,7 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
     override fun simplifySoftly(): Rational {
         if (isNull()) return zero()
 
-        val gcd = GCD(numer, denom)
+        val gcd = gcd(numer, denom)
         val newNumer = (if (denom < 0) -numer else numer) / gcd
         val newDenom = abs(denom) / gcd
         if (newNumer == 0) return zero()
