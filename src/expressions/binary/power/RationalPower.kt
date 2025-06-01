@@ -10,16 +10,21 @@ class RationalPower private constructor(override val body: Pair<Expression, Rati
     override val exponent = body.second
 
     override fun simplify(): Expression {
-        val (simpleBase, simpleExponent) = simplifySoftly().body
+        val simpleThis = simplifySoftly()
+        val (simpleBase, simpleExponent) = simpleThis.body
         if (simpleBase.isZeroRational()) TODO("Zero exponentiation")
         if (simpleBase.isUnitRational() || simpleExponent.isNull()) return simpleBase
 
-        if (simpleBase is Monomial) {}
-        return RationalPower(simpleBase to simpleExponent, true)
+        if (simpleBase is Monomial) TODO("To implement")
+        return simpleThis
     }
     override fun simplifySoftly(): RationalPower {
         val (simpleBase, simpleExponent) = super.simplifySoftly().body
         simpleExponent as Rational
-        return RationalPower(simpleBase to simpleExponent)
+        return RationalPower(simpleBase to simpleExponent, true)
+    }
+
+    private fun Monomial.pow(exp: Rational): Monomial {
+        TODO("To implement")
     }
 }
