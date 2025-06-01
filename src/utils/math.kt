@@ -41,7 +41,7 @@ fun Int.factorise(): Map<Int, Int> {
     return decomp
 }
 
-fun power(base: Int, exponent: Int): Int {
+fun Int.power(exponent: Int): Int {
     val exponentsOfTwo = mutableListOf<Int>()
     var n = 0
     var currPowerOfTwo = 1
@@ -61,13 +61,13 @@ fun power(base: Int, exponent: Int): Int {
     }
 
     var result = 1
-    var currMultiple = base
+    var currMultiple = this
     for (exp in exponentsOfTwo) {
         for (i in 1..exp) {
             currMultiple *= currMultiple
         }
         result *= currMultiple
-        currMultiple = base
+        currMultiple = this
     }
     return result
 }

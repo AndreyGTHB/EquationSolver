@@ -69,5 +69,5 @@ fun main() {
     val q2 = (m2 * f2) / m4
 //    println(q2); println(q2.simplify())
     val q3 = (q2 *  s5) / m3
-    println(q3); println(q3.simplifySoftly())
+    println(q3)
 }

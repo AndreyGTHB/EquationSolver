@@ -17,7 +17,7 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
         if (simpleThis.denom is Rational) return simpleThis.numer.reduce(simpleThis.denom)
         return Quotient(simpleThis.body, true)
     }
-    override fun simplifySoftly(): Quotient {
+    private fun simplifySoftly(): Quotient {
         if (final) return this
 
         val (simpleNumer, simpleDenom) = simplifyBody()

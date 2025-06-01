@@ -35,7 +35,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         return if (simpleBody.size == 1) simpleBody.first()
                else                      Product(simpleBody, true)
     }
-    override fun simplifySoftly(): Product {
+    private fun simplifySoftly(): Product {
         if (final) return this
 
         // Associativity

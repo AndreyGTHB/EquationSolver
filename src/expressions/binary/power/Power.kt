@@ -17,7 +17,7 @@ open class Power protected constructor(body: Pair<Expression, Expression>, final
         return if (simpleExponent is Rational) RationalPower(simpleBase to simpleExponent).simplify()
                else                                    Power(simpleBase to simpleExponent, true)
     }
-    override fun simplifySoftly(): Power {
+    protected open fun simplifySoftly(): Power {
         if (final) return this
 
         var (simpleBase, simpleExponent) = simplifyBody()

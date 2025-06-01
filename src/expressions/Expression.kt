@@ -9,7 +9,6 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
     abstract val body: Any
 
     abstract fun simplify(): Expression
-    abstract fun simplifySoftly(): Expression
 
     internal open fun commonFactor(other: Expression): Expression? = null
     open fun reduceOrNull(other: Expression): Expression? = null

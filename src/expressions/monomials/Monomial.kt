@@ -21,7 +21,7 @@ class Monomial private constructor(override val body: Pair<Rational, Map<Char, R
         if (simpleMonomial.varMap.isEmpty()) return simpleMonomial.coeff
         return simpleMonomial
     }
-    override fun simplifySoftly(): Monomial {
+    private fun simplifySoftly(): Monomial {
         if (final) { return this }
 
         val simpleCoeff = coeff.simplify()

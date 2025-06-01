@@ -4,6 +4,7 @@ import expressions.Expression
 import expressions.zero
 import utils.gcd
 import utils.over
+import utils.power
 import kotlin.math.abs
 
 class Rational (override val body: Pair<Int, Int>) : Expression() {
@@ -21,7 +22,7 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
         if (final) return this
         return simplifySoftly()
     }
-    override fun simplifySoftly(): Rational {
+    private fun simplifySoftly(): Rational {
         if (isNull()) return zero()
 
         val gcd = gcd(numer, denom)
@@ -40,6 +41,7 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
 
     fun isNull(): Boolean = numer == 0
     fun isUnit(): Boolean = numer == denom
+    fun isInteger(): Boolean = numer % denom == 0
 //    override fun equals(other: Any?): Boolean {
 //        other ?: return false
 //        return when (other) {
@@ -76,6 +78,9 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
 
     operator fun div(other: Int) = numer over denom * other
     operator fun div(other: Rational) = this.numer * other.denom over this.denom * other.numer
+
+    infix fun raisedTo(exp: Int): Rational = if (exp >= 0) (numer.power(exp) over denom.power(exp))
+                                             else          flip() raisedTo (-exp)
 
     override operator fun unaryMinus() = -numer over denom
 

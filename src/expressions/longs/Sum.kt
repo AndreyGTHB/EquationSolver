@@ -23,7 +23,7 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
             else -> Sum(simpleSum.body, true)
         }
     }
-    override fun simplifySoftly(): Sum {
+    private fun simplifySoftly(): Sum {
         if (final) return this
 
         var prevBody = simplifyBody()
