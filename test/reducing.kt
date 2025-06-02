@@ -1,10 +1,7 @@
-import com.sun.org.apache.xpath.internal.operations.Variable
 import expressions.Expression
-import expressions.binary.Quotient
 import expressions.longs.Sum
-import expressions.numerical.Rational
+import expressions.number.Rational
 import expressions.unit
-import expressions.unitMonomial
 import utils.toMonomial
 import utils.over
 

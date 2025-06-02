@@ -2,7 +2,7 @@ package expressions.binary.power
 
 import expressions.Expression
 import expressions.binary.BinaryExpression
-import expressions.numerical.Rational
+import expressions.number.Rational
 
 open class Power protected constructor(body: Pair<Expression, Expression>, final: Boolean) : BinaryExpression(body, final) {
     constructor(body: Pair<Expression, Expression>) : this(body, false)

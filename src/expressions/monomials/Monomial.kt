@@ -2,7 +2,7 @@ package expressions.monomials
 
 import expressions.Expression
 import expressions.zero
-import expressions.numerical.Rational
+import expressions.number.Rational
 import expressions.unit
 import utils.min
 
@@ -51,10 +51,9 @@ class Monomial private constructor(override val body: Pair<Rational, Map<Char, R
         return Monomial(unit() to commonVarMap)
     }
 
-    override fun reduceOrNull(other: Expression): Expression? {
-        if (!(this.final && other.final)) throw RuntimeException("A non-simplified monomial cannot be reduced")
+    override fun _reduceOrNull(other: Expression): Expression? {
         return when (other) {
-            is Rational -> Monomial(coeff / other to varMap).simplify()
+            is Rational -> Monomial(coeff / other to varMap)
             is Monomial -> reduceByMonomialOrNull(other)
             else -> null
         }
@@ -67,7 +66,7 @@ class Monomial private constructor(override val body: Pair<Rational, Map<Char, R
             if (newVarMap[v]!!.isNegative()) return null
             if (newVarMap[v]!!.isNull()) newVarMap.remove(v)
         }
-        return Monomial(newCoeff to newVarMap).simplify()
+        return Monomial(newCoeff to newVarMap)
     }
 
     fun isUnit(): Boolean = simplify().equals(1)

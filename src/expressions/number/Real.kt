@@ -1,10 +1,8 @@
-package expressions.numerical
+package expressions.number
 
 import expressions.Expression
-import utils.factorise
-import utils.over
-import utils.power
-import utils.toRational
+import expressions.zero
+import utils.*
 
 class Real private constructor(override val body: Pair<Int, Rational>, final: Boolean) : Expression(final) {
     constructor(body: Pair<Int, Rational>) : this(body, false)
@@ -13,6 +11,7 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
     val exponent = body.second
 
     init {
+        if (base == 0 && !exponent.isPositive()) TODO("Division by zero")
         if (base < 0 && !exponent.isInteger()) TODO("Domain of definition")
     }
 
@@ -20,6 +19,7 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
         if (final) return this
 
         val sReal = simplifySoftly()
+        if (sReal.base == 0) return zero()
         val (intExponent, rootIndex) = sReal.exponent.body
         if (rootIndex == 1) return (base over 1) raisedTo intExponent
 
@@ -45,6 +45,12 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
     private fun simplifySoftly(): Real {
         val sExponent = exponent.simplify()
         return Real(base to sExponent, true)
+    }
+
+    override fun commonFactor(other: Expression): Real? {
+        if (other !is Real) return null
+        val commonBaseFactor = gcd(this.base, other.base)
+        return Real(commonBaseFactor to min(this.exponent, other.exponent), true)
     }
 
     override fun toString(): String {

@@ -2,7 +2,7 @@ package expressions.binary.power
 
 import expressions.Expression
 import expressions.monomials.Monomial
-import expressions.numerical.Rational
+import expressions.number.Rational
 
 class RationalPower private constructor(override val body: Pair<Expression, Rational>, final: Boolean) : Power(body, final) {
     constructor(body: Pair<Expression, Rational>) : this(body, false)

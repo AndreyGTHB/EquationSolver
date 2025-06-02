@@ -3,7 +3,7 @@ package expressions.longs
 import expressions.*
 import expressions.binary.Quotient
 import expressions.monomials.Monomial
-import expressions.numerical.Rational
+import expressions.number.Rational
 
 class Product private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
     constructor(body: List<Expression>) : this(body, false)
@@ -32,8 +32,11 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
             }
         }
 
-        return if (simpleBody.size == 1) simpleBody.first()
-               else                      Product(simpleBody, true)
+        return when (simpleBody.size) {
+            0 -> unit()
+            1 -> simpleBody.first()
+            else -> Product(simpleBody, true)
+        }
     }
     private fun simplifySoftly(): Product {
         if (final) return this
@@ -146,10 +149,9 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         return Product(cfBody)
     }
 
-    override fun reduceOrNull(other: Expression): Expression? {
-        if (!final) throw RuntimeException("A non-simplified product cannot be reduced")
+    override fun _reduceOrNull(other: Expression): Expression? {
         if (other is Rational) {
-            return (this * other.flip()).simplify()
+            return this * other.flip()
         }
 
         val newBody = mutableListOf<Expression>()
@@ -159,9 +161,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
             newBody.add(it.reduce(cf))
             currOther = currOther.reduce(cf)
         }
-        if (currOther is Rational) return Product(newBody, true)
-                                              .reduce(currOther)
-                                              .simplify()
+        if (currOther is Rational) return Product(newBody, true).reduce(currOther)
         return null
     }
 

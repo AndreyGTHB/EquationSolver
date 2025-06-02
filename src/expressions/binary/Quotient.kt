@@ -1,7 +1,7 @@
 package expressions.binary
 
 import expressions.Expression
-import expressions.numerical.Rational
+import expressions.number.Rational
 import expressions.commonFactor
 
 class Quotient private constructor(body: Pair<Expression, Expression>, final: Boolean) : BinaryExpression(body, final) {
@@ -31,8 +31,7 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
         return commonFactor(numer, other)
     }
 
-    override fun reduceOrNull(other: Expression): Expression? {
-        if (!this.final && other.final) throw RuntimeException("A non-simplified quotient cannot be reduced")
+    override fun _reduceOrNull(other: Expression): Expression? {
         val reducedNumer = numer.reduceOrNull(other) ?: return null
         val reducedThis = Quotient(reducedNumer to denom)
         return reducedThis.simplify()

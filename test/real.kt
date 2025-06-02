@@ -1,10 +1,8 @@
-import expressions.numerical.Real
-import expressions.unit
+import expressions.number.Real
 import utils.over
-import utils.power
 
 fun main() {
-    val a = Real(-2 to (4 over 1))
+    val a = Real(10 to (5 over 2))
     println(a)
     println(a.simplify())
 }

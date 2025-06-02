@@ -3,7 +3,7 @@ package expressions
 import expressions.binary.Quotient
 import expressions.longs.Product
 import expressions.longs.Sum
-import expressions.numerical.Rational
+import expressions.number.Rational
 
 abstract class Expression (open val final: Boolean = false) : Comparable<Expression> {
     abstract val body: Any
@@ -11,13 +11,14 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
     abstract fun simplify(): Expression
 
     internal open fun commonFactor(other: Expression): Expression? = null
-    open fun reduceOrNull(other: Expression): Expression? = null
-    fun reduce(other: Expression): Expression {
+    protected open fun _reduceOrNull(other: Expression): Expression? = null
+    fun reduceOrNull(other: Expression): Expression? {
         if (!(this.final && other.final)) TODO("Reducing non-simplified expressions")
         if (other.isZeroRational()) TODO("Reducing by zero")
         if (other.isUnitRational() || this.isZeroRational()) return this
-        return reduceOrNull(other)!!
+        return _reduceOrNull(other)?.simplify()
     }
+    fun reduce(other: Expression): Expression = reduceOrNull(other)!!
 
     fun isUnitRational(): Boolean = this is Rational && this.isUnit()
     fun isZeroRational(): Boolean = this is Rational && this.isNull()

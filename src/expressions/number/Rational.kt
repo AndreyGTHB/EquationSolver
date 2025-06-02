@@ -1,4 +1,4 @@
-package expressions.numerical
+package expressions.number
 
 import expressions.Expression
 import expressions.zero
@@ -32,10 +32,8 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
         return newNumer over newDenom
     }
 
-    override fun reduceOrNull(other: Expression): Rational? {
-        if (other is Rational) return (this / other).simplify()
-        return null
-    }
+    override fun _reduceOrNull(other: Expression): Rational? = if (other is Rational) this / other
+                                                               else                   null
 
     fun flip(): Rational = Rational(denom to numer)
 

@@ -1,6 +1,6 @@
 package utils
 
-import expressions.numerical.Rational
+import expressions.number.Rational
 import kotlin.math.abs
 
 fun gcd(a: Int, b: Int): Int {

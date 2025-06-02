@@ -3,10 +3,9 @@ package expressions.longs
 import expressions.Expression
 import expressions.binary.Quotient
 import expressions.monomials.Monomial
-import expressions.numerical.Rational
+import expressions.number.Rational
 import expressions.commonFactor
 import expressions.zero
-import utils.toRational
 import utils.toVarMap
 import utils.varMapToString
 
@@ -79,9 +78,9 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
         return cf
     }
 
-    override fun reduceOrNull(other: Expression): Expression? {
+    override fun _reduceOrNull(other: Expression): Expression? {
         val newBody = body.map { it.reduceOrNull(other) ?: return null }
-        return Sum(newBody).simplify()
+        return Sum(newBody)
     }
 
     override operator fun unaryMinus(): Sum {

@@ -1,7 +1,7 @@
 package expressions.binary
 
 import expressions.Expression
-import expressions.numerical.Rational
+import expressions.number.Rational
 
 abstract class BinaryExpression (
     override val body: Pair<Expression, Expression>,
