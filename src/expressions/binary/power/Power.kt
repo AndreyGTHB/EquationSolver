@@ -13,18 +13,19 @@ open class Power protected constructor(body: Pair<Expression, Expression>, final
     override fun simplify(): Expression {
         if (final) return this
 
-        val (simpleBase, simpleExponent) = simplifySoftly().body
-        return if (simpleExponent is Rational) RationalPower(simpleBase to simpleExponent).simplify()
-               else                                    Power(simpleBase to simpleExponent, true)
+        val sPower = simplifySoftly()
+        val (sBase, sExponent) = sPower.body
+        return if (sExponent is Rational) RationalPower(sBase to sExponent).simplify()
+               else                               Power(sBase to sExponent, true)
     }
     protected open fun simplifySoftly(): Power {
         if (final) return this
 
-        var (simpleBase, simpleExponent) = simplifyBody()
-        if (simpleBase is Power) {
-            simpleExponent = (simpleExponent * simpleBase.exponent).simplify()
-            simpleBase = simpleBase.base
+        var (sBase, sExponent) = simplifyBody()
+        if (sBase is Power) {
+            sExponent = (sExponent * sBase.exponent).simplify()
+            sBase = sBase.base
         }
-        return Power(simpleBase to simpleExponent)
+        return Power(sBase to sExponent)
     }
 }
