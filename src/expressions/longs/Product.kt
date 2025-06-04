@@ -165,6 +165,18 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         return null
     }
 
+    fun rationalComponent(): Rational {
+        if (!final) TODO("Must be simplified")
+        return if (body.first() is Rational) body.first() as Rational
+          else                          unit()
+    }
+    fun nonRationalComponent(): Expression {
+        if (!final) TODO("Must be simplified")
+        return if (body.first() !is Rational) this
+          else if (body.size == 1)            unit()
+          else                                Product(body.slice(1 until body.size), true)
+    }
+
     override operator fun times(other: Expression): Product {
         return Product(listOf(other) + body)
     }
