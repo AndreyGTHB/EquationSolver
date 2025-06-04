@@ -2,11 +2,14 @@ package expressions.binary
 
 import expressions.Expression
 import expressions.number.Rational
+import utils.over
 
 abstract class BinaryExpression (
     override val body: Pair<Expression, Expression>,
     final: Boolean
 ) : Expression(final) {
+    override fun _isNumber() = body.first.isNumber() && body.second.isNumber()
+
     protected fun simplifyBody(): Pair<Expression, Expression> {
         return body.first.simplify() to body.second.simplify()
     }

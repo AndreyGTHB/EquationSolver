@@ -33,7 +33,7 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
             else                                              currBody.add(term)
         }
 
-        // Reduction of similar terms
+        // Reduction of terms with same non-rational part
         prevBody = currBody
         currBody = mutableListOf()
         var freeTerm = zero()
@@ -53,10 +53,10 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
             }
         }
         freeTerm = freeTerm.simplify()
-        if (!freeTerm.isNull()) currBody.add(freeTerm)
+        if (!freeTerm.isZero()) currBody.add(freeTerm)
         varMapStrings.forEach { vms, coeff ->
             val vm = vms.toVarMap()
-            if (!coeff.isNull()) { currBody.add(Monomial(coeff to vm).simplify()) }
+            if (!coeff.isZero()) { currBody.add(Monomial(coeff to vm).simplify()) }
         }
         quotientMap.forEach { denom, numer ->
             val simpleQt = Quotient(numer to denom).simplify()

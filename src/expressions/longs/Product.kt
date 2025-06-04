@@ -35,7 +35,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         return when (simpleBody.size) {
             0 -> unit()
             1 -> simpleBody.first()
-            else -> Product(simpleBody, true)
+            else -> simpleThis
         }
     }
     private fun simplifySoftly(): Product {
@@ -63,7 +63,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         prevBody.forEach { fact ->
             when (fact) {
                 is Rational -> {
-                    if (fact.isNull()) return zeroProduct()
+                    if (fact.isZero()) return zeroProduct()
                     monomialFactor *= fact
                 }
                 is Monomial -> monomialFactor *= fact
@@ -77,7 +77,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         if (!simpleQf.isUnitRational()) currBody.add(simpleQf)
 
         currBody.sort()
-        return Product(currBody)
+        return Product(currBody, true)
     }
 
     private fun expandBrackets(): Sum {
@@ -165,16 +165,34 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         return null
     }
 
-    fun rationalComponent(): Rational {
+    fun rationalPart(): Rational {
         if (!final) TODO("Must be simplified")
         return if (body.first() is Rational) body.first() as Rational
           else                          unit()
     }
-    fun nonRationalComponent(): Expression {
+    fun nonRationalPart(): Expression {
         if (!final) TODO("Must be simplified")
         return if (body.first() !is Rational) this
           else if (body.size == 1)            unit()
           else                                Product(body.slice(1 until body.size), true)
+    }
+    fun numberPart(): Expression {
+        if (!final) TODO("Must be simplified")
+        val numberPartSize = body.indexOfFirst { !it.isNumber() }
+        return when (numberPartSize) {
+            -1   -> this
+            0    -> unit()
+            else -> Product(body.slice(0 until numberPartSize), true)
+        }
+    }
+    fun nonNumberPart(): Expression {
+        if (!final) TODO("Must be simplified")
+        val numberPartSize = body.indexOfFirst { !it.isNumber() }
+        return when (numberPartSize) {
+            -1   -> unit()
+            0    -> this
+            else -> Product(body.slice(numberPartSize+1 until body.size), true)
+        }
     }
 
     override operator fun times(other: Expression): Product {

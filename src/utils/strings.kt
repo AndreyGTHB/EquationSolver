@@ -1,5 +1,6 @@
 package utils
 
+import expressions.Expression
 import expressions.monomials.Monomial
 import expressions.number.Rational
 import expressions.unit
@@ -17,7 +18,7 @@ fun String.toRationalOrNull(): Rational? {
 }
 fun String.toRational(): Rational = this.toRationalOrNull()!!
 
-fun String.toMonomial(): Monomial {
+fun String.toMonomial(): Expression {
     var coeff = unit()
     val variables: MutableMap<Char, Rational> = mutableMapOf()
 
@@ -29,7 +30,7 @@ fun String.toMonomial(): Monomial {
             variables[it.first()] = (variables[it.first()] ?: zero()) + 1
         }
     }
-    return Monomial(coeff to variables)
+    return (coeff * Monomial(variables)).simplify()
 }
 
 fun varMapToString(varMap: Map<Char, Rational>): String {

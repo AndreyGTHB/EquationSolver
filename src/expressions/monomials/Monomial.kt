@@ -7,30 +7,26 @@ import expressions.unit
 import utils.min
 
 
-class Monomial private constructor(override val body: Pair<Rational, Map<Char, Rational>>, final: Boolean) : Expression(final) {
-    constructor(body: Pair<Rational, Map<Char, Rational>>) : this(body, false)
+class Monomial private constructor(override val body: Map<Char, Rational>, final: Boolean) : Expression(final) {
+    constructor(body: Map<Char, Rational>) : this(body, false)
 
-    val coeff = body.first
-    val varMap = body.second
+    val varMap = body
 
     override fun simplify(): Expression {
         if (final) { return this }
 
         val simpleMonomial = simplifySoftly()
-        if (simpleMonomial.coeff.isNull()) return zero()
-        if (simpleMonomial.varMap.isEmpty()) return simpleMonomial.coeff
+        if (simpleMonomial.varMap.isEmpty()) return unit()
         return simpleMonomial
     }
     private fun simplifySoftly(): Monomial {
         if (final) { return this }
 
-        val simpleCoeff = coeff.simplify()
         val simpleVarMap = varMap
-            .filterValues { !it.isNull() }
+            .filterValues { !it.isZero() }
             .mapValues { it.value.simplify() }
             .toSortedMap()
-//        val sortedBody = simpleCoeff to sortedVarMap
-        return Monomial(simpleCoeff to simpleVarMap, true)
+        return Monomial(simpleVarMap, true)
     }
 
     override fun commonFactor(other: Expression): Expression? {
@@ -45,64 +41,45 @@ class Monomial private constructor(override val body: Pair<Rational, Map<Char, R
         varMap.forEach{ (v, thisDegree) ->
             val otherDegree = other.varMap[v] ?: zero()
             val newDegree = min(thisDegree, otherDegree)
-            if (!newDegree.isNull()) commonVarMap[v] = newDegree
+            if (!newDegree.isZero()) commonVarMap[v] = newDegree
         }
         if (commonVarMap.isEmpty()) return null
-        return Monomial(unit() to commonVarMap)
+        return Monomial(commonVarMap)
     }
 
     override fun _reduceOrNull(other: Expression): Expression? {
         return when (other) {
-            is Rational -> Monomial(coeff / other to varMap)
+            is Rational -> other.flip() * other
             is Monomial -> reduceByMonomialOrNull(other)
             else -> null
         }
     }
     private fun reduceByMonomialOrNull(other: Monomial): Expression? {
-        val newCoeff = this.coeff / other.coeff
         val newVarMap = this.varMap.toMutableMap()
         for ((v, d) in other.varMap) {
             newVarMap[v] = (this.varMap[v] ?: zero()) - d
             if (newVarMap[v]!!.isNegative()) return null
-            if (newVarMap[v]!!.isNull()) newVarMap.remove(v)
+            if (newVarMap[v]!!.isZero()) newVarMap.remove(v)
         }
-        return Monomial(newCoeff to newVarMap)
+        return Monomial(newVarMap)
     }
 
     fun isUnit(): Boolean = simplify().equals(1)
 
-    override operator fun unaryMinus(): Monomial {
-        return Monomial(-coeff to varMap, final)
-    }
-
     operator fun times(other: Monomial): Monomial {
-        val newCoeff = this.coeff * other.coeff
         val newVarMap = varMap.toMutableMap()
         for ((v, d) in other.varMap) {
             newVarMap[v] = (newVarMap[v] ?: zero()) + d
         }
-        return Monomial(newCoeff to newVarMap)
+        return Monomial(newVarMap)
     }
-    operator fun times(other: Int): Monomial {
-        return Monomial(coeff * other to varMap)
-    }
-    operator fun times(other: Rational): Monomial {
-        return Monomial(coeff * other to varMap)
-    }
-
-    operator fun div(other: Int): Monomial {
-        return Monomial(coeff / other to varMap)
-    }
-    operator fun div(other: Rational): Monomial {
-        return Monomial(coeff / other to varMap)
-    }
-
 
     override fun toString(): String {
-        var str = "M:  $coeff "
+        var str = "M: "
         for ((v, d) in varMap) {
             str += "$v^$d "
         }
+        str = str.slice(0 until str.lastIndex)
         return str
     }
 }

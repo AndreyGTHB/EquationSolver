@@ -5,10 +5,18 @@ import expressions.longs.Product
 import expressions.longs.Sum
 import expressions.number.Rational
 
+@Suppress("FunctionName")
 abstract class Expression (open val final: Boolean = false) : Comparable<Expression> {
     abstract val body: Any
+    private var isNumber: Boolean? = null
 
     abstract fun simplify(): Expression
+
+    protected open fun _isNumber(): Boolean = false
+    fun isNumber(): Boolean {
+        if (isNumber == null) isNumber = _isNumber()
+        return isNumber!!
+    }
 
     internal open fun commonFactor(other: Expression): Expression? = null
     protected open fun _reduceOrNull(other: Expression): Expression? = null
@@ -21,7 +29,7 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
     fun reduce(other: Expression): Expression = reduceOrNull(other)!!
 
     fun isUnitRational(): Boolean = this is Rational && this.isUnit()
-    fun isZeroRational(): Boolean = this is Rational && this.isNull()
+    fun isZeroRational(): Boolean = this is Rational && this.isZero()
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false

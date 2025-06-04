@@ -18,12 +18,14 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
         if (denom == 0) { throw RuntimeException("Zero division") }
     }
 
+    override fun _isNumber() = true
+
     override fun simplify(): Rational {
         if (final) return this
         return simplifySoftly()
     }
     private fun simplifySoftly(): Rational {
-        if (isNull()) return zero()
+        if (isZero()) return zero()
 
         val gcd = gcd(numer, denom)
         val newNumer = (if (denom < 0) -numer else numer) / gcd
@@ -37,7 +39,7 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
 
     fun flip(): Rational = Rational(denom to numer)
 
-    fun isNull(): Boolean = numer == 0
+    fun isZero(): Boolean = numer == 0
     fun isUnit(): Boolean = numer == denom
     fun isInteger(): Boolean = numer % denom == 0
 //    override fun equals(other: Any?): Boolean {

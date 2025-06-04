@@ -15,6 +15,8 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
         if (base < 0 && !exponent.isInteger()) TODO("Domain of definition")
     }
 
+    override fun _isNumber() = true
+
     override fun simplify(): Expression {
         if (final) return this
 
