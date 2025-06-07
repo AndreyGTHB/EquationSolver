@@ -66,8 +66,10 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
         }
 
         // Reduction of terms with the same non-numerical part
+        prevBody = currBody
+        currBody = mutableListOf()
         val termMap2 = mutableMapOf<Expression, Expression>()
-        currBody.forEach { term ->
+        prevBody.forEach { term ->
             val nonNumPart = if (term.isNumber())  unit()
                         else if (term is Product)  term.nonNumericalPart()
                         else if (term is Quotient) term.nonNumericalPart()
@@ -76,10 +78,12 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
                      else if (term is Product)  term.numericalPart()
                      else if (term is Quotient) term.numericalPart()
                      else                       unit()
-            val prevCoeff = termMap2[nonNumPart]
-            termMap2[nonNumPart] = if (prevCoeff == null) numPart else prevCoeff + numPart
+            if (nonNumPart.isUnitRational()) currBody.add(term)
+            else {
+                val prevCoeff = termMap2[nonNumPart]
+                termMap2[nonNumPart] = if (prevCoeff == null) numPart else prevCoeff + numPart
+            }
         }
-        currBody.clear()
         termMap2.forEach { expr, coeff ->
             val reducedTerm = (coeff * expr).simplify(false)
             if (!reducedTerm.isZeroRational()) currBody.add(reducedTerm)

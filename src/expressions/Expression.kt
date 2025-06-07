@@ -44,18 +44,10 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
 
     open operator fun unaryMinus(): Expression = (-unit()) * this
 
-    open operator fun plus(other: Expression): Sum {
-        return Sum(listOf(this, other))
-    }
-    open operator fun minus(other: Expression): Sum {
-        return Sum(listOf(this, -other))
-    }
-    open operator fun times(other: Expression): Product {
-        return Product(listOf(this, other))
-    }
-    open operator fun div(other: Expression): Quotient {
-        return Quotient(this to other)
-    }
+    open operator fun plus(other: Expression)  = Sum(listOf(this, other))
+    open operator fun minus(other: Expression) = Sum(listOf(this, -other))
+    open operator fun times(other: Expression) = Product(listOf(this, other))
+    open operator fun div(other: Expression)   = Quotient(this to other)
 
     abstract override fun toString(): String
     override fun hashCode(): Int = body.hashCode()
