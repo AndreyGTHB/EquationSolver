@@ -1,6 +1,9 @@
 package expressions.number
 
 import expressions.Expression
+import expressions.longs.Product
+import expressions.unit
+import expressions.unitReal
 import expressions.zero
 import utils.*
 
@@ -21,9 +24,9 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
         if (final) return this
 
         val sReal = simplifySoftly()
-        if (sReal.base == 0) return zero()
+        if (sReal.base == 0 || sReal.base == 1) return sReal.base.toRational()
         val (intExponent, rootIndex) = sReal.exponent.body
-        if (rootIndex == 1) return (base over 1) raisedTo intExponent
+        if (rootIndex == 1) return base.toRational() raisedTo intExponent
 
         val decomp = base.factorise().mapValues { intExponent * it.value }
 
@@ -49,10 +52,33 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
         return Real(base to sExponent, true)
     }
 
+    fun simplifyAndSeparate(): Pair<Rational, Real> {
+        return when (val sThis = simplify()) {
+            is Rational -> sThis to unitReal()
+            is Real ->     unit() to sThis
+            else -> {
+                sThis as Product
+                val rationalMultiple = sThis.body[0] as Rational
+                val realMultiple = sThis.body[1] as Real
+                rationalMultiple to realMultiple
+            }
+        }
+    }
+
+    fun isUnit() = base == 1
+
     override fun commonFactor(other: Expression): Real? {
         if (other !is Real) return null
         val commonBaseFactor = gcd(this.base, other.base)
         return Real(commonBaseFactor to min(this.exponent, other.exponent), true)
+    }
+
+    override fun _reduceOrNull(other: Expression): Expression? {
+        if (other !is Real) return null
+        if (this.base % other.base != 0 || this.exponent < other.exponent) return null
+        val factor1 = other.base.power(this.exponent - other.exponent)
+        val factor2 = (this.base / other.base).power(this.exponent)
+        return factor1 * factor2
     }
 
     override fun toString(): String {
@@ -60,3 +86,5 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
         return str
     }
 }
+
+

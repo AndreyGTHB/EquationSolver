@@ -35,11 +35,11 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
         if (other == null) return false
         if (other::class != this::class) return false
         other as Expression
-        return this.toString() == other.toString()
+        return compareExpressions(this, other) == 0
     }
 
     override fun compareTo(other: Expression): Int {
-        return this.toString() compareTo other.toString()
+        return compareExpressions(this, other)
     }
 
     open operator fun unaryMinus(): Expression = (-unit()) * this

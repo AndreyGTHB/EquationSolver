@@ -1,6 +1,7 @@
 package utils
 
 import expressions.number.Rational
+import expressions.number.Real
 import kotlin.math.abs
 
 fun gcd(a: Int, b: Int): Int {
@@ -71,6 +72,7 @@ fun Int.power(exponent: Int): Int {
     }
     return result
 }
+fun Int.power(exp: Rational) = Real(this to exp)
 
 infix fun Int.over(other: Int) = Rational(this to other)
 fun Int.toRational() = this over 1

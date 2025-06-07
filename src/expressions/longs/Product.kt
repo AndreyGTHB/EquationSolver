@@ -4,6 +4,8 @@ import expressions.*
 import expressions.binary.Quotient
 import expressions.monomials.Monomial
 import expressions.number.Rational
+import expressions.number.Real
+import utils.power
 
 class Product private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
     constructor(body: List<Expression>) : this(body, false)
@@ -18,17 +20,17 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         val simpleBody = simpleThis.body
 
         if (expandBrackets) {
-            val expanded = expandBrackets()
+            val expanded = simpleThis.expandBrackets()
             if (expanded.body.size > 1) return expanded.simplify()
         }
 
-        simpleBody.forEachIndexed { i, fact ->
-            if (fact is Quotient) {
-                val numerBody = mutableListOf(fact.numer)
+        simpleBody.forEachIndexed { i, factor ->
+            if (factor is Quotient) {
+                val numerBody = mutableListOf(factor.numer)
                 numerBody += simpleBody.slice(0 until i)
                 numerBody += simpleBody.slice(i+1 until simpleBody.size)
                 val numerProduct = Product(numerBody)
-                return Quotient(numerProduct to fact.denom).simplify()
+                return Quotient(numerProduct to factor.denom).simplify()
             }
         }
 
@@ -58,42 +60,65 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         // Simplifying
         prevBody = currBody
         currBody = mutableListOf()
+        var rationalFactor = unit()
+        val realBaseMap = mutableMapOf<Int, Rational>()
         var monomialFactor = unitMonomial()
         var quotientFactor = unitQuotient()
-        prevBody.forEach { fact ->
-            when (fact) {
+        prevBody.forEach { factor ->
+            when (factor) {
                 is Rational -> {
-                    if (fact.isZero()) return zeroProduct()
-                    monomialFactor *= fact
+                    if (factor.isZero()) return zeroProduct()
+                    rationalFactor *= factor
                 }
-                is Monomial -> monomialFactor *= fact
-                is Quotient -> quotientFactor *= fact
-                else        -> currBody.add(fact)
+                is Real ->     realBaseMap[factor.base] = (realBaseMap[factor.base] ?: zero()) + factor.exponent
+                is Monomial -> monomialFactor *= factor
+                is Quotient -> quotientFactor *= factor
+                else        -> currBody.add(factor)
             }
         }
-        val simpleMf = monomialFactor.simplify()
-        val simpleQf = quotientFactor.simplify()
-        if (!simpleMf.isUnitRational()) currBody.add(simpleMf)
-        if (!simpleQf.isUnitRational()) currBody.add(simpleQf)
+
+        // Continue simplifying the real numbers
+        val realFactors = mutableListOf<Real>()
+        realBaseMap.forEach { base, exp ->
+            val (sRational, sReal) = base.power(exp).simplifyAndSeparate()
+            rationalFactor *= sRational
+            if (!sReal.isUnit()) realFactors.add(sReal)
+
+        }
+        val realExponentMap = mutableMapOf<Rational, Int>()
+        realFactors.forEach { factor ->
+            realExponentMap[factor.exponent] = (realExponentMap[factor.exponent] ?: 1) * factor.base
+        }
+        realExponentMap.forEach { exp, base ->
+            val (sRational, sReal) = base.power(exp).simplifyAndSeparate()
+            rationalFactor *= sRational
+            currBody.add(sReal)
+        }
+        arrayOf(rationalFactor, monomialFactor, quotientFactor).forEach {
+            val sFactor = it.simplify()
+            if (!sFactor.isUnitRational()) currBody.add(sFactor)
+        }
 
         currBody.sort()
         return Product(currBody, true)
     }
 
     private fun expandBrackets(): Sum {
-        body.forEachIndexed { i, fact ->
-            if (fact is Sum) {
-                val expandedBody: MutableList<Expression> = mutableListOf()
-                fact.body.forEach { term ->
-                    val productBody = mutableListOf(term)
-                    productBody += body.slice(0 until i)
-                    productBody += body.slice(i+1 until body.size)
-                    expandedBody.add(Product(productBody).expandBrackets())
-                }
-                return Sum(expandedBody)
+        val expandedBody = mutableListOf<Sum>()
+        for ((i, factor) in body.withIndex()) {
+            if (factor !is Sum) continue
+            factor.body.forEach {
+                val productBody = body.slice(0 until i) +
+                                  it                                +
+                                  body.slice(i+1 until body.size)
+                expandedBody.add(Product(productBody).expandBrackets())
             }
+            break
         }
-        return Sum(listOf(this))
+        if (expandedBody.isEmpty()) return Sum(listOf(this))
+        val currBody = mutableListOf<Expression>()
+        expandedBody.forEach { sum -> sum.body.forEach { term -> currBody.add(term) } }
+        return Sum(currBody)
     }
     private fun factorOutSums(): Product {
         val newBody = mutableListOf<Expression>()
@@ -104,6 +129,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
                     newBody.add(cf)
                     newBody.add(it.reduce(cf))
                 }
+                else newBody.add(it)
             }
             else newBody.add(it)
         }
@@ -112,25 +138,26 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
 
     override fun commonFactor(other: Expression): Expression? {
         return when (other) {
+            is Real     -> commonFactorWithReal(other)
             is Monomial -> commonFactorWithMonomial(other)
-            is Product -> commonFactorWithProduct(other)
-            else -> null
+            is Product  -> commonFactorWithProduct(other)
+            else        -> null
         }
     }
-    private fun commonFactorWithMonomial(other: Monomial): Monomial {
-        var cf = unitMonomial()
-        var currOther = other
-        for (it in body) {
-            if (it is Monomial) {
-                val currcf = commonFactor(it, currOther)
-                if (currcf !is Monomial) continue
-                cf *= currcf
-                val reduced = currOther.reduceOrNull(currcf)
-                if (reduced !is Monomial) return cf
-                currOther = reduced
-            }
+    private fun commonFactorWithReal(other: Real): Product {
+        val cfBody = mutableListOf<Expression>()
+        var currOther: Expression = other
+        body.forEach {
+            val cf = commonFactor(it, currOther)
+            if (cf is Rational) return@forEach
+            cfBody.add(cf)
+            currOther = currOther.reduce(cf)
         }
-        return cf
+        return Product(cfBody)
+    }
+    private fun commonFactorWithMonomial(other: Monomial): Expression? {
+        body.forEach { if (it is Monomial) return commonFactor(it, other) }
+        return null
     }
     private fun commonFactorWithProduct(other: Product): Expression {
         val cfBody = mutableListOf<Expression>()
@@ -157,41 +184,45 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         val newBody = mutableListOf<Expression>()
         var currOther = other
         body.forEach {
+            if (currOther is Rational) return@forEach
             val cf = commonFactor(it, currOther)
             newBody.add(it.reduce(cf))
             currOther = currOther.reduce(cf)
         }
-        if (currOther is Rational) return Product(newBody, true).reduce(currOther)
+        if (currOther is Rational) return Product(newBody) * (currOther as Rational).flip()
         return null
     }
 
     fun rationalPart(): Rational {
         if (!final) TODO("Must be simplified")
-        return if (body.first() is Rational) body.first() as Rational
+        return if (body[0] is Rational) body[0] as Rational
           else                          unit()
     }
     fun nonRationalPart(): Expression {
         if (!final) TODO("Must be simplified")
-        return if (body.first() !is Rational) this
+        return if (body[0] !is Rational) this
           else if (body.size == 1)            unit()
+          else if (body.size == 2)            body[1]
           else                                Product(body.slice(1 until body.size), true)
     }
-    fun numberPart(): Expression {
+    fun numericalPart(): Expression {
         if (!final) TODO("Must be simplified")
-        val numberPartSize = body.indexOfFirst { !it.isNumber() }
-        return when (numberPartSize) {
+        val numPartSize = body.indexOfFirst { !it.isNumber() }
+        return when (numPartSize) {
             -1   -> this
             0    -> unit()
-            else -> Product(body.slice(0 until numberPartSize), true)
+            1    -> body[0]
+            else -> Product(body.slice(0 until numPartSize), true)
         }
     }
-    fun nonNumberPart(): Expression {
+    fun nonNumericalPart(): Expression {
         if (!final) TODO("Must be simplified")
-        val numberPartSize = body.indexOfFirst { !it.isNumber() }
-        return when (numberPartSize) {
-            -1   -> unit()
-            0    -> this
-            else -> Product(body.slice(numberPartSize+1 until body.size), true)
+        val numPartSize = body.indexOfFirst { !it.isNumber() }
+        return when (numPartSize) {
+            -1          -> unit()
+            0           -> this
+            body.size-1 -> body.last()
+            else        -> Product(body.slice(numPartSize until body.size), true)
         }
     }
 

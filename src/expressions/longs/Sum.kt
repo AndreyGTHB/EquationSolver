@@ -2,12 +2,10 @@ package expressions.longs
 
 import expressions.Expression
 import expressions.binary.Quotient
-import expressions.monomials.Monomial
 import expressions.number.Rational
 import expressions.commonFactor
+import expressions.unit
 import expressions.zero
-import utils.toVarMap
-import utils.varMapToString
 
 class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
     constructor(body: List<Expression>) : this(body, false)
@@ -17,14 +15,12 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
 
         val simpleSum = simplifySoftly()
         return when (simpleSum.body.size) {
-            0 -> zero()
-            1 -> simpleSum.body.first()
-            else -> Sum(simpleSum.body, true)
+            0 ->    zero()
+            1 ->    simpleSum.body.first()
+            else -> simpleSum
         }
     }
     private fun simplifySoftly(): Sum {
-        if (final) return this
-
         var prevBody = simplifyBody()
         var currBody = mutableListOf<Expression>()
         // Associativity
@@ -33,38 +29,64 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
             else                                              currBody.add(term)
         }
 
-        // Reduction of terms with same non-rational part
+        // Bringing quotients to the common denominator
         prevBody = currBody
         currBody = mutableListOf()
-        var freeTerm = zero()
-        val varMapStrings = mutableMapOf<String, Rational>()
         val quotientMap = mutableMapOf<Expression, Expression>()
         prevBody.forEach { term ->
-            when (term) {
-                is Rational -> { freeTerm += term }
-                is Monomial -> {
-                    val varMapString = varMapToString(term.varMap)
-                    varMapStrings[varMapString] = (varMapStrings[varMapString] ?: zero()) + term.coeff
-                }
-                is Quotient -> {
-                    quotientMap[term.denom] = (quotientMap[term.denom] ?: zero()) + term.numer
-                }
-                else ->        { currBody.add(term) }
-            }
-        }
-        freeTerm = freeTerm.simplify()
-        if (!freeTerm.isZero()) currBody.add(freeTerm)
-        varMapStrings.forEach { vms, coeff ->
-            val vm = vms.toVarMap()
-            if (!coeff.isZero()) { currBody.add(Monomial(coeff to vm).simplify()) }
+            if (term is Quotient) quotientMap[term.denom] = (quotientMap[term.denom] ?: zero()) + term.numer
+            else                  currBody.add(term)
         }
         quotientMap.forEach { denom, numer ->
-            val simpleQt = Quotient(numer to denom).simplify()
-            if (!simpleQt.isZeroRational()) currBody.add(simpleQt)
+            val reducedQuotient = (numer / denom).simplify()
+            if (!reducedQuotient.isZeroRational()) currBody.add(reducedQuotient)
+        }
+
+        // Reduction of terms with the same non-rational part
+        val termMap1 = mutableMapOf<Expression, Rational>()
+        currBody.forEach { term ->
+            val nonRationalPart = when (term) {
+                is Rational -> unit()
+                is Product  -> term.nonRationalPart()
+                is Quotient -> term.nonRationalPart()
+                else        -> term
+            }
+            val rationalPart = when (term) {
+                is Rational -> term
+                is Product  -> term.rationalPart()
+                is Quotient -> term.rationalPart()
+                else        -> unit()
+            }
+            termMap1[nonRationalPart] = (termMap1[nonRationalPart] ?: zero()) + rationalPart
+        }
+        currBody.clear()
+        termMap1.forEach { expr, coeff ->
+            val reducedTerm = (coeff * expr).simplify()
+            if (!reducedTerm.isZeroRational()) currBody.add(reducedTerm)
+        }
+
+        // Reduction of terms with the same non-numerical part
+        val termMap2 = mutableMapOf<Expression, Expression>()
+        currBody.forEach { term ->
+            val nonNumPart = if (term.isNumber())  unit()
+                        else if (term is Product)  term.nonNumericalPart()
+                        else if (term is Quotient) term.nonNumericalPart()
+                        else                       term
+            val numPart = if (term.isNumber())  term
+                     else if (term is Product)  term.numericalPart()
+                     else if (term is Quotient) term.numericalPart()
+                     else                       unit()
+            val prevCoeff = termMap2[nonNumPart]
+            termMap2[nonNumPart] = if (prevCoeff == null) numPart else prevCoeff + numPart
+        }
+        currBody.clear()
+        termMap2.forEach { expr, coeff ->
+            val reducedTerm = (coeff * expr).simplify(false)
+            if (!reducedTerm.isZeroRational()) currBody.add(reducedTerm)
         }
 
         currBody.sort()
-        return Sum(currBody)
+        return Sum(currBody, true)
     }
 
     override fun commonFactor(other: Expression): Expression {
