@@ -45,18 +45,8 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
         // Reduction of terms with the same non-rational part
         val termMap1 = mutableMapOf<Expression, Rational>()
         currBody.forEach { term ->
-            val nonRationalPart = when (term) {
-                is Rational -> unit()
-                is Product  -> term.nonRationalPart()
-                is Quotient -> term.nonRationalPart()
-                else        -> term
-            }
-            val rationalPart = when (term) {
-                is Rational -> term
-                is Product  -> term.rationalPart()
-                is Quotient -> term.rationalPart()
-                else        -> unit()
-            }
+            val nonRationalPart = term.nonRationalPart()
+            val rationalPart = term.rationalPart()
             termMap1[nonRationalPart] = (termMap1[nonRationalPart] ?: zero()) + rationalPart
         }
         currBody.clear()
@@ -70,14 +60,8 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
         currBody = mutableListOf()
         val termMap2 = mutableMapOf<Expression, Expression>()
         prevBody.forEach { term ->
-            val nonNumPart = if (term.isNumber())  unit()
-                        else if (term is Product)  term.nonNumericalPart()
-                        else if (term is Quotient) term.nonNumericalPart()
-                        else                       term
-            val numPart = if (term.isNumber())  term
-                     else if (term is Product)  term.numericalPart()
-                     else if (term is Quotient) term.numericalPart()
-                     else                       unit()
+            val nonNumPart = term.nonNumericalPart()
+            val numPart = term.numericalPart()
             if (nonNumPart.isUnitRational()) currBody.add(term)
             else {
                 val prevCoeff = termMap2[nonNumPart]

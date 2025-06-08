@@ -193,19 +193,19 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         return null
     }
 
-    fun rationalPart(): Rational {
+    override fun rationalPart(): Rational {
         if (!final) TODO("Must be simplified")
         return if (body[0] is Rational) body[0] as Rational
           else                          unit()
     }
-    fun nonRationalPart(): Expression {
+    override fun nonRationalPart(): Expression {
         if (!final) TODO("Must be simplified")
         return if (body[0] !is Rational) this
-          else if (body.size == 1)            unit()
-          else if (body.size == 2)            body[1]
-          else                                Product(body.slice(1 until body.size), true)
+          else if (body.size == 1)       unit()
+          else if (body.size == 2)       body[1]
+          else                           Product(body.slice(1 until body.size), true)
     }
-    fun numericalPart(): Expression {
+    override fun numericalPart(): Expression {
         if (!final) TODO("Must be simplified")
         val numPartSize = body.indexOfFirst { !it.isNumber() }
         return when (numPartSize) {
@@ -215,7 +215,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
             else -> Product(body.slice(0 until numPartSize), true)
         }
     }
-    fun nonNumericalPart(): Expression {
+    override fun nonNumericalPart(): Expression {
         if (!final) TODO("Must be simplified")
         val numPartSize = body.indexOfFirst { !it.isNumber() }
         return when (numPartSize) {

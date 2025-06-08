@@ -19,9 +19,16 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
     }
 
     override fun _isNumber() = true
+    override fun numericalPart() = this
+    override fun nonNumericalPart() = unit()
 
     override fun simplify(): Expression {
         if (final) return this
+
+        if (exponent.isNegative()) {
+            val opposite = Real(base to -exponent)
+            return (unit() / opposite).simplify()
+        }
 
         val sReal = simplifySoftly()
         if (sReal.base == 0 || sReal.base == 1) return sReal.base.toRational()
@@ -55,7 +62,7 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
     fun simplifyAndSeparate(): Pair<Rational, Real> {
         return when (val sThis = simplify()) {
             is Rational -> sThis to unitReal()
-            is Real ->     unit() to sThis
+            is Real     -> unit() to sThis
             else -> {
                 sThis as Product
                 val rationalMultiple = sThis.body[0] as Rational

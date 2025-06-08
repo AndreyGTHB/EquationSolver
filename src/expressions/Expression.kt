@@ -19,6 +19,7 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
     }
 
     internal open fun commonFactor(other: Expression): Expression? = null
+
     protected open fun _reduceOrNull(other: Expression): Expression? = null
     fun reduceOrNull(other: Expression): Expression? {
         if (!(this.final && other.final)) TODO("Reducing non-simplified expressions")
@@ -27,6 +28,11 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
         return _reduceOrNull(other)?.simplify()
     }
     fun reduce(other: Expression): Expression = reduceOrNull(other)!!
+
+    open fun rationalPart(): Rational = unit()
+    open fun nonRationalPart(): Expression = this
+    open fun numericalPart(): Expression = if (isNumber()) this else unit()
+    open fun nonNumericalPart(): Expression = if (isNumber()) unit() else this
 
     fun isUnitRational(): Boolean = this is Rational && this.isUnit()
     fun isZeroRational(): Boolean = this is Rational && this.isZero()
@@ -38,9 +44,7 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
         return compareExpressions(this, other) == 0
     }
 
-    override fun compareTo(other: Expression): Int {
-        return compareExpressions(this, other)
-    }
+    override fun compareTo(other: Expression) = compareExpressions(this, other)
 
     open operator fun unaryMinus(): Expression = (-unit()) * this
 

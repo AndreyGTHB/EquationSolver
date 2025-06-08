@@ -1,5 +1,7 @@
 # EquationSolver
 ToDo:
 - Rational power processing
-- Abolish monomial coefficients?
-- Get rid of negative powers
+- Get rid of negative powers ?
+- Quotient:
+- - Working with quotients in the numer/denom
+- - Grouping rationals only in the numer

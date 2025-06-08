@@ -6,20 +6,16 @@ import utils.toMonomial
 //import expressions.*
 
 fun main() {
-    val n1 = 5 over 4
-    val n2 = 10 over 8
-    val m1 = "a*b*c".toMonomial()
-    val s1 = m1 + n1 - n2
+    val q1 = "q".toMonomial()
+    val q2 = "Q".toMonomial()
+    val q3 = "P".toMonomial()
+    val f1 = "f".toMonomial()
+    val f2 = "F".toMonomial()
+    val f0 = "I".toMonomial()
 
-    val expMap = mapOf(n1 to 1, s1.simplify() to 3, m1 to 2)
-    println(expMap)
-    println(expMap[n1])
-    println(expMap[n2])
-    println(expMap[n2.simplify()])
-    println(expMap[s1])
-    println(expMap[s1.simplify()])
-
-    val map1 = mapOf(1 to -1, 2 to -2)
-    val map2 = mapOf(2 to -2, 1 to -1)
-    println(map1 == map2)
+    val a = -(q1 + q2)/(q1+q3)
+    val df = f1 + a*f0 - f2
+    val qq = q1 * (unit() + a)
+    val c = qq / df
+    println(c.simplify())
 }

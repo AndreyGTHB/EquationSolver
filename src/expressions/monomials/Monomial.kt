@@ -15,18 +15,31 @@ class Monomial private constructor(override val body: Map<Char, Rational>, final
     override fun simplify(): Expression {
         if (final) { return this }
 
-        val simpleMonomial = simplifySoftly()
-        if (simpleMonomial.varMap.isEmpty()) return unit()
-        return simpleMonomial
+        val sMonomial = simplifySoftly()
+        if (sMonomial.varMap.isEmpty()) return unit()
+
+        val numerVarMap = varMap.toMutableMap()
+        val denomVarMap = mutableMapOf<Char, Rational>()
+        sMonomial.varMap.forEach { v, exp ->
+            if (exp.isNegative()) {
+                denomVarMap[v] = -exp
+                numerVarMap.remove(v)
+            }
+        }
+        if (denomVarMap.isNotEmpty()) {
+            val qt = Monomial(numerVarMap, true) / Monomial(denomVarMap, true)
+            return qt.simplify()
+        }
+        return sMonomial
     }
     private fun simplifySoftly(): Monomial {
         if (final) { return this }
 
-        val simpleVarMap = varMap
+        val sVarMap = varMap
             .filterValues { !it.isZero() }
             .mapValues { it.value.simplify() }
             .toSortedMap()
-        return Monomial(simpleVarMap, true)
+        return Monomial(sVarMap, true)
     }
 
     override fun commonFactor(other: Expression): Expression? {
@@ -38,7 +51,7 @@ class Monomial private constructor(override val body: Map<Char, Rational>, final
     }
     private fun commonFactorWithMonomial(other: Monomial): Monomial? {
         val commonVarMap = mutableMapOf<Char, Rational>()
-        varMap.forEach{ (v, thisDegree) ->
+        varMap.forEach { (v, thisDegree) ->
             val otherDegree = other.varMap[v] ?: zero()
             val newDegree = min(thisDegree, otherDegree)
             if (!newDegree.isZero()) commonVarMap[v] = newDegree
@@ -49,7 +62,6 @@ class Monomial private constructor(override val body: Map<Char, Rational>, final
 
     override fun _reduceOrNull(other: Expression): Expression? {
         return when (other) {
-            is Rational -> other.flip() * other
             is Monomial -> reduceByMonomialOrNull(other)
             else -> null
         }
@@ -64,7 +76,7 @@ class Monomial private constructor(override val body: Map<Char, Rational>, final
         return Monomial(newVarMap)
     }
 
-    fun isUnit(): Boolean = simplify().equals(1)
+    fun isUnit() = simplify().equals(1)
 
     operator fun times(other: Monomial): Monomial {
         val newVarMap = varMap.toMutableMap()

@@ -3,8 +3,6 @@ package expressions.binary
 import expressions.Expression
 import expressions.number.Rational
 import expressions.commonFactor
-import expressions.longs.Product
-import expressions.unit
 
 class Quotient private constructor(body: Pair<Expression, Expression>, final: Boolean) : BinaryExpression(body, final) {
     constructor(body: Pair<Expression, Expression>) : this(body, false)
@@ -15,9 +13,31 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
     override fun simplify(): Expression {
         if (final) return this
 
-        val simpleThis = simplifySoftly()
-        if (simpleThis.denom is Rational) return simpleThis.numer.reduce(simpleThis.denom)
-        return Quotient(simpleThis.body, true)
+        val sQuotient = simplifySoftly()
+        val (sNumer, sDenom) = sQuotient.body
+        if (sDenom.isUnitRational()) return sNumer
+
+        if (sNumer is Quotient && sDenom is Quotient) {
+            val qt = (sNumer.numer * sDenom.denom) / (sNumer.denom * sDenom.numer)
+            return qt.simplify()
+        }
+        if (sNumer is Quotient) {
+            val qt = sNumer.numer / (sNumer.denom * sDenom)
+            return qt.simplify()
+        }
+        if (sDenom is Quotient) {
+            val qt = (sNumer * sDenom.denom) / sDenom.numer
+            return qt.simplify()
+        }
+
+        val denomRationalPart = sDenom.rationalPart()
+        if (!denomRationalPart.isUnitRational()) {
+            val denomNonRationalPart = sDenom.nonRationalPart()
+            val qt = (sNumer * denomRationalPart.flip()) / denomNonRationalPart
+            return qt.simplify()
+        }
+
+        return sQuotient
     }
     private fun simplifySoftly(): Quotient {
         if (final) return this
@@ -26,7 +46,7 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
         val cf = commonFactor(simpleNumer, simpleDenom)
         val reducedNumer = simpleNumer.reduce(cf)
         val reducedDenom = simpleDenom.reduce(cf)
-        return Quotient(reducedNumer to reducedDenom)
+        return Quotient(reducedNumer to reducedDenom, true)
     }
 
     override fun commonFactor(other: Expression): Expression {
@@ -38,41 +58,25 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
         return Quotient(reducedNumer to denom)
     }
 
-    fun rationalPart(): Rational {
+    override fun rationalPart(): Rational {
         if (!final) TODO("Must be simplified")
-        return when (numer) {
-            is Rational -> numer
-            is Product  -> numer.rationalPart()
-            else        -> unit()
-        }
+        return numer.rationalPart()
     }
-    fun nonRationalPart(): Expression {
+    override fun nonRationalPart(): Expression {
         if (!final) TODO("Must be simplified")
-        return when (numer) {
-            is Rational -> Quotient(unit() to denom, true)
-            is Product  -> numer.nonRationalPart()
-            else        -> this
-        }
+        return Quotient(numer.nonRationalPart() to denom, true)
     }
-    fun numericalPart(): Expression {
+    override fun numericalPart(): Expression {
         if (!final) TODO("Must be simplified")
-        val numerNumPart = if (numer.isNumber()) numer
-                           else if (numer is Product) numer.numericalPart()
-                           else unit()
-        val denomNumPart = if (denom.isNumber()) denom
-                           else if (denom is Product) denom.numericalPart()
-                           else unit()
+        val numerNumPart = numer.numericalPart()
+        val denomNumPart = denom.numericalPart()
         return if (denomNumPart.isUnitRational()) numerNumPart
           else                                    Quotient(numerNumPart to denomNumPart, true)
     }
-    fun nonNumericalPart(): Expression {
+    override fun nonNumericalPart(): Expression {
         if (!final) TODO("Must be simplified")
-        val numerNonNumPart = if (numer.isNumber()) unit()
-                              else if (numer is Product) numer.nonNumericalPart()
-                              else                       numer
-        val denomNonNumPart = if (denom.isNumber()) unit()
-                              else if (denom is Product) denom.nonNumericalPart()
-                              else                       denom
+        val numerNonNumPart = numer.nonNumericalPart()
+        val denomNonNumPart = denom.nonNumericalPart()
         return if (denomNonNumPart.isUnitRational()) numerNonNumPart
         else                                         Quotient(numerNonNumPart to denomNonNumPart, true)
     }

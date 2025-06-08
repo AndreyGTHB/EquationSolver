@@ -1,6 +1,7 @@
 package expressions.number
 
 import expressions.Expression
+import expressions.unit
 import expressions.zero
 import utils.gcd
 import utils.over
@@ -14,11 +15,13 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
     val numer = body.first
     val denom = body.second
 
-    init {
-        if (denom == 0) { throw RuntimeException("Zero division") }
-    }
+    init { if (denom == 0) throw RuntimeException("Zero division") }
 
     override fun _isNumber() = true
+    override fun rationalPart() = this
+    override fun nonRationalPart() = unit()
+    override fun numericalPart() = this
+    override fun nonNumericalPart() = unit()
 
     override fun simplify(): Rational {
         if (final) return this
@@ -37,11 +40,11 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
     override fun _reduceOrNull(other: Expression): Rational? = if (other is Rational) this / other
                                                                else                   null
 
-    fun flip(): Rational = Rational(denom to numer)
+    fun flip() = denom over numer
 
-    fun isZero(): Boolean = numer == 0
-    fun isUnit(): Boolean = numer == denom
-    fun isInteger(): Boolean = numer % denom == 0
+    fun isZero() = numer == 0
+    fun isUnit() = numer == denom
+    fun isInteger() = numer % denom == 0
 //    override fun equals(other: Any?): Boolean {
 //        other ?: return false
 //        return when (other) {
