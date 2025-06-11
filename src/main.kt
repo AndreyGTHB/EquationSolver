@@ -1,21 +1,21 @@
+import expressions.commonFactor
 import expressions.longs.Sum
+import expressions.monomials.Monomial
 import expressions.unit
 import utils.over
+import utils.power
 import utils.toMonomial
 
-//import expressions.*
-
 fun main() {
-    val q1 = "q".toMonomial()
-    val q2 = "Q".toMonomial()
-    val q3 = "P".toMonomial()
-    val f1 = "f".toMonomial()
-    val f2 = "F".toMonomial()
-    val f0 = "I".toMonomial()
+    val r2 = 2.power(1 over 2)
+    val r3 = 3.power(1 over 2)
+    val r5 = 5.power(1 over 2)
+    val r23 = 2.power(1 over 3)
+    val r73 = 7.power(1 over 3)
+    val a = (r3-r2) * (r3+r2)
+    val b = (r23-r73) * (r23*r23 + 14.power(1 over 3) + r73*r73)
+    val c = (r5 - unit())*(r5 - unit()) + (2 over 1)*(r5 - unit()) + unit()*unit()
 
-    val a = -(q1 + q2)/(q1+q3)
-    val df = f1 + a*f0 - f2
-    val qq = q1 * (unit() + a)
-    val c = qq / df
-    println(c.simplify())
+    val expr = a + c/b
+    println(expr.simplify())
 }

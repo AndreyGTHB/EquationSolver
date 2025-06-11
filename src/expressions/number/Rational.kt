@@ -10,7 +10,7 @@ import kotlin.math.abs
 
 class Rational (override val body: Pair<Int, Int>) : Expression() {
     override val final: Boolean
-        get() = gcd(numer, denom) == 1
+        get() = (denom >= 0 && gcd(numer, denom) == 1)
 
     val numer = body.first
     val denom = body.second
@@ -33,7 +33,6 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
         val gcd = gcd(numer, denom)
         val newNumer = (if (denom < 0) -numer else numer) / gcd
         val newDenom = abs(denom) / gcd
-        if (newNumer == 0) return zero()
         return newNumer over newDenom
     }
 
@@ -45,22 +44,9 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
     fun isZero() = numer == 0
     fun isUnit() = numer == denom
     fun isInteger() = numer % denom == 0
-//    override fun equals(other: Any?): Boolean {
-//        other ?: return false
-//        return when (other) {
-//            is Rational -> equalsToFraction(other)
-//            is Int -> equalsToFraction(other.toRational())
-//            else -> false
-//        }
-//    }
-//    private fun equalsToFraction(other: Rational): Boolean {
-//        val (thisNumer, thisDenom) = this.simplify().body
-//        val (otherNumer, otherDenom) = other.simplify().body
-//        return thisNumer == otherNumer && thisDenom == otherDenom
-//    }
 
-    fun isPositive(): Boolean = numer * denom > 0
-    fun isNegative(): Boolean = numer * denom < 0
+    fun isPositive() = numer * denom > 0
+    fun isNegative() = numer * denom < 0
 
     operator fun plus(other: Int) = numer + other * denom over denom
     operator fun plus(other: Rational): Rational {

@@ -8,6 +8,7 @@ fun main() {
     val mon1 = "23*a*b*b*e".toMonomial()
     val mon2 = "-1*d*a*d*b*c".toMonomial()
     var quot = mon1 / mon2
+    println(quot.simplify())
 //    println("${quot.numer} ${quot.denom}")
 //    quot = quot.simplifySoftly()
 //    println(quot)
@@ -18,6 +19,6 @@ fun main() {
 //    println(sum)
 //    println(sum.simplify())
 
-    val qq = (a / b) / (b / a)
-    println(qq.simplify())
+    val qq = ((a / b) / (b / a)).simplify()
+    println(qq)
 }

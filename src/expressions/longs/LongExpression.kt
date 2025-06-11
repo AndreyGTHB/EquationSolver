@@ -1,6 +1,7 @@
 package expressions.longs
 
 import expressions.Expression
+import expressions.compareExpressionTypes
 
 abstract class LongExpression (override val body: List<Expression>, final: Boolean) : Expression(final) {
     override fun _isNumber() = body.all { it.isNumber() }

@@ -64,9 +64,7 @@ fun Int.power(exponent: Int): Int {
     var result = 1
     var currMultiple = this
     for (exp in exponentsOfTwo) {
-        for (i in 1..exp) {
-            currMultiple *= currMultiple
-        }
+        repeat(exp) { currMultiple *= currMultiple }
         result *= currMultiple
         currMultiple = this
     }

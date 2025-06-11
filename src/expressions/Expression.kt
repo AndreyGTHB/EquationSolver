@@ -41,18 +41,21 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
         if (other == null) return false
         if (other::class != this::class) return false
         other as Expression
-        return compareExpressions(this, other) == 0
+        return this.body == other.body
+    }
+    override fun hashCode(): Int = body.hashCode()
+
+    override fun compareTo(other: Expression): Int {
+        val typeComparisonCode = compareExpressionTypes(this, other)
+        return if (typeComparisonCode == 0) this.toString() compareTo other.toString()
+          else                              typeComparisonCode
     }
 
-    override fun compareTo(other: Expression) = compareExpressions(this, other)
-
     open operator fun unaryMinus(): Expression = (-unit()) * this
-
     open operator fun plus(other: Expression)  = Sum(listOf(this, other))
     open operator fun minus(other: Expression) = Sum(listOf(this, -other))
     open operator fun times(other: Expression) = Product(listOf(this, other))
     open operator fun div(other: Expression)   = Quotient(this to other)
 
     abstract override fun toString(): String
-    override fun hashCode(): Int = body.hashCode()
 }

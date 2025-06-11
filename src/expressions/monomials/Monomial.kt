@@ -26,15 +26,13 @@ class Monomial private constructor(override val body: Map<Char, Rational>, final
                 numerVarMap.remove(v)
             }
         }
-        if (denomVarMap.isNotEmpty()) {
-            val qt = Monomial(numerVarMap, true) / Monomial(denomVarMap, true)
-            return qt.simplify()
-        }
-        return sMonomial
+        val expr =  if (numerVarMap.isNotEmpty()
+                     && denomVarMap.isNotEmpty()) Monomial(numerVarMap, true) / Monomial(denomVarMap, true)
+               else if (denomVarMap.isNotEmpty()) unit() / Monomial(denomVarMap, true)
+               else                               sMonomial
+        return expr.simplify()
     }
     private fun simplifySoftly(): Monomial {
-        if (final) { return this }
-
         val sVarMap = varMap
             .filterValues { !it.isZero() }
             .mapValues { it.value.simplify() }

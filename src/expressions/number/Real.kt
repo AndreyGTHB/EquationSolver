@@ -33,7 +33,7 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
         val sReal = simplifySoftly()
         if (sReal.base == 0 || sReal.base == 1) return sReal.base.toRational()
         val (intExponent, rootIndex) = sReal.exponent.body
-        if (rootIndex == 1) return base.toRational() raisedTo intExponent
+        if (rootIndex == 1) return base.power(intExponent).toRational()
 
         val decomp = base.factorise().mapValues { intExponent * it.value }
 

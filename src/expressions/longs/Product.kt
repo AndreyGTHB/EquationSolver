@@ -6,6 +6,7 @@ import expressions.monomials.Monomial
 import expressions.number.Rational
 import expressions.number.Real
 import utils.power
+import utils.toRational
 
 class Product private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
     constructor(body: List<Expression>) : this(body, false)
@@ -85,12 +86,14 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
             if (!sReal.isUnit()) realFactors.add(sReal)
 
         }
-        val realExponentMap = mutableMapOf<Rational, Int>()
+        val rootsMap = mutableMapOf<Int, Int>()
         realFactors.forEach { factor ->
-            realExponentMap[factor.exponent] = (realExponentMap[factor.exponent] ?: 1) * factor.base
+            val (intExp, rootIndex) = factor.exponent.body
+            rootsMap[rootIndex] = (rootsMap[rootIndex] ?: 1) * factor.base.power(intExp)
         }
-        realExponentMap.forEach { exp, base ->
-            val (sRational, sReal) = base.power(exp).simplifyAndSeparate()
+        rootsMap.forEach { index, base ->
+            val rootExp = index.toRational().flip()
+            val (sRational, sReal) = base.power(rootExp).simplifyAndSeparate()
             rationalFactor *= sRational
             currBody.add(sReal)
         }
