@@ -83,6 +83,11 @@ class Monomial private constructor(override val body: Map<Char, Rational>, final
         }
         return Monomial(newVarMap)
     }
+    fun power(exp: Rational): Expression {
+        val newVarMap = varMap.mapValues { (v, d) -> (d * exp).simplify() }
+        return if (final && exp.isPositive()) Monomial(newVarMap, true)
+          else                                Monomial(newVarMap)
+    }
 
     override fun toString(): String {
         var str = "M: "

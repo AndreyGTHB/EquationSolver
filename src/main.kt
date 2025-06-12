@@ -18,4 +18,5 @@ fun main() {
 
     val expr = a + c/b
     println(expr.simplify())
+    println((3 over 2) == (6 over 4))
 }

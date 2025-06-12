@@ -1,5 +1,6 @@
 package expressions
 
+import expressions.binary.Power
 import expressions.binary.Quotient
 import expressions.longs.Product
 import expressions.longs.Sum
@@ -56,6 +57,7 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
     open operator fun minus(other: Expression) = Sum(listOf(this, -other))
     open operator fun times(other: Expression) = Product(listOf(this, other))
     open operator fun div(other: Expression)   = Quotient(this to other)
+    infix fun raisedTo(other: Expression)      = Power(this to other)
 
     abstract override fun toString(): String
 }

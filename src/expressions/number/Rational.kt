@@ -39,6 +39,11 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
     override fun _reduceOrNull(other: Expression): Rational? = if (other is Rational) this / other
                                                                else                   null
 
+    override fun compareTo(other: Expression): Int {
+        return if (other is Rational) this.numer * other.denom - other.numer * this.denom
+          else                        super.compareTo(other)
+    }
+
     fun flip() = denom over numer
 
     fun isZero() = numer == 0
@@ -68,8 +73,9 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
     operator fun div(other: Int) = numer over denom * other
     operator fun div(other: Rational) = this.numer * other.denom over this.denom * other.numer
 
-    infix fun raisedTo(exp: Int): Rational = if (exp >= 0) (numer.power(exp) over denom.power(exp))
-                                             else          flip() raisedTo (-exp)
+    fun power(exp: Int): Rational = if (exp >= 0) (numer.power(exp) over denom.power(exp))
+                                    else          flip() raisedTo (-exp)
+    infix fun raisedTo(exp: Int): Rational = power(exp)
 
     override operator fun unaryMinus() = -numer over denom
 
