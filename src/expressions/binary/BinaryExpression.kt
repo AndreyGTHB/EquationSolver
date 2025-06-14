@@ -10,7 +10,7 @@ abstract class BinaryExpression (
 ) : Expression(final) {
     override fun _isNumber() = body.first.isNumber() && body.second.isNumber()
 
-    protected fun simplifyBody(): Pair<Expression, Expression> {
+    protected suspend fun simplifyBody(): Pair<Expression, Expression> {
         return body.first.simplify() to body.second.simplify()
     }
     protected fun emptyBody(): Pair<Expression, Expression> {

@@ -10,7 +10,7 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
     val numer = body.first
     val denom = body.second
 
-    override fun simplify(): Expression {
+    override suspend fun simplify(): Expression {
         if (final) return this
 
         val sQuotient = simplifySoftly()
@@ -39,7 +39,7 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
 
         return sQuotient
     }
-    private fun simplifySoftly(): Quotient {
+    private suspend fun simplifySoftly(): Quotient {
         if (final) return this
 
         val (simpleNumer, simpleDenom) = simplifyBody()
@@ -49,11 +49,11 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
         return Quotient(reducedNumer to reducedDenom, true)
     }
 
-    override fun commonFactor(other: Expression): Expression {
+    override suspend fun commonFactor(other: Expression): Expression {
         return commonFactor(numer, other)
     }
 
-    override fun _reduceOrNull(other: Expression): Expression? {
+    override suspend fun _reduceOrNull(other: Expression): Expression? {
         val reducedNumer = numer.reduceOrNull(other) ?: return null
         return Quotient(reducedNumer to denom)
     }

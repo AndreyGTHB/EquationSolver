@@ -11,10 +11,10 @@ import utils.toRational
 class Product private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
     constructor(body: List<Expression>) : this(body, false)
 
-    override fun simplify(): Expression {
+    override suspend fun simplify(): Expression {
         return simplify(true)
     }
-    fun simplify(expandBrackets: Boolean): Expression {
+    suspend fun simplify(expandBrackets: Boolean): Expression {
         if (final && !expandBrackets) return this
 
         val simpleThis = simplifySoftly()
@@ -41,7 +41,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
             else -> simpleThis
         }
     }
-    private fun simplifySoftly(): Product {
+    private suspend fun simplifySoftly(): Product {
         if (final) return this
 
         // Associativity
@@ -123,7 +123,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         expandedBody.forEach { sum -> sum.body.forEach { term -> currBody.add(term) } }
         return Sum(currBody)
     }
-    private fun factorOutSums(): Product {
+    private suspend fun factorOutSums(): Product {
         val newBody = mutableListOf<Expression>()
         body.forEach {
             if (it is Sum) {
@@ -139,7 +139,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         return Product(newBody)
     }
 
-    override fun commonFactor(other: Expression): Expression? {
+    override suspend fun commonFactor(other: Expression): Expression? {
         return when (other) {
             is Real     -> commonFactorWithReal(other)
             is Monomial -> commonFactorWithMonomial(other)
@@ -147,7 +147,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
             else        -> null
         }
     }
-    private fun commonFactorWithReal(other: Real): Product {
+    private suspend fun commonFactorWithReal(other: Real): Product {
         val cfBody = mutableListOf<Expression>()
         var currOther: Expression = other
         body.forEach {
@@ -162,7 +162,8 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         body.forEach { if (it is Monomial) return commonFactor(it, other) }
         return null
     }
-    private fun commonFactorWithProduct(other: Product): Expression {
+
+    private suspend fun commonFactorWithProduct(other: Product): Expression {
         val cfBody = mutableListOf<Expression>()
         val currOtherBody = other.body.toMutableList()
         this.body.forEach { fact1 ->
@@ -179,7 +180,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         return Product(cfBody)
     }
 
-    override fun _reduceOrNull(other: Expression): Expression? {
+    override suspend fun _reduceOrNull(other: Expression): Expression? {
         if (other is Rational) {
             return this * other.flip()
         }

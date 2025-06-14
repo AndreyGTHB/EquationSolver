@@ -12,7 +12,7 @@ class Monomial private constructor(override val body: Map<Char, Rational>, final
 
     val varMap = body
 
-    override fun simplify(): Expression {
+    override suspend fun simplify(): Expression {
         if (final) { return this }
 
         val sMonomial = simplifySoftly()
@@ -40,7 +40,7 @@ class Monomial private constructor(override val body: Map<Char, Rational>, final
         return Monomial(sVarMap, true)
     }
 
-    override fun commonFactor(other: Expression): Expression? {
+    override suspend fun commonFactor(other: Expression): Expression? {
         return when (other) {
             is Monomial -> commonFactorWithMonomial(other)
             else -> null
@@ -58,7 +58,7 @@ class Monomial private constructor(override val body: Map<Char, Rational>, final
         return Monomial(commonVarMap)
     }
 
-    override fun _reduceOrNull(other: Expression): Expression? {
+    override suspend fun _reduceOrNull(other: Expression): Expression? {
         return when (other) {
             is Monomial -> reduceByMonomialOrNull(other)
             else -> null
@@ -73,8 +73,6 @@ class Monomial private constructor(override val body: Map<Char, Rational>, final
         }
         return Monomial(newVarMap)
     }
-
-    fun isUnit() = simplify().equals(1)
 
     operator fun times(other: Monomial): Monomial {
         val newVarMap = varMap.toMutableMap()

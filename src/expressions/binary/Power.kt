@@ -15,7 +15,7 @@ class Power private constructor(body: Pair<Expression, Expression>, final: Boole
     val base = body.first
     val exponent = body.second
 
-    override fun simplify(): Expression {
+    override suspend fun simplify(): Expression {
         if (final) return this
 
         val sPower = simplifySoftly()
@@ -33,7 +33,7 @@ class Power private constructor(body: Pair<Expression, Expression>, final: Boole
         return if (sExponent is Rational) sPower.simplifyAsRationalPower()
                else                       sPower
     }
-    private fun simplifySoftly(): Power {
+    private suspend fun simplifySoftly(): Power {
         var (sBase, sExponent) = simplifyBody()
         if (sBase is Power) {
             sExponent = (sExponent * sBase.exponent).simplify()
@@ -41,7 +41,7 @@ class Power private constructor(body: Pair<Expression, Expression>, final: Boole
         }
         return Power(sBase to sExponent, true)
     }
-    private fun simplifyAsRationalPower(): Expression {
+    private suspend fun simplifyAsRationalPower(): Expression {
         exponent as Rational
         if (exponent.isNegative()) return (unit() / Power(base to -exponent)).simplify()
         if (exponent.isZero())     return unit()
@@ -67,7 +67,7 @@ class Power private constructor(body: Pair<Expression, Expression>, final: Boole
         }
     }
 
-    override fun commonFactor(other: Expression): Expression {
+    override suspend fun commonFactor(other: Expression): Expression {
         if (other is Power) return commonFactorWithPower(other)
         val cfWithBase = commonFactor(base, other)
         return Power(cfWithBase to exponent)

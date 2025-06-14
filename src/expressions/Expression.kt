@@ -11,7 +11,7 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
     abstract val body: Any
     private var isNumber: Boolean? = null
 
-    abstract fun simplify(): Expression
+    abstract suspend fun simplify(): Expression
 
     protected open fun _isNumber(): Boolean = false
     fun isNumber(): Boolean {
@@ -19,16 +19,16 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
         return isNumber!!
     }
 
-    internal open fun commonFactor(other: Expression): Expression? = null
+    internal open suspend fun commonFactor(other: Expression): Expression? = null
 
-    protected open fun _reduceOrNull(other: Expression): Expression? = null
-    fun reduceOrNull(other: Expression): Expression? {
+    protected open suspend fun _reduceOrNull(other: Expression): Expression? = null
+    suspend fun reduceOrNull(other: Expression): Expression? {
         if (!(this.final && other.final)) TODO("Reducing non-simplified expressions")
         if (other.isZeroRational()) TODO("Reducing by zero")
         if (other.isUnitRational() || this.isZeroRational()) return this
         return _reduceOrNull(other)?.simplify()
     }
-    fun reduce(other: Expression): Expression = reduceOrNull(other)!!
+    suspend fun reduce(other: Expression): Expression = reduceOrNull(other)!!
 
     open fun rationalPart(): Rational = unit()
     open fun nonRationalPart(): Expression = this

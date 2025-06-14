@@ -23,7 +23,7 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
     override fun numericalPart() = this
     override fun nonNumericalPart() = unit()
 
-    override fun simplify(): Rational {
+    override suspend fun simplify(): Rational {
         if (final) return this
         return simplifySoftly()
     }
@@ -36,7 +36,7 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
         return newNumer over newDenom
     }
 
-    override fun _reduceOrNull(other: Expression): Rational? = if (other is Rational) this / other
+    override suspend fun _reduceOrNull(other: Expression): Rational? = if (other is Rational) this / other
                                                                else                   null
 
     override fun compareTo(other: Expression): Int {

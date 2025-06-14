@@ -10,7 +10,7 @@ import expressions.zero
 class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
     constructor(body: List<Expression>) : this(body, false)
 
-    override fun simplify(): Expression {
+    override suspend fun simplify(): Expression {
         if (final) return this
 
         val simpleSum = simplifySoftly()
@@ -20,7 +20,7 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
             else -> simpleSum
         }
     }
-    private fun simplifySoftly(): Sum {
+    private suspend fun simplifySoftly(): Sum {
         var prevBody = simplifyBody()
         var currBody = mutableListOf<Expression>()
         // Associativity
@@ -37,7 +37,7 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
             if (term is Quotient) quotientMap[term.denom] = (quotientMap[term.denom] ?: zero()) + term.numer
             else                  currBody.add(term)
         }
-        quotientMap.forEach { denom, numer ->
+        for ((denom, numer) in quotientMap) {
             val reducedQuotient = (numer / denom).simplify()
             if (!reducedQuotient.isZeroRational()) currBody.add(reducedQuotient)
         }
@@ -50,11 +50,10 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
             termMap1[nonRationalPart] = (termMap1[nonRationalPart] ?: zero()) + rationalPart
         }
         currBody.clear()
-        termMap1.forEach { expr, coeff ->
+        for ((expr, coeff) in termMap1) {
             val reducedTerm = (coeff * expr).simplify()
             if (!reducedTerm.isZeroRational()) currBody.add(reducedTerm)
         }
-
         // Reduction of terms with the same non-numerical part
         prevBody = currBody
         currBody = mutableListOf()
@@ -68,16 +67,20 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
                 termMap2[nonNumPart] = if (prevCoeff == null) numPart else prevCoeff + numPart
             }
         }
-        termMap2.forEach { expr, coeff ->
+        for ((expr, coeff) in termMap2) {
             val reducedTerm = (coeff * expr).simplify(false)
             if (!reducedTerm.isZeroRational()) currBody.add(reducedTerm)
         }
+//        termMap2.forEach { expr, coeff ->
+//            val reducedTerm = (coeff * expr).simplify(false)
+//            if (!reducedTerm.isZeroRational()) currBody.add(reducedTerm)
+//        }
 
         currBody.sort()
         return Sum(currBody, true)
     }
 
-    override fun commonFactor(other: Expression): Expression {
+    override suspend fun commonFactor(other: Expression): Expression {
         return commonFactor(commonInternalFactor(), other)
     }
     fun commonInternalFactor(): Expression {
@@ -88,7 +91,7 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
         return cf
     }
 
-    override fun _reduceOrNull(other: Expression): Expression? {
+    override suspend fun _reduceOrNull(other: Expression): Expression? {
         val newBody = body.map { it.reduceOrNull(other) ?: return null }
         return Sum(newBody)
     }
