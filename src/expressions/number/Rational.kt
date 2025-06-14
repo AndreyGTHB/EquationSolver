@@ -74,7 +74,7 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
     operator fun div(other: Rational) = this.numer * other.denom over this.denom * other.numer
 
     fun power(exp: Int): Rational = if (exp >= 0) (numer.power(exp) over denom.power(exp))
-                                    else          flip() raisedTo (-exp)
+                                    else          flip().power(-exp)
     infix fun raisedTo(exp: Int): Rational = power(exp)
 
     override operator fun unaryMinus() = -numer over denom
