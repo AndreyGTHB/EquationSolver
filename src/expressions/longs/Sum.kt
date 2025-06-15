@@ -40,7 +40,7 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
             if (term is Quotient) quotientMap[term.denom] = (quotientMap[term.denom] ?: zero()) + term.numer
             else                  currBody.add(term)
         }
-        for ((denom, numer) in quotientMap) {
+        quotientMap.forEach { (denom, numer) ->
             val reducedQuotient = (numer / denom).simplify()
             if (!reducedQuotient.isZeroRational()) currBody.add(reducedQuotient)
         }
@@ -53,7 +53,7 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
             termMap1[nonRationalPart] = (termMap1[nonRationalPart] ?: zero()) + rationalPart
         }
         currBody.clear()
-        for ((expr, coeff) in termMap1) {
+        termMap1.forEach { (expr, coeff) ->
             val reducedTerm = (coeff * expr).simplify()
             if (!reducedTerm.isZeroRational()) currBody.add(reducedTerm)
         }
@@ -70,14 +70,10 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
                 termMap2[nonNumPart] = if (prevCoeff == null) numPart else prevCoeff + numPart
             }
         }
-        for ((expr, coeff) in termMap2) {
+        termMap2.forEach { (expr, coeff) ->
             val reducedTerm = (coeff * expr).simplify(false)
             if (!reducedTerm.isZeroRational()) currBody.add(reducedTerm)
         }
-//        termMap2.forEach { expr, coeff ->
-//            val reducedTerm = (coeff * expr).simplify(false)
-//            if (!reducedTerm.isZeroRational()) currBody.add(reducedTerm)
-//        }
 
         currBody.sort()
         return Sum(currBody, true)

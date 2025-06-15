@@ -84,7 +84,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
 
         // Continue simplifying the real numbers
         val realFactors = mutableListOf<Real>()
-        for((base, exp) in realBaseMap) {
+        realBaseMap.forEach { (base, exp) ->
             val (sRational, sReal) = base.power(exp).simplifyAndSeparate()
             rationalFactor *= sRational
             if (!sReal.isUnit()) realFactors.add(sReal)
@@ -95,7 +95,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
             val (intExp, rootIndex) = factor.exponent.body
             rootsMap[rootIndex] = (rootsMap[rootIndex] ?: 1) * factor.base.power(intExp)
         }
-        for((index, base) in rootsMap) {
+        rootsMap.forEach { (index, base) ->
             val rootExp = index.toRational().flip()
             val (sRational, sReal) = base.power(rootExp).simplifyAndSeparate()
             rationalFactor *= sRational

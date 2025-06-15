@@ -1,8 +1,9 @@
 import expressions.longs.Sum
+import kotlinx.coroutines.runBlocking
 import utils.over
 import utils.toMonomial
 
-fun main() {
+fun main() = runBlocking {
     var s1 = Sum(listOf(1 over 2))
     s1 += 2 over 3
     s1 += 3 over 4

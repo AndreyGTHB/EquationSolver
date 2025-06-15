@@ -3,6 +3,7 @@ package expressions.longs
 import expressions.Expression
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
+import utils.coroutineScope
 
 abstract class LongExpression (override val body: List<Expression>, final: Boolean) : Expression(final) {
     private val logger = LoggerFactory.getLogger(this::class.java)
@@ -10,13 +11,12 @@ abstract class LongExpression (override val body: List<Expression>, final: Boole
     override fun _isNumber() = body.all { it.isNumber() }
 
     protected suspend fun simplifyBody(): List<Expression> {
-//        logger.info(".")
-        val scope = CoroutineScope(Dispatchers.Default)
-        val sBody = scope.async {
+        logger.debug(".")
+        val sBody = coroutineScope(Dispatchers.Default) {
             body.map {
                 async { it.simplify() }
             }.awaitAll()
-        }.await()
+        }
         return sBody
     }
 

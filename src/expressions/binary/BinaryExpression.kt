@@ -5,6 +5,7 @@ import expressions.number.Rational
 import kotlinx.coroutines.*
 import utils.over
 import org.slf4j.LoggerFactory
+import utils.coroutineScope
 
 abstract class BinaryExpression (
     override val body: Pair<Expression, Expression>,
@@ -15,13 +16,12 @@ abstract class BinaryExpression (
     override fun _isNumber() = body.first.isNumber() && body.second.isNumber()
 
     protected suspend fun simplifyBody(): Pair<Expression, Expression> {
-//        logger.info(".")
-        val scope = CoroutineScope(Job())
-        val sBody = scope.async {
+        logger.debug(".")
+        val sBody = coroutineScope(Dispatchers.Default) {
             val sFirstDeferred = async { body.first.simplify() }
             val sSecondDeferred = async { body.second.simplify() }
             sFirstDeferred.await() to sSecondDeferred.await()
-        }.await()
+        }
         return sBody
     }
 

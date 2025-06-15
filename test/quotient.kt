@@ -1,8 +1,9 @@
 import expressions.unit
+import kotlinx.coroutines.runBlocking
 import utils.over
 import utils.toMonomial
 
-fun main() {
+fun main() = runBlocking {
     val a = "a".toMonomial()
     val b = "b".toMonomial()
     val mon1 = "23*a*b*b*e".toMonomial()

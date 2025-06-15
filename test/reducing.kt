@@ -2,10 +2,11 @@ import expressions.Expression
 import expressions.longs.Sum
 import expressions.number.Rational
 import expressions.unit
+import kotlinx.coroutines.runBlocking
 import utils.toMonomial
 import utils.over
 
-fun main() {
+fun main() = runBlocking {
     // Fraction
     val f1 = Rational(6 to 13)
     val f2 = Rational(2 to 3)
