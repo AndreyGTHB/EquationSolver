@@ -10,23 +10,14 @@ abstract class LongExpression (override val body: List<Expression>, final: Boole
     override fun _isNumber() = body.all { it.isNumber() }
 
     protected suspend fun simplifyBody(): List<Expression> {
-        logger.trace(">> LongExpression.simplifyBody()")
+//        logger.info(".")
         val scope = CoroutineScope(Dispatchers.Default)
-        val sBodyDeferred = scope.async {
-            logger.trace("   >> LongExpression.simplifyBody().coroutineScope()")
-            body.mapIndexed { i, expr ->
-                async {
-                    logger.trace("      >> $i __0_0__ IN  .simplify()")
-                    expr.simplify().also {
-                        logger.trace("      << $i __0_0__ OUT .simplify()")
-                    }
-                }
-            }.awaitAll().also {
-                logger.trace("   << LongExpression.simplifyBody().coroutineScope()")
-            }
-        }
-        logger.trace("<< LongExpression.simplifyBody()")
-        return sBodyDeferred.await()
+        val sBody = scope.async {
+            body.map {
+                async { it.simplify() }
+            }.awaitAll()
+        }.await()
+        return sBody
     }
 
     override fun toString(): String {

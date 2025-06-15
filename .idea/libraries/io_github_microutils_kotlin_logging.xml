@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="io.github.microutils.kotlin.logging" type="repository">
+    <properties maven-id="io.github.microutils:kotlin-logging:2.0.11" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/io/github/microutils/kotlin-logging/2.0.11/kotlin-logging-2.0.11.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib-common/1.5.21/kotlin-stdlib-common-1.5.21.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

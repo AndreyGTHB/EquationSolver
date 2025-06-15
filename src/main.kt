@@ -1,21 +1,21 @@
 import expressions.Expression
-import expressions.commonFactor
-import expressions.longs.Sum
-import expressions.monomials.Monomial
 import expressions.unit
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import utils.over
 import utils.power
-import utils.toMonomial
 import kotlin.time.measureTime
 
 fun main() {
-    val timeNeeded = measureTime { repeat(100) {
-        testJob()
+    val timeNeeded = measureTime { runBlocking {
+        repeat(10000) {
+            launch { testJob() }
+        }
     } }
     println("Time needed: $timeNeeded")
 }
 
-fun testJob(): Expression {
+suspend fun testJob(): Expression {
     val r2 = 2.power(1 over 2)
     val r3 = 3.power(1 over 2)
     val r5 = 5.power(1 over 2)
@@ -26,5 +26,5 @@ fun testJob(): Expression {
     val c = (r5 - unit())*(r5 - unit()) + (2 over 1)*(r5 - unit()) + unit()*unit()
 
     val expr = a + c/b
-    return expr.simplifyBlocking()
+    return expr.simplify()
 }

@@ -5,12 +5,16 @@ import expressions.binary.Quotient
 import expressions.commonFactor
 import expressions.number.Rational
 import expressions.zero
+import org.slf4j.LoggerFactory
 
 class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
+    private val logger = LoggerFactory.getLogger(Sum::class.java)
+
     constructor(body: List<Expression>) : this(body, false)
 
     override suspend fun simplify(): Expression {
         if (final) return this
+//        logger.trace("Sum.simplify()")
 
         val simpleSum = simplifySoftly()
         return when (simpleSum.body.size) {

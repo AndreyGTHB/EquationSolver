@@ -5,10 +5,13 @@ import expressions.binary.Quotient
 import expressions.monomials.Monomial
 import expressions.number.Rational
 import expressions.number.Real
+import org.slf4j.LoggerFactory
 import utils.power
 import utils.toRational
 
 class Product private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
+    private val logger = LoggerFactory.getLogger(Product::class.java)
+
     constructor(body: List<Expression>) : this(body, false)
 
     override suspend fun simplify(): Expression {
@@ -16,6 +19,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
     }
     suspend fun simplify(expandBrackets: Boolean): Expression {
         if (final && !expandBrackets) return this
+//        logger.trace("Product.simplify()")
 
         val simpleThis = simplifySoftly()
         val simpleBody = simpleThis.body

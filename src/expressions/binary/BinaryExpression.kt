@@ -15,13 +15,14 @@ abstract class BinaryExpression (
     override fun _isNumber() = body.first.isNumber() && body.second.isNumber()
 
     protected suspend fun simplifyBody(): Pair<Expression, Expression> {
-        val scope = CoroutineScope(Dispatchers.Default)
-        val sBodyDeferred = scope.async {
+//        logger.info(".")
+        val scope = CoroutineScope(Job())
+        val sBody = scope.async {
             val sFirstDeferred = async { body.first.simplify() }
             val sSecondDeferred = async { body.second.simplify() }
             sFirstDeferred.await() to sSecondDeferred.await()
-        }
-        return sBodyDeferred.await()
+        }.await()
+        return sBody
     }
 
     override fun toString(): String {
