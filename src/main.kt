@@ -7,6 +7,13 @@ import utils.power
 import utils.toMonomial
 
 fun main() {
+    val timeNeeded = measureTime { repeat(100) {
+        testJob()
+    } }
+    println("Time needed: $timeNeeded")
+}
+
+fun testJob(): Expression {
     val r2 = 2.power(1 over 2)
     val r3 = 3.power(1 over 2)
     val r5 = 5.power(1 over 2)
@@ -17,6 +24,5 @@ fun main() {
     val c = (r5 - unit())*(r5 - unit()) + (2 over 1)*(r5 - unit()) + unit()*unit()
 
     val expr = a + c/b
-    println(expr.simplify())
-    println((3 over 2) == (6 over 4))
+    return expr.simplifyBlocking()
 }

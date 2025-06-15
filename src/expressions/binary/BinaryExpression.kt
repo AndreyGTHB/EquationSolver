@@ -2,19 +2,26 @@ package expressions.binary
 
 import expressions.Expression
 import expressions.number.Rational
+import kotlinx.coroutines.*
 import utils.over
+import org.slf4j.LoggerFactory
 
 abstract class BinaryExpression (
     override val body: Pair<Expression, Expression>,
     final: Boolean
 ) : Expression(final) {
+    private val logger = LoggerFactory.getLogger(BinaryExpression::class.java)
+
     override fun _isNumber() = body.first.isNumber() && body.second.isNumber()
 
     protected suspend fun simplifyBody(): Pair<Expression, Expression> {
-        return body.first.simplify() to body.second.simplify()
-    }
-    protected fun emptyBody(): Pair<Expression, Expression> {
-        return Rational(0 to 1) to Rational(0 to 1)
+        val scope = CoroutineScope(Dispatchers.Default)
+        val sBodyDeferred = scope.async {
+            val sFirstDeferred = async { body.first.simplify() }
+            val sSecondDeferred = async { body.second.simplify() }
+            sFirstDeferred.await() to sSecondDeferred.await()
+        }
+        return sBodyDeferred.await()
     }
 
     override fun toString(): String {

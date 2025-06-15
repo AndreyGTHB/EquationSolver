@@ -4,7 +4,7 @@ import utils.over
 import utils.toRational
 import utils.toMonomial
 
-fun main() {
+fun main() = runBlocking {
     val m1 = "5*a".toMonomial().simplify()
     val m2 = "a".toMonomial().simplify()
     println(m2.reduceOrNull(m1))

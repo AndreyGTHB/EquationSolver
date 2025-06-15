@@ -5,6 +5,7 @@ import expressions.binary.Quotient
 import expressions.longs.Product
 import expressions.longs.Sum
 import expressions.number.Rational
+import kotlinx.coroutines.runBlocking
 
 @Suppress("FunctionName")
 abstract class Expression (open val final: Boolean = false) : Comparable<Expression> {
@@ -12,6 +13,7 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
     private var isNumber: Boolean? = null
 
     abstract suspend fun simplify(): Expression
+    fun simplifyBlocking() = runBlocking { simplify() }
 
     protected open fun _isNumber(): Boolean = false
     fun isNumber(): Boolean {
