@@ -80,7 +80,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
 
         // Continue simplifying the real numbers
         val realFactors = mutableListOf<Real>()
-        realBaseMap.forEach { base, exp ->
+        for((base, exp) in realBaseMap) {
             val (sRational, sReal) = base.power(exp).simplifyAndSeparate()
             rationalFactor *= sRational
             if (!sReal.isUnit()) realFactors.add(sReal)
@@ -91,7 +91,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
             val (intExp, rootIndex) = factor.exponent.body
             rootsMap[rootIndex] = (rootsMap[rootIndex] ?: 1) * factor.base.power(intExp)
         }
-        rootsMap.forEach { index, base ->
+        for((index, base) in rootsMap) {
             val rootExp = index.toRational().flip()
             val (sRational, sReal) = base.power(rootExp).simplifyAndSeparate()
             rationalFactor *= sRational
@@ -158,7 +158,7 @@ class Product private constructor(body: List<Expression>, final: Boolean) : Long
         }
         return Product(cfBody)
     }
-    private fun commonFactorWithMonomial(other: Monomial): Expression? {
+    private suspend fun commonFactorWithMonomial(other: Monomial): Expression? {
         body.forEach { if (it is Monomial) return commonFactor(it, other) }
         return null
     }

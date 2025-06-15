@@ -2,9 +2,8 @@ package expressions.longs
 
 import expressions.Expression
 import expressions.binary.Quotient
-import expressions.number.Rational
 import expressions.commonFactor
-import expressions.unit
+import expressions.number.Rational
 import expressions.zero
 
 class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
@@ -83,7 +82,7 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
     override suspend fun commonFactor(other: Expression): Expression {
         return commonFactor(commonInternalFactor(), other)
     }
-    fun commonInternalFactor(): Expression {
+    suspend fun commonInternalFactor(): Expression {
         var cf: Expression = zero()
         body.forEach {
             cf = commonFactor(cf, it)

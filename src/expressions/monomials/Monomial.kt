@@ -32,7 +32,7 @@ class Monomial private constructor(override val body: Map<Char, Rational>, final
                else                               sMonomial
         return expr.simplify()
     }
-    private fun simplifySoftly(): Monomial {
+    private suspend fun simplifySoftly(): Monomial {
         val sVarMap = varMap
             .filterValues { !it.isZero() }
             .mapValues { it.value.simplify() }
@@ -82,9 +82,8 @@ class Monomial private constructor(override val body: Map<Char, Rational>, final
         return Monomial(newVarMap)
     }
     fun power(exp: Rational): Expression {
-        val newVarMap = varMap.mapValues { (v, d) -> (d * exp).simplify() }
-        return if (final && exp.isPositive()) Monomial(newVarMap, true)
-          else                                Monomial(newVarMap)
+        val newVarMap = varMap.mapValues { (v, d) -> d * exp }
+        return Monomial(newVarMap)
     }
 
     override fun toString(): String {

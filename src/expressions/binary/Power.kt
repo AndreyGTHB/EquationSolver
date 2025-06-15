@@ -72,7 +72,7 @@ class Power private constructor(body: Pair<Expression, Expression>, final: Boole
         val cfWithBase = commonFactor(base, other)
         return Power(cfWithBase to exponent)
     }
-    private fun commonFactorWithPower(other: Power): Expression {
+    private suspend fun commonFactorWithPower(other: Power): Expression {
         val cfOfBases = commonFactor(this.base, other.base)
         return if (this.exponent is Rational && other.exponent is Rational) {
             Power(cfOfBases to min(this.exponent, other.exponent))

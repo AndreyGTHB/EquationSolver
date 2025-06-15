@@ -1,3 +1,4 @@
+import expressions.Expression
 import expressions.commonFactor
 import expressions.longs.Sum
 import expressions.monomials.Monomial
@@ -5,6 +6,7 @@ import expressions.unit
 import utils.over
 import utils.power
 import utils.toMonomial
+import kotlin.time.measureTime
 
 fun main() {
     val timeNeeded = measureTime { repeat(100) {
