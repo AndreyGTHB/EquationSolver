@@ -7,7 +7,6 @@ abstract class LongExpression (override val body: List<Expression>, final: Boole
     override fun _isNumber() = body.all { it.isNumber() }
 
     protected fun simplifyBody(): List<Expression> {
-        println(Thread.currentThread().name)
         val newBody = body.map { it.simplify() } .toList()
         return newBody
     }
