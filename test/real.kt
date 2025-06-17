@@ -1,9 +1,6 @@
-import expressions.Expression
-import expressions.number.Real
-import expressions.unit
-import utils.over
+import expressions.number.over
+import expressions.number.power
 import utils.power
-import utils.toMonomial
 
 fun main() {
     val a = 2.power(3 over 2)

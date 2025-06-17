@@ -1,7 +1,7 @@
 import expressions.Expression
+import expressions.number.over
+import expressions.number.power
 import expressions.unit
-import utils.over
-import utils.power
 import kotlin.time.measureTime
 
 fun main() {

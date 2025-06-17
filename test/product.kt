@@ -1,8 +1,9 @@
 import expressions.longs.Product
 import expressions.longs.Sum
 import expressions.number.Rational
+import expressions.number.over
+import expressions.number.toRational
 import expressions.unit
-import utils.over
 import utils.toMonomial
 import utils.toRational
 

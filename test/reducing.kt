@@ -1,9 +1,9 @@
 import expressions.Expression
 import expressions.longs.Sum
 import expressions.number.Rational
+import expressions.number.over
 import expressions.unit
 import utils.toMonomial
-import utils.over
 
 fun main() {
     // Fraction
