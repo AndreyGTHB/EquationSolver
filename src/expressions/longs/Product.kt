@@ -5,6 +5,8 @@ import expressions.binary.Quotient
 import expressions.monomials.Monomial
 import expressions.number.Rational
 import expressions.number.Real
+import expressions.number.power
+import expressions.number.toRational
 import utils.power
 import utils.toRational
 

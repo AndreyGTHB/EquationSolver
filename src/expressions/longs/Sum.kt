@@ -1,11 +1,8 @@
 package expressions.longs
 
-import expressions.Expression
+import expressions.*
 import expressions.binary.Quotient
 import expressions.number.Rational
-import expressions.commonFactor
-import expressions.unit
-import expressions.zero
 
 class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
     constructor(body: List<Expression>) : this(body, false)

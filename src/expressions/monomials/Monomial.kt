@@ -3,8 +3,8 @@ package expressions.monomials
 import expressions.Expression
 import expressions.zero
 import expressions.number.Rational
+import expressions.number.min
 import expressions.unit
-import utils.min
 
 
 class Monomial private constructor(override val body: Map<Char, Rational>, final: Boolean) : Expression(final) {

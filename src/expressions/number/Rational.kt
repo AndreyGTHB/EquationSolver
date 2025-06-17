@@ -4,7 +4,6 @@ import expressions.Expression
 import expressions.unit
 import expressions.zero
 import utils.gcd
-import utils.over
 import utils.power
 import kotlin.math.abs
 
@@ -86,3 +85,9 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
     override fun toString(): String = "$numer/$denom"
     fun toFloat(): Float = numer.toFloat() / denom
 }
+
+
+infix fun Int.over(other: Int) = Rational(this to other)
+fun Int.toRational() = this over 1
+
+fun min(a: Rational, b: Rational): Rational = if ((a - b).isNegative()) a else b

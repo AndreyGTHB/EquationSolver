@@ -4,7 +4,6 @@ import expressions.Expression
 import expressions.longs.Product
 import expressions.unit
 import expressions.unitReal
-import expressions.zero
 import utils.*
 
 class Real private constructor(override val body: Pair<Int, Rational>, final: Boolean) : Expression(final) {
@@ -72,7 +71,7 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
         }
     }
 
-    fun isUnit() = base == 1
+    fun isUnit() = base == 1 || exponent.isZero()
 
     override fun commonFactor(other: Expression): Real? {
         if (other !is Real) return null
@@ -95,3 +94,4 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
 }
 
 
+fun Int.power(exp: Rational) = Real(this to exp)

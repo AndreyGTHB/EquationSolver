@@ -70,9 +70,3 @@ fun Int.power(exponent: Int): Int {
     }
     return result
 }
-fun Int.power(exp: Rational) = Real(this to exp)
-
-infix fun Int.over(other: Int) = Rational(this to other)
-fun Int.toRational() = this over 1
-
-fun min(a: Rational, b: Rational): Rational = if ((a - b).isNegative()) a else b

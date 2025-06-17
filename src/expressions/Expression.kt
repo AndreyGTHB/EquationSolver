@@ -16,6 +16,7 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
     protected open fun _isNumber(): Boolean = false
     fun isNumber(): Boolean {
         if (isNumber == null) isNumber = _isNumber()
+        true xor false
         return isNumber!!
     }
 
@@ -34,9 +35,6 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
     open fun nonRationalPart(): Expression = this
     open fun numericalPart(): Expression = if (isNumber()) this else unit()
     open fun nonNumericalPart(): Expression = if (isNumber()) unit() else this
-
-    fun isUnitRational(): Boolean = this is Rational && this.isUnit()
-    fun isZeroRational(): Boolean = this is Rational && this.isZero()
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
@@ -61,3 +59,7 @@ abstract class Expression (open val final: Boolean = false) : Comparable<Express
 
     abstract override fun toString(): String
 }
+
+
+fun Expression.isUnitRational(): Boolean = this is Rational && this.isUnit()
+fun Expression.isZeroRational(): Boolean = this is Rational && this.isZero()

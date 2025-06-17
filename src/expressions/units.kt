@@ -5,7 +5,7 @@ import expressions.longs.Product
 import expressions.monomials.Monomial
 import expressions.number.Rational
 import expressions.number.Real
-import utils.over
+import expressions.number.over
 
 fun unit(): Rational = 1 over 1
 fun unitReal() = Real(1 to unit())

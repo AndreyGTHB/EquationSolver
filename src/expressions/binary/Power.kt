@@ -6,8 +6,8 @@ import expressions.longs.Product
 import expressions.monomials.Monomial
 import expressions.number.Rational
 import expressions.number.Real
+import expressions.number.min
 import expressions.unit
-import utils.min
 
 class Power private constructor(body: Pair<Expression, Expression>, final: Boolean) : BinaryExpression(body, final) {
     constructor(body: Pair<Expression, Expression>) : this(body, false)

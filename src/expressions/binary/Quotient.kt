@@ -3,6 +3,7 @@ package expressions.binary
 import expressions.Expression
 import expressions.number.Rational
 import expressions.commonFactor
+import expressions.isUnitRational
 
 class Quotient private constructor(body: Pair<Expression, Expression>, final: Boolean) : BinaryExpression(body, final) {
     constructor(body: Pair<Expression, Expression>) : this(body, false)
