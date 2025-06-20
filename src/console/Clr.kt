@@ -14,11 +14,13 @@ object Clr {
 
     const val WHITE = "${esc}38;5;7m"
     const val RED = "${esc}38;5;1m"
-    const val ERR = RED
+    const val GREEN = "${esc}38;5;46m"
     const val YELLOW = "${esc}38;5;227m"
-    const val WARN = YELLOW
     const val BLUE = "${esc}38;5;27m"
     const val ORANGE = "${esc}38;5;208m"
+    const val ERR = RED
+    const val WARN = YELLOW
+    const val SUCCESS = GREEN
 
     // 256 Colors
     fun fg(n: Int) = "${esc}38;5;${n}m" // Set a foreground color.
@@ -34,6 +36,7 @@ object Clr {
     fun String.highlight(baseColor: String? = null): String {
         val clr = baseColor ?: RC
         return clr + this
+            .replace("✔", "${SUCCESS}✔${clr}")
             .replace("❌", "${ERR}❌${clr}")
             .replace("⚠", "${WARN}⚠${clr}")
             .replace("⮕", "${BLUE}⮕${clr}")
