@@ -10,7 +10,7 @@ fun main() {
         }.joinToString("")
     )
     println(Clr.RC)
-    println("⚠ ${Clr.B}Highlight${Clr.RC} ${Clr.S}special${Clr.RC} ${Clr.B+Clr.U}symbols${Clr.RC} ${Clr.U+Clr.I}using${Clr.RC} ${Clr.B+Clr.I+Clr.ORANGE}String${Clr.RC+Clr.B+Clr.YELLOW}.${Clr.U}highlight()${Clr.RC} function. Works for: '❌', '⚠', '⮕', '⊗'".highlight())
+    println("⚠ ${Clr.B}Highlight${Clr.RC} ${Clr.S}special${Clr.RC} ${Clr.B+Clr.U}symbols${Clr.RC} ${Clr.U+Clr.I}using${Clr.RC} ${Clr.B+Clr.I+Clr.ORANGE}String${Clr.RC+Clr.B+Clr.YELLOW}.${Clr.U}highlight()${Clr.RC} function. Works for: '❌', '⚠', '✔', '⮕', '⊗'".highlight())
     println(Clr.RC)
 
     demoColors256("${Clr.fg(121)}Foreground colors - ${Clr.U+Clr.B}fun fg(color)${Clr.RC}") {
