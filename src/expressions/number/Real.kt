@@ -1,14 +1,17 @@
 package expressions.number
 
+import equations.Domain
+import equations.FullDomain
 import expressions.Expression
 import expressions.longs.Product
 import expressions.unit
 import expressions.unitReal
 import utils.*
 
-class Real private constructor(override val body: Pair<Int, Rational>, final: Boolean) : Expression(final) {
-    constructor(body: Pair<Int, Rational>) : this(body, false)
-
+class Real (
+    override val body: Pair<Int, Rational>,
+    domain: Domain = FullDomain,
+) : Expression(domain, false) {
     val base = body.first
     val exponent = body.second
 
@@ -18,12 +21,8 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
     }
 
     override fun _isNumber() = true
-    override fun numericalPart() = this
-    override fun nonNumericalPart() = unit()
 
-    override fun simplify(): Expression {
-        if (final) return this
-
+    override fun _simplify(): Expression {
         if (exponent.isNegative()) {
             val opposite = Real(base to -exponent)
             return (unit() / opposite).simplify()
@@ -34,7 +33,7 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
         val (intExponent, rootIndex) = sReal.exponent.body
         if (rootIndex == 1) return base.power(intExponent).toRational()
 
-        val decomp = base.factorise().mapValues { intExponent * it.value }
+        val decomp = base.factorise().mapValues { it.value * intExponent }
 
         var outerPart = 1
         var innerPart = 1
@@ -55,7 +54,7 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
     }
     private fun simplifySoftly(): Real {
         val sExponent = exponent.simplify()
-        return Real(base to sExponent, true)
+        return Real(base to sExponent)
     }
 
     fun simplifyAndSeparate(): Pair<Rational, Real> {
@@ -73,10 +72,10 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
 
     fun isUnit() = base == 1 || exponent.isZero()
 
-    override fun commonFactor(other: Expression): Real? {
+    override fun _commonFactor(other: Expression): Real? {
         if (other !is Real) return null
         val commonBaseFactor = gcd(this.base, other.base)
-        return Real(commonBaseFactor to min(this.exponent, other.exponent), true)
+        return Real(commonBaseFactor to min(this.exponent, other.exponent)).apply { final = true }
     }
 
     override fun _reduceOrNull(other: Expression): Expression? {
@@ -95,3 +94,4 @@ class Real private constructor(override val body: Pair<Int, Rational>, final: Bo
 
 
 fun Int.power(exp: Rational) = Real(this to exp)
+fun Int.squareRoot() = Real(this to (1 over 2))

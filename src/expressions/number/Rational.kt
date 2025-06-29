@@ -1,32 +1,28 @@
 package expressions.number
 
-import expressions.Expression
-import expressions.unit
-import expressions.zero
+import equations.Domain
+import equations.FullDomain
+import expressions.*
 import utils.gcd
 import utils.power
 import kotlin.math.abs
 
-class Rational (override val body: Pair<Int, Int>) : Expression() {
-    override val final: Boolean
-        get() = (denom >= 0 && gcd(numer, denom) == 1)
-
+class Rational (
+    override val body: Pair<Int, Int>,
+    domain: Domain = FullDomain,
+    final: Boolean = false
+) : Expression(domain, final) {
     val numer = body.first
     val denom = body.second
 
-    init { if (denom == 0) throw RuntimeException("Zero division") }
+    init { assert(denom != 0) }
 
     override fun _isNumber() = true
     override fun rationalPart() = this
     override fun nonRationalPart() = unit()
-    override fun numericalPart() = this
-    override fun nonNumericalPart() = unit()
 
-    override fun simplify(): Rational {
-        if (final) return this
-        return simplifySoftly()
-    }
-    private fun simplifySoftly(): Rational {
+    override fun simplify() = super.simplify() as Rational
+    override fun _simplify(): Rational {
         if (isZero()) return zero()
 
         val gcd = gcd(numer, denom)
@@ -35,6 +31,14 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
         return newNumer over newDenom
     }
 
+    override fun _commonFactor(other: Expression): Rational? {
+        if (other !is Rational) return null
+        val commonDenom = this.denom * other.denom
+        val thisNumer = this.numer * other.denom
+        val otherNumer = this.denom * other.numer
+        val cfAbs = gcd(thisNumer, otherNumer) over commonDenom
+        return if (this.isNegative() && other.isNegative()) -cfAbs else cfAbs
+    }
     override fun _reduceOrNull(other: Expression): Rational? = if (other is Rational) this / other
                                                                else                   null
 

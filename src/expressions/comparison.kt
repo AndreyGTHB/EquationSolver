@@ -1,5 +1,6 @@
 package expressions
 
+import expressions.binary.Power
 import expressions.binary.Quotient
 import expressions.longs.Product
 import expressions.longs.Sum
@@ -12,8 +13,9 @@ val exprOrderMap = mapOf(
     Real::class to 2,
     Monomial::class to 3,
     Product::class to 4,
-    Quotient::class to 5,
-    Sum::class to 6
+    Power::class to 5,
+    Quotient::class to 6,
+    Sum::class to 7
 )
 
 internal fun compareExpressionTypes(a: Expression, b: Expression): Int {

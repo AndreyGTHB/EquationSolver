@@ -2,14 +2,18 @@ import expressions.Expression
 import expressions.number.over
 import expressions.number.power
 import expressions.unit
+import kotlinx.coroutines.*
 import kotlin.time.measureTime
 
-fun main() {
-    val timeNeeded = measureTime {
-        repeat(100) {
-            testJob()
-        }
-    }
+fun main() = runBlocking(Dispatchers.Default) {
+    val timeNeeded = measureTime { coroutineScope {
+//        repeat(100_000) { launch {
+//            testJob()
+//        }}
+        repeat (100) { testJob() }
+    }}
+    println(testJob())
+    println(testJob().domain)
     println("Time needed: $timeNeeded")
 }
 

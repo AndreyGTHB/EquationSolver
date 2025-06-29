@@ -1,5 +1,10 @@
 package expressions
 
+import equations.Domain
+import equations.EmptyDomain
+import equations.RestrictingDomain
+import equations.FullDomain
+import equations.Equation
 import expressions.binary.Power
 import expressions.binary.Quotient
 import expressions.longs.Product
@@ -7,27 +12,66 @@ import expressions.longs.Sum
 import expressions.number.Rational
 
 @Suppress("FunctionName")
-abstract class Expression (open val final: Boolean = false) : Comparable<Expression> {
-    abstract val body: Any
+abstract class Expression (
+    domain: Domain = FullDomain,
+    final: Boolean = false
+) : Comparable<Expression> {
+    companion object {
+        fun commonFactor(a: Expression, b: Expression): Expression {
+            assert (a.final && b.final)
+
+            if (a is Rational || b is Rational) {
+                assert(!(a.isZeroRational() && b.isZeroRational()))
+                if (a.isZeroRational()) return b
+                if (b.isZeroRational()) return a
+                if (a.isUnitRational() || b.isUnitRational()) return unit()
+            }
+
+            val cf = a._commonFactor(b) ?: b._commonFactor(a) ?: unit()
+            return cf.simplify().apply { domain *= a.domain * b.domain }
+        }
+    }
+
+    abstract val body: Any?
+    var domain = domain
+        private set
+    var final = final
+        protected set
+
     private var isNumber: Boolean? = null
 
-    abstract fun simplify(): Expression
+    protected abstract fun _simplify(): Expression
+    open fun simplify(): Expression {
+        if (final) return this
+        val sThis = _simplify()
+        val sDomain = _fullDomain()
+        return if (sDomain == EmptyDomain) InvalidExpression
+               else                        sThis.apply {
+                                               domain = sDomain
+                                               final = true
+                                           }
+    }
+
+    protected open fun _fullDomain() = domain
+    protected fun addDomainRestriction(restr: Equation) { domain *= RestrictingDomain(restr) }
+    protected fun makeInvalid() { domain = EmptyDomain }
 
     protected open fun _isNumber(): Boolean = false
     fun isNumber(): Boolean {
         if (isNumber == null) isNumber = _isNumber()
-        true xor false
         return isNumber!!
     }
 
-    internal open fun commonFactor(other: Expression): Expression? = null
+    protected open fun _commonFactor(other: Expression): Expression? = null
 
     protected open fun _reduceOrNull(other: Expression): Expression? = null
     fun reduceOrNull(other: Expression): Expression? {
-        if (!(this.final && other.final)) TODO("Reducing non-simplified expressions")
-        if (other.isZeroRational()) TODO("Reducing by zero")
+        assert(this.final && other.final)
+        assert(!other.isZeroRational())
         if (other.isUnitRational() || this.isZeroRational()) return this
-        return _reduceOrNull(other)?.simplify()
+
+        val reduced = _reduceOrNull(other)
+        return reduced?.simplify()?.also { it.domain *= this.domain * other.domain }
     }
     fun reduce(other: Expression): Expression = reduceOrNull(other)!!
 

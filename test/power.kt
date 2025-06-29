@@ -8,7 +8,7 @@ import kotlin.time.measureTime
 
 val logger: Logger = LoggerFactory.getLogger("power")
 
-fun main() = runBlocking {
+fun main() {
     val timeNeeded = measureTime { test(1) }
     logger.info("Time needed: $timeNeeded")
     logger.info("Time per single test: {}", timeNeeded / 1)
@@ -21,4 +21,4 @@ fun test(numberOfTests: Int) { repeat(numberOfTests) {
         val p = s1 raisedTo it
         println(p.simplify())
     }
-} }
+}}

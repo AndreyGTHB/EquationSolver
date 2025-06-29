@@ -48,7 +48,7 @@ fun main() {
     val s5 = s4 + m8 + m7
 //    println(s5); println(s5.simplify())
     val s6 = s5.simplify() as Sum
-    val cif_s6 = s6.commonInternalFactor()
+    val cif_s6 = s6.commonInternalFactor
 //    println(cif_s6)
 //    println(s6.reduceOrNull(cif_s6))
     val s7 = unit() / "a".toMonomial() + unit()*2 / "a".toMonomial() - unit()*4 / "a".toMonomial()

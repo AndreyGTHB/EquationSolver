@@ -1,6 +1,7 @@
 package utils
 
 import expressions.Expression
+import expressions.longs.Product
 import expressions.monomials.Monomial
 import expressions.number.Rational
 import expressions.unit
@@ -19,7 +20,7 @@ fun String.toRationalOrNull(): Rational? {
 }
 fun String.toRational(): Rational = this.toRationalOrNull()!!
 
-fun String.toMonomial(): Expression {
+fun String.toMonomial(): Product {
     var coeff = unit()
     val variables: MutableMap<Char, Rational> = mutableMapOf()
 

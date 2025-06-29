@@ -1,4 +1,5 @@
 import expressions.monomials.Monomial
+import expressions.number.over
 import expressions.number.toRational
 import expressions.zero
 import utils.toMonomial
@@ -13,4 +14,8 @@ fun main() {
 
     val m4 = "9/10*a*a*x*p".toMonomial()
     println(m4)
+
+    val m5 = "a*b".toMonomial() * (2 over 3)
+    println(m5)
+    println(m5.simplify())
 }

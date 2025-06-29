@@ -1,21 +1,22 @@
 package expressions.binary
 
-import expressions.Expression
+import equations.Domain
+import equations.FullDomain
+import equations.equateTo
+import expressions.*
 import expressions.number.Rational
-import expressions.commonFactor
-import expressions.isUnitRational
 
-class Quotient private constructor(body: Pair<Expression, Expression>, final: Boolean) : BinaryExpression(body, final) {
-    constructor(body: Pair<Expression, Expression>) : this(body, false)
-
+class Quotient (
+    body: Pair<Expression, Expression>,
+    domain: Domain = FullDomain
+) : BinaryExpression(body, domain, false) {
     val numer = body.first
     val denom = body.second
 
-    override fun simplify(): Expression {
-        if (final) return this
-
+    override fun _simplify(): Expression {
         val sQuotient = simplifySoftly()
         val (sNumer, sDenom) = sQuotient.body
+        if (sDenom.isZeroRational()) return InvalidExpression
         if (sDenom.isUnitRational()) return sNumer
 
         if (sNumer is Quotient && sDenom is Quotient) {
@@ -41,16 +42,17 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
         return sQuotient
     }
     private fun simplifySoftly(): Quotient {
-        if (final) return this
+        val (sNumer, sDenom) = simplifyBody()
+        if (!sDenom.isNumber()) addDomainRestriction(sDenom equateTo zero())
+        if (sNumer.isZeroRational()) return zeroQuotient()
 
-        val (simpleNumer, simpleDenom) = simplifyBody()
-        val cf = commonFactor(simpleNumer, simpleDenom)
-        val reducedNumer = simpleNumer.reduce(cf)
-        val reducedDenom = simpleDenom.reduce(cf)
-        return Quotient(reducedNumer to reducedDenom, true)
+        val cf = commonFactor(sNumer, sDenom)
+        val reducedNumer = sNumer.reduce(cf)
+        val reducedDenom = sDenom.reduce(cf)
+        return Quotient(reducedNumer to reducedDenom)
     }
 
-    override fun commonFactor(other: Expression): Expression {
+    override fun _commonFactor(other: Expression): Expression {
         return commonFactor(numer, other)
     }
 
@@ -65,21 +67,21 @@ class Quotient private constructor(body: Pair<Expression, Expression>, final: Bo
     }
     override fun nonRationalPart(): Expression {
         if (!final) TODO("Must be simplified")
-        return Quotient(numer.nonRationalPart() to denom, true)
+        return Quotient(numer.nonRationalPart() to denom).apply { final = true }
     }
     override fun numericalPart(): Expression {
         if (!final) TODO("Must be simplified")
         val numerNumPart = numer.numericalPart()
         val denomNumPart = denom.numericalPart()
         return if (denomNumPart.isUnitRational()) numerNumPart
-          else                                    Quotient(numerNumPart to denomNumPart, true)
+          else                                    Quotient(numerNumPart to denomNumPart).apply { final = true }
     }
     override fun nonNumericalPart(): Expression {
         if (!final) TODO("Must be simplified")
         val numerNonNumPart = numer.nonNumericalPart()
         val denomNonNumPart = denom.nonNumericalPart()
         return if (denomNonNumPart.isUnitRational()) numerNonNumPart
-        else                                         Quotient(numerNonNumPart to denomNonNumPart, true)
+               else Quotient(numerNonNumPart to denomNonNumPart).apply { final = true }
     }
 
     fun sumAsQuotient(other: Quotient): Quotient {

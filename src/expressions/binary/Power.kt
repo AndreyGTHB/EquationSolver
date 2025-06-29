@@ -1,7 +1,8 @@
 package expressions.binary
 
+import equations.Domain
+import equations.FullDomain
 import expressions.Expression
-import expressions.commonFactor
 import expressions.longs.Product
 import expressions.monomials.Monomial
 import expressions.number.Rational
@@ -9,15 +10,14 @@ import expressions.number.Real
 import expressions.number.min
 import expressions.unit
 
-class Power private constructor(body: Pair<Expression, Expression>, final: Boolean) : BinaryExpression(body, final) {
-    constructor(body: Pair<Expression, Expression>) : this(body, false)
-
+class Power (
+    body: Pair<Expression, Expression>,
+    domain: Domain = FullDomain
+) : BinaryExpression(body, domain, false) {
     val base = body.first
     val exponent = body.second
 
-    override fun simplify(): Expression {
-        if (final) return this
-
+    override fun _simplify(): Expression {
         val sPower = simplifySoftly()
         val (sBase, sExponent) = sPower.body
 
@@ -39,7 +39,7 @@ class Power private constructor(body: Pair<Expression, Expression>, final: Boole
             sExponent = (sExponent * sBase.exponent).simplify()
             sBase = sBase.base
         }
-        return Power(sBase to sExponent, true)
+        return Power(sBase to sExponent)
     }
     private fun simplifyAsRationalPower(): Expression {
         exponent as Rational
@@ -67,16 +67,15 @@ class Power private constructor(body: Pair<Expression, Expression>, final: Boole
         }
     }
 
-    override fun commonFactor(other: Expression): Expression {
-        if (other is Power) return commonFactorWithPower(other)
-        val cfWithBase = commonFactor(base, other)
-        return Power(cfWithBase to exponent)
+    override fun _commonFactor(other: Expression): Expression? {
+        return if (other is Power) return commonFactorWithPower(other)
+          else                            commonFactor(base, other)
     }
-    private fun commonFactorWithPower(other: Power): Expression {
+    private fun commonFactorWithPower(other: Power): Expression? {
         val cfOfBases = commonFactor(this.base, other.base)
         return if (this.exponent is Rational && other.exponent is Rational) {
             Power(cfOfBases to min(this.exponent, other.exponent))
         }
-        else cfOfBases
+        else null
     }
 }

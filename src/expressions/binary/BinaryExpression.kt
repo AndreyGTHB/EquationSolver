@@ -1,20 +1,27 @@
 package expressions.binary
 
+import equations.Domain
+import equations.FullDomain
 import expressions.Expression
-import expressions.number.Rational
+import expressions.InvalidExpression
 
 abstract class BinaryExpression (
     override val body: Pair<Expression, Expression>,
+    domain: Domain = FullDomain,
     final: Boolean
-) : Expression(final) {
+) : Expression(domain, final) {
+    private lateinit var bodyDomain: Domain
+
     override fun _isNumber() = body.first.isNumber() && body.second.isNumber()
 
     protected fun simplifyBody(): Pair<Expression, Expression> {
-        return body.first.simplify() to body.second.simplify()
+        return (body.first.simplify() to body.second.simplify()).also {
+            if (it.first == InvalidExpression || it.second == InvalidExpression) this.makeInvalid()
+            bodyDomain = it.first.domain * it.second.domain
+        }
     }
-    protected fun emptyBody(): Pair<Expression, Expression> {
-        return Rational(0 to 1) to Rational(0 to 1)
-    }
+
+    override fun _fullDomain() = bodyDomain * domain
 
     override fun toString(): String {
         var asString = "${this::class.simpleName}:\n"
