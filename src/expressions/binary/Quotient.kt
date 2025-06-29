@@ -1,41 +1,87 @@
 package expressions.binary
 
-import expressions.Expression
+import equations.Domain
+import equations.FullDomain
+import equations.equateTo
+import expressions.*
 import expressions.number.Rational
-import expressions.commonFactor
 
-class Quotient private constructor(body: Pair<Expression, Expression>, final: Boolean) : BinaryExpression(body, final) {
-    constructor(body: Pair<Expression, Expression>) : this(body, false)
-
+class Quotient (
+    body: Pair<Expression, Expression>,
+    domain: Domain = FullDomain
+) : BinaryExpression(body, domain, false) {
     val numer = body.first
     val denom = body.second
 
-    override fun simplify(): Expression {
-        if (final) return this
+    override fun _simplify(): Expression {
+        val sQuotient = simplifySoftly()
+        val (sNumer, sDenom) = sQuotient.body
+        if (sDenom.isZeroRational()) return InvalidExpression
+        if (sDenom.isUnitRational()) return sNumer
 
-        val simpleThis = simplifySoftly()
-        if (simpleThis.denom is Rational) return simpleThis.numer.reduce(simpleThis.denom)
-        return Quotient(simpleThis.body, true)
+        if (sNumer is Quotient && sDenom is Quotient) {
+            val qt = (sNumer.numer * sDenom.denom) / (sNumer.denom * sDenom.numer)
+            return qt.simplify()
+        }
+        if (sNumer is Quotient) {
+            val qt = sNumer.numer / (sNumer.denom * sDenom)
+            return qt.simplify()
+        }
+        if (sDenom is Quotient) {
+            val qt = (sNumer * sDenom.denom) / sDenom.numer
+            return qt.simplify()
+        }
+
+        val denomRationalPart = sDenom.rationalPart()
+        if (!denomRationalPart.isUnitRational()) {
+            val denomNonRationalPart = sDenom.nonRationalPart()
+            val qt = (sNumer * denomRationalPart.flip()) / denomNonRationalPart
+            return qt.simplify()
+        }
+
+        return sQuotient
     }
-    override fun simplifySoftly(): Quotient {
-        if (final) return this
+    private fun simplifySoftly(): Quotient {
+        val (sNumer, sDenom) = simplifyBody()
+        if (!sDenom.isNumber()) addDomainRestriction(sDenom equateTo zero())
+        if (sNumer.isZeroRational()) return zeroQuotient()
 
-        val (simpleNumer, simpleDenom) = simplifyBody()
-        val cf = commonFactor(simpleNumer, simpleDenom)
-        val reducedNumer = simpleNumer.reduce(cf)
-        val reducedDenom = simpleDenom.reduce(cf)
+        val cf = commonFactor(sNumer, sDenom)
+        val reducedNumer = sNumer.reduce(cf)
+        val reducedDenom = sDenom.reduce(cf)
         return Quotient(reducedNumer to reducedDenom)
     }
 
-    override fun commonFactor(other: Expression): Expression {
+    override fun _commonFactor(other: Expression): Expression {
         return commonFactor(numer, other)
     }
 
-    override fun reduceOrNull(other: Expression): Expression? {
-        if (!this.final && other.final) throw RuntimeException("A non-simplified quotient cannot be reduced")
+    override fun _reduceOrNull(other: Expression): Expression? {
         val reducedNumer = numer.reduceOrNull(other) ?: return null
-        val reducedThis = Quotient(reducedNumer to denom)
-        return reducedThis.simplify()
+        return Quotient(reducedNumer to denom)
+    }
+
+    override fun rationalPart(): Rational {
+        if (!final) TODO("Must be simplified")
+        return numer.rationalPart()
+    }
+    override fun nonRationalPart(): Expression {
+        if (!final) TODO("Must be simplified")
+        return Quotient(numer.nonRationalPart() to denom).apply { final = true }
+    }
+    override fun numericalPart(): Expression {
+        if (!final) TODO("Must be simplified")
+        val numerNumPart = numer.numericalPart()
+        val denomNumPart = denom.numericalPart()
+        return if (denomNumPart.isUnitRational()) numerNumPart
+          else                                    Quotient(numerNumPart to denomNumPart).apply { final = true }
+    }
+    override fun nonNumericalPart(): Expression {
+        if (!final) TODO("Must be simplified")
+        val numerNonNumPart = numer.nonNumericalPart()
+        val denomNonNumPart = denom.nonNumericalPart()
+        return if (denomNonNumPart.isUnitRational()) numerNonNumPart
+               else Quotient(numerNonNumPart to denomNonNumPart).apply { final = true }
     }
 
     fun sumAsQuotient(other: Quotient): Quotient {

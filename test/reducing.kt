@@ -1,9 +1,9 @@
 import expressions.Expression
 import expressions.longs.Sum
 import expressions.number.Rational
+import expressions.number.over
 import expressions.unit
 import utils.toMonomial
-import utils.over
 
 fun main() {
     // Fraction
@@ -48,7 +48,7 @@ fun main() {
     val s5 = s4 + m8 + m7
 //    println(s5); println(s5.simplify())
     val s6 = s5.simplify() as Sum
-    val cif_s6 = s6.commonInternalFactor()
+    val cif_s6 = s6.commonInternalFactor
 //    println(cif_s6)
 //    println(s6.reduceOrNull(cif_s6))
     val s7 = unit() / "a".toMonomial() + unit()*2 / "a".toMonomial() - unit()*4 / "a".toMonomial()
@@ -66,5 +66,6 @@ fun main() {
     val q2 = (m2 * f2) / m4
 //    println(q2); println(q2.simplify())
     val q3 = (q2 *  s5) / m3
-    println(q3); println(q3.simplifySoftly())
+    println(q3)
+    println(q3.simplify())
 }

@@ -1,11 +1,10 @@
 package utils
 
 import expressions.number.Rational
+import expressions.number.Real
 import kotlin.math.abs
 
-
 fun gcd(a: Int, b: Int): Int {
-    if (a * b == 0) TODO("Two zeros")
     var (big, small) = abs(a) to abs(b)
     var t = big
     if (big < small) {
@@ -20,6 +19,7 @@ fun gcd(a: Int, b: Int): Int {
     }
     return big
 }
+
 fun Collection<Int>.gcd(): Int {
     var cd = 0
     this.forEach { if (it != 0) cd = gcd(it, cd) }
@@ -42,7 +42,7 @@ fun Int.factorise(): Map<Int, Int> {
     return decomp
 }
 
-fun power(base: Int, exponent: Int): Int {
+fun Int.power(exponent: Int): Int {
     val exponentsOfTwo = mutableListOf<Int>()
     var n = 0
     var currPowerOfTwo = 1
@@ -62,19 +62,11 @@ fun power(base: Int, exponent: Int): Int {
     }
 
     var result = 1
-    var currMultiple = base
+    var currMultiple = this
     for (exp in exponentsOfTwo) {
-        for (i in 1..exp) {
-            currMultiple *= currMultiple
-        }
+        repeat(exp) { currMultiple *= currMultiple }
         result *= currMultiple
-        currMultiple = base
+        currMultiple = this
     }
     return result
 }
-
-
-infix fun Int.over(other: Int) = Rational(this to other)
-fun Int.toRational() = this over 1
-
-fun min(a: Rational, b: Rational): Rational = if ((a - b).isNegative()) a else b

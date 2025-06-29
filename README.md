@@ -1,4 +1,4 @@
 # EquationSolver
 ToDo:
-- Product: bringing to the common denominator
-- Quotient: working with a quotient as the numer/denom
+- Real: check simplification unambiguity (powers, quotients), implement commonFactorWithRational()
+- Product: powers simplification (equal bases)

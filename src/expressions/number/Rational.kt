@@ -1,61 +1,60 @@
 package expressions.number
 
-import expressions.Expression
-import expressions.zero
+import equations.Domain
+import equations.FullDomain
+import expressions.*
 import utils.gcd
-import utils.over
+import utils.power
 import kotlin.math.abs
 
-class Rational (override val body: Pair<Int, Int>) : Expression() {
-    override val final: Boolean
-        get() = gcd(numer, denom) == 1
-
+class Rational (
+    override val body: Pair<Int, Int>,
+    domain: Domain = FullDomain,
+    final: Boolean = false
+) : Expression(domain, final) {
     val numer = body.first
     val denom = body.second
 
-    init {
-        if (denom == 0) { throw RuntimeException("Zero division") }
-    }
+    init { assert(denom != 0) }
 
-    override fun simplify(): Rational {
-        if (final) return this
-        return simplifySoftly()
-    }
-    override fun simplifySoftly(): Rational {
-        if (isNull()) return zero()
+    override fun _isNumber() = true
+    override fun rationalPart() = this
+    override fun nonRationalPart() = unit()
+
+    override fun simplify() = super.simplify() as Rational
+    override fun _simplify(): Rational {
+        if (isZero()) return zero()
 
         val gcd = gcd(numer, denom)
         val newNumer = (if (denom < 0) -numer else numer) / gcd
         val newDenom = abs(denom) / gcd
-        if (newNumer == 0) return zero()
         return newNumer over newDenom
     }
 
-    override fun reduceOrNull(other: Expression): Rational? {
-        if (other is Rational) return (this / other).simplify()
-        return null
+    override fun _commonFactor(other: Expression): Rational? {
+        if (other !is Rational) return null
+        val commonDenom = this.denom * other.denom
+        val thisNumer = this.numer * other.denom
+        val otherNumer = this.denom * other.numer
+        val cfAbs = gcd(thisNumer, otherNumer) over commonDenom
+        return if (this.isNegative() && other.isNegative()) -cfAbs else cfAbs
+    }
+    override fun _reduceOrNull(other: Expression): Rational? = if (other is Rational) this / other
+                                                               else                   null
+
+    override fun compareTo(other: Expression): Int {
+        return if (other is Rational) this.numer * other.denom - other.numer * this.denom
+          else                        super.compareTo(other)
     }
 
-    fun flip(): Rational = Rational(denom to numer)
+    fun flip() = denom over numer
 
-    fun isNull(): Boolean = numer == 0
-    fun isUnit(): Boolean = numer == denom
-//    override fun equals(other: Any?): Boolean {
-//        other ?: return false
-//        return when (other) {
-//            is Rational -> equalsToFraction(other)
-//            is Int -> equalsToFraction(other.toRational())
-//            else -> false
-//        }
-//    }
-//    private fun equalsToFraction(other: Rational): Boolean {
-//        val (thisNumer, thisDenom) = this.simplify().body
-//        val (otherNumer, otherDenom) = other.simplify().body
-//        return thisNumer == otherNumer && thisDenom == otherDenom
-//    }
+    fun isZero() = numer == 0
+    fun isUnit() = numer == denom
+    fun isInteger() = numer % denom == 0
 
-    fun isPositive(): Boolean = numer * denom > 0
-    fun isNegative(): Boolean = numer * denom < 0
+    fun isPositive() = numer * denom > 0
+    fun isNegative() = numer * denom < 0
 
     operator fun plus(other: Int) = numer + other * denom over denom
     operator fun plus(other: Rational): Rational {
@@ -77,6 +76,10 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
     operator fun div(other: Int) = numer over denom * other
     operator fun div(other: Rational) = this.numer * other.denom over this.denom * other.numer
 
+    fun power(exp: Int): Rational = if (exp >= 0) (numer.power(exp) over denom.power(exp))
+                                    else          flip().power(-exp)
+    infix fun raisedTo(exp: Int): Rational = power(exp)
+
     override operator fun unaryMinus() = -numer over denom
 
     operator fun inc(): Rational {
@@ -86,3 +89,9 @@ class Rational (override val body: Pair<Int, Int>) : Expression() {
     override fun toString(): String = "$numer/$denom"
     fun toFloat(): Float = numer.toFloat() / denom
 }
+
+
+infix fun Int.over(other: Int) = Rational(this to other)
+fun Int.toRational() = this over 1
+
+fun min(a: Rational, b: Rational): Rational = if ((a - b).isNegative()) a else b

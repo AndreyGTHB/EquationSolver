@@ -1,76 +1,114 @@
 package expressions.longs
 
-import expressions.Expression
+import equations.Domain
+import equations.FullDomain
+import expressions.*
 import expressions.binary.Quotient
-import expressions.monomials.Monomial
 import expressions.number.Rational
-import expressions.commonFactor
-import expressions.zero
-import utils.toVarMap
-import utils.varMapToString
 
-class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpression(body, final) {
-    constructor(body: List<Expression>) : this(body, false)
+class Sum (
+    body: List<Expression>,
+    domain: Domain = FullDomain
+) : LongExpression(body, domain, false) {
+    constructor(vararg body: Expression) : this(body.toList())
 
-    override fun simplify(): Expression {
-        if (final) return this
+    val commonInternalFactor by lazy(::genCommonInternalFactor)
 
-        val simpleSum = simplifySoftly()
-        return when (simpleSum.body.size) {
-            0 -> zero()
-            1 -> simpleSum.body.first()
-            else -> Sum(simpleSum.body, true)
+    override fun _simplify(): Expression {
+        val sThis = simplifySoftly()
+        return when (sThis.body.size) {
+            0    -> zero()
+            1    -> sThis.body[0]
+            else -> sThis
         }
     }
-    override fun simplifySoftly(): Sum {
-        if (final) return this
+    private fun simplifySoftly(): Sum {
+        val newBody = simplifyBody()
+            .expandSums()
+            .combineByNonRationalPart()
+            .combineByNonNumericalPart()
+            .combineQuotients()
+            .sorted()
+        return Sum(newBody)
+    }
 
-        var prevBody = simplifyBody()
-        var currBody = mutableListOf<Expression>()
-        // Associativity
-        prevBody.forEach { term ->
-            if (term is Sum) { term.body.forEach { subTerm -> currBody.add(subTerm) } }
-            else                                              currBody.add(term)
-        }
-
-        // Reduction of similar terms
-        prevBody = currBody
-        currBody = mutableListOf()
-        var freeTerm = zero()
-        val varMapStrings = mutableMapOf<String, Rational>()
-        val quotientMap = mutableMapOf<Expression, Expression>()
-        prevBody.forEach { term ->
+    private fun List<Expression>.expandSums(): List<Expression> {
+        val newBody = mutableListOf<Expression>()
+        forEach { term ->
             when (term) {
-                is Rational -> { freeTerm += term }
-                is Monomial -> {
-                    val varMapString = varMapToString(term.varMap)
-                    varMapStrings[varMapString] = (varMapStrings[varMapString] ?: zero()) + term.coeff
+                is Sum -> term.body.forEach { subTerm -> newBody.add(subTerm) }
+                is Product -> {
+                    val expanded = term.expandBrackets()
+                    expanded.body.forEach { subTerm -> newBody.add(subTerm.simplify()) }
                 }
-                is Quotient -> {
-                    quotientMap[term.denom] = (quotientMap[term.denom] ?: zero()) + term.numer
-                }
-                else ->        { currBody.add(term) }
+                is Quotient -> { when (term.numer) {
+                    is Sum -> term.numer.body.forEach { numerSubTerm -> newBody.add((numerSubTerm / term.denom).simplify()) }
+                    is Product -> {
+                        val expandedNumer = term.numer.expandBrackets()
+                        expandedNumer.body.forEach { numerSubTerm -> newBody.add((numerSubTerm / term.denom).simplify()) }
+                    }
+                    else -> newBody.add(term)
+                }}
+                else -> newBody.add(term)
             }
         }
-        freeTerm = freeTerm.simplify()
-        if (!freeTerm.isNull()) currBody.add(freeTerm)
-        varMapStrings.forEach { vms, coeff ->
-            val vm = vms.toVarMap()
-            if (!coeff.isNull()) { currBody.add(Monomial(coeff to vm).simplify()) }
+        return newBody
+    }
+
+    private fun List<Expression>.combineByNonRationalPart(): List<Expression> {
+        val newBody = mutableListOf<Expression>()
+        val termMap = mutableMapOf<Expression, Rational>()
+        forEach { term ->
+            val nonRationalPart = term.nonRationalPart()
+            val rationalPart = term.rationalPart()
+            termMap[nonRationalPart] = (termMap[nonRationalPart] ?: zero()) + rationalPart
+        }
+        termMap.forEach { expr, coeff ->
+            val reducedTerm = (coeff * expr).simplify()
+            if (!reducedTerm.isZeroRational()) newBody.add(reducedTerm)
+        }
+        return newBody
+    }
+
+    private fun List<Expression>.combineByNonNumericalPart(): List<Expression> {
+        val newBody = mutableListOf<Expression>()
+        val termMap = mutableMapOf<Expression, Expression>()
+        forEach { term ->
+            val nonNumPart = term.nonNumericalPart()
+            val numPart = term.numericalPart()
+            if (nonNumPart.isUnitRational()) newBody.add(term)
+            else {
+                val prevCoeff = termMap[nonNumPart]
+                termMap[nonNumPart] = if (prevCoeff == null) numPart else prevCoeff + numPart
+            }
+        }
+        termMap.forEach { expr, coeff ->
+            val reducedTerm = (coeff * expr).simplify()
+            if (!reducedTerm.isZeroRational()) newBody.add(reducedTerm)
+        }
+        return newBody
+    }
+
+    private fun List<Expression>.combineQuotients(): List<Expression> {
+        val newBody = mutableListOf<Expression>()
+        val quotientMap = mutableMapOf<Expression, Expression>()
+        forEach { term ->
+            if (term is Quotient) quotientMap[term.denom] = (quotientMap[term.denom] ?: zero()) + term.numer
+            else                  newBody.add(term)
         }
         quotientMap.forEach { denom, numer ->
-            val simpleQt = Quotient(numer to denom).simplify()
-            if (!simpleQt.isZeroRational()) currBody.add(simpleQt)
+            val reducedQuotient = (numer / denom).simplify()
+            if (!reducedQuotient.isZeroRational()) newBody.add(reducedQuotient)
         }
-
-        currBody.sort()
-        return Sum(currBody)
+        return newBody
     }
 
-    override fun commonFactor(other: Expression): Expression {
-        return commonFactor(commonInternalFactor(), other)
+    override fun _commonFactor(other: Expression): Expression {
+        return commonFactor(commonInternalFactor, other)
     }
-    fun commonInternalFactor(): Expression {
+    private fun genCommonInternalFactor(): Expression {
+        assert(final)
+
         var cf: Expression = zero()
         body.forEach {
             cf = commonFactor(cf, it)
@@ -78,9 +116,9 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
         return cf
     }
 
-    override fun reduceOrNull(other: Expression): Expression? {
+    override fun _reduceOrNull(other: Expression): Expression? {
         val newBody = body.map { it.reduceOrNull(other) ?: return null }
-        return Sum(newBody).simplify()
+        return Sum(newBody)
     }
 
     override operator fun unaryMinus(): Sum {
@@ -89,9 +127,9 @@ class Sum private constructor(body: List<Expression>, final: Boolean) : LongExpr
     }
 
     override operator fun plus(other: Expression):  Sum {
-        return Sum(body + listOf(other))
+        return Sum(body + other)
     }
     override operator fun minus(other: Expression): Sum {
-        return Sum(body + listOf(-other))
+        return Sum(body + (-other))
     }
 }

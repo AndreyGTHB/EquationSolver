@@ -14,14 +14,5 @@ class C : B() {
 }
 
 fun main() {
-    val a = A()
-    val b = B()
-    val c = C()
-    val cb: B = C()
-
-    a.method(b)
-    a.method(c)
-    a.method(cb)
-    val x = 0
 
 }

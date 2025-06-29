@@ -1,5 +1,7 @@
 package utils
 
+import expressions.Expression
+import expressions.longs.Product
 import expressions.monomials.Monomial
 import expressions.number.Rational
 import expressions.unit
@@ -12,12 +14,13 @@ fun String.isRational(): Boolean = this.toRationalOrNull() != null
 fun String.toRationalOrNull(): Rational? {
     val splitted = this.split('/')
     if (!(splitted.size == 2 && splitted[0].isInt() && splitted[1].isInt())) return null
+    if (splitted[1].toIntOrNull() == 0) return null
     val (numer, denom) = splitted.map { it.toInt() }
     return Rational(numer to denom)
 }
 fun String.toRational(): Rational = this.toRationalOrNull()!!
 
-fun String.toMonomial(): Monomial {
+fun String.toMonomial(): Product {
     var coeff = unit()
     val variables: MutableMap<Char, Rational> = mutableMapOf()
 
@@ -29,7 +32,7 @@ fun String.toMonomial(): Monomial {
             variables[it.first()] = (variables[it.first()] ?: zero()) + 1
         }
     }
-    return Monomial(coeff to variables)
+    return coeff * Monomial(variables)
 }
 
 fun varMapToString(varMap: Map<Char, Rational>): String {
