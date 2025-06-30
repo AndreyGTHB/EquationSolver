@@ -17,22 +17,22 @@ class Product (
 ) : LongExpression(body, domain, false) {
     constructor(vararg body: Expression) : this(body.toList())
 
-    override fun _simplify(): Expression {
-        val sThis = simplifySoftly()
-        val sBody = sThis.body
+    override fun _simplify(): Expression { simplifySoftly().apply {
+        val sumsCount = body.countSums()
+        return when (sumsCount) {
+            0    -> simplifyIgnoringSums()
+            1    -> simplifyWithOneSum()
+            else -> expandBrackets().simplify()
+        }
+    }}
 
-        val sumsCount = sBody.countSums()
-        if (sumsCount == 0) return sThis.simplifyIgnoringSums()
-        if (sumsCount > 1)  return sThis.expandBrackets().simplify()
-
-        // If exactly one sum in the body
-        val sumFactor = sBody.first { it is Sum }
-        return if (sumFactor.isNumber()) sThis.simplifyIgnoringSums()
-               else                      sThis.expandBrackets().simplify()
+    private fun simplifyWithOneSum(): Expression {
+        val sumFactor = body.first { it is Sum }
+        return if (sumFactor.isNumber()) simplifyIgnoringSums()
+        else                             expandBrackets().simplify()
     }
-    private fun simplifyIgnoringSums(): Expression {
-        // Calling only after simplifySoftly()
 
+    private fun simplifyIgnoringSums(): Expression {
         body.forEachIndexed { i, factor -> if (factor is Quotient) {
             val numerBody = buildList {
                 addAll(body.slice(0 until i))
@@ -47,36 +47,59 @@ class Product (
             0 -> unit()
             1 -> body[0]
             else -> this
-}
+        }
     }
     private fun simplifySoftly(): Product {
-        // Associativity
-        var prevBody = simplifyBody()
-        var currBody = mutableListOf<Expression>()
-        prevBody.forEach { factor ->
-            if (factor is Product) factor.body.forEach { subFact -> currBody.add(subFact) }
-            else                                                    currBody.add(factor)
+        val newBody = simplifyBody()
+            .expandProducts()
+            .factorOutSumsIfNeeded()
+            .combineByTypes()
+            .sorted()
+        return Product(newBody)
+    }
+
+    private fun List<Expression>.expandProducts(): List<Expression> {
+        val newBody = emptyBody()
+        forEach { factor ->
+            if (factor is Product) factor.body.forEach { subFactor -> newBody.add(subFactor) }
+            else                                                      newBody.add(factor)
         }
+        return newBody
+    }
 
-        if (currBody.countSums() == 1) currBody = currBody.factorOutSums()
+    private fun List<Expression>.factorOutSumsIfNeeded(): List<Expression> {
+        val newBody = emptyBody()
+        var firstSum = true
+        forEach {
+            if (it is Sum) {
+                if (!firstSum) return this
+                firstSum = false
 
-        // Simplifying
-        prevBody = currBody
-        currBody = mutableListOf()
+                val cif = it.commonInternalFactor
+                newBody.add(cif)
+                newBody.add(it.reduce(cif))
+            }
+            else newBody.add(it)
+        }
+        return newBody
+    }
+
+    private fun List<Expression>.combineByTypes(): List<Expression> {
+        val newBody = emptyBody()
         var rationalFactor = unit()
         val realBaseMap = mutableMapOf<Int, Rational>()
         var monomialFactor = unitMonomial()
         var quotientFactor = unitQuotient()
-        prevBody.forEach { factor ->
-            when (factor) {
+        forEach {
+            when (it) {
                 is Rational -> {
-                    if (factor.isZero()) return zeroProduct()
-                    rationalFactor *= factor
+                    if (it.isZero()) return listOf(zero())
+                    rationalFactor *= it
                 }
-                is Real ->     realBaseMap[factor.base] = (realBaseMap[factor.base] ?: zero()) + factor.exponent
-                is Monomial -> monomialFactor *= factor
-                is Quotient -> quotientFactor *= factor
-                else        -> currBody.add(factor)
+                is Real ->     realBaseMap[it.base] = (realBaseMap[it.base] ?: zero()) + it.exponent
+                is Monomial -> monomialFactor *= it
+                is Quotient -> quotientFactor *= it
+                else        -> newBody.add(it)
             }
         }
 
@@ -89,24 +112,22 @@ class Product (
 
         }
         val rootsMap = mutableMapOf<Int, Int>()
-        realFactors.forEach { factor ->
-            val (intExp, rootIndex) = factor.exponent.body
-            rootsMap[rootIndex] = (rootsMap[rootIndex] ?: 1) * factor.base.power(intExp)
+        realFactors.forEach {
+            val (intExp, rootIndex) = it.exponent.body
+            rootsMap[rootIndex] = (rootsMap[rootIndex] ?: 1) * it.base.power(intExp)
         }
         rootsMap.forEach { index, base ->
             val rootExp = index.toRational().flip()
             val (sRational, sReal) = base.power(rootExp).simplifyAndSeparate()
             rationalFactor *= sRational
-            currBody.add(sReal)
+            newBody.add(sReal)
         }
 
         arrayOf(rationalFactor, monomialFactor, quotientFactor).forEach {
             val sFactor = it.simplify()
-            if (!sFactor.isUnitRational()) currBody.add(sFactor)
+            if (!sFactor.isUnitRational()) newBody.add(sFactor)
         }
-
-        currBody.sort()
-        return Product(currBody)
+        return newBody
     }
 
     fun expandBrackets(): Sum {
@@ -122,27 +143,12 @@ class Product (
             break
         }
         if (expandedBody.isEmpty()) return Sum(listOf(this))
-        val currBody = mutableListOf<Expression>()
+        val currBody = emptyBody()
         expandedBody.forEach { sum -> sum.body.forEach { term -> currBody.add(term) } }
         return Sum(currBody)
     }
 
-    private fun List<Expression>.countSums(): Int = count { it is Sum }
-    private fun List<Expression>.factorOutSums(): MutableList<Expression> {
-        val result = mutableListOf<Expression>()
-        forEach {
-            if (it is Sum) {
-                val cf = it.commonInternalFactor
-                if (!cf.isUnitRational()) {
-                    result.add(cf)
-                    result.add(it.reduce(cf))
-                }
-                else result.add(it)
-            }
-            else result.add(it)
-        }
-        return result
-    }
+    private fun List<Expression>.countSums() = count { it is Sum }
 
     override fun _commonFactor(other: Expression): Expression? {
         return when (other) {
@@ -154,7 +160,7 @@ class Product (
         }
     }
     private fun commonFactorWithReal(other: Real): Product {
-        val cfBody = mutableListOf<Expression>()
+        val cfBody = emptyBody()
         var currOther: Expression = other
         body.forEach {
             val cf = commonFactor(it, currOther)
@@ -169,7 +175,7 @@ class Product (
         return null
     }
     private fun commonFactorWithProduct(other: Product): Expression {
-        val cfBody = mutableListOf<Expression>()
+        val cfBody = emptyBody()
         val currOtherBody = other.body.toMutableList()
         this.body.forEach { fact1 ->
             var currFact1 = fact1
@@ -189,7 +195,7 @@ class Product (
             return this * other.flip()
         }
 
-        val newBody = mutableListOf<Expression>()
+        val newBody = emptyBody()
         var currOther = other
         body.forEach {
             if (currOther is Rational) return@forEach
@@ -237,9 +243,11 @@ class Product (
     override operator fun times(other: Expression): Product {
         return Product(listOf(other) + body)
     }
-    override operator fun unaryMinus(): Product {
-        val newBody = mutableListOf(-body.first())
-        newBody += body.slice(1 until body.size)
+    override operator fun unaryMinus(): Expression {
+        if (body.isEmpty()) return -unit()
+
+        val newBody = body.toMutableList()
+        newBody[0] = -newBody[0]
         return Product(newBody)
     }
 }

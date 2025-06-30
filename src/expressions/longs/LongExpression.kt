@@ -14,6 +14,8 @@ abstract class LongExpression (
 
     override fun _isNumber() = body.all { it.isNumber() }
 
+    override fun _fullDomain() = bodyDomain * domain
+
     protected fun simplifyBody(): List<Expression> {
         val newBody = body.map { subExpr ->
             subExpr.simplify().also {
@@ -24,7 +26,7 @@ abstract class LongExpression (
         return newBody
     }
 
-    override fun _fullDomain() = bodyDomain * domain
+    protected fun emptyBody() = mutableListOf<Expression>()
 
     override fun toString(): String {
         var asString = "${this::class.simpleName}:\n"

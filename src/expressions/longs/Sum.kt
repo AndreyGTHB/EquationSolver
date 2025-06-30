@@ -33,7 +33,7 @@ class Sum (
     }
 
     private fun List<Expression>.expandSums(): List<Expression> {
-        val newBody = mutableListOf<Expression>()
+        val newBody = emptyBody()
         forEach { term ->
             when (term) {
                 is Sum -> term.body.forEach { subTerm -> newBody.add(subTerm) }
@@ -56,7 +56,7 @@ class Sum (
     }
 
     private fun List<Expression>.combineByNonRationalPart(): List<Expression> {
-        val newBody = mutableListOf<Expression>()
+        val newBody = emptyBody()
         val termMap = mutableMapOf<Expression, Rational>()
         forEach { term ->
             val nonRationalPart = term.nonRationalPart()
@@ -71,7 +71,7 @@ class Sum (
     }
 
     private fun List<Expression>.combineByNonNumericalPart(): List<Expression> {
-        val newBody = mutableListOf<Expression>()
+        val newBody = emptyBody()
         val termMap = mutableMapOf<Expression, Expression>()
         forEach { term ->
             val nonNumPart = term.nonNumericalPart()
@@ -90,7 +90,7 @@ class Sum (
     }
 
     private fun List<Expression>.combineQuotients(): List<Expression> {
-        val newBody = mutableListOf<Expression>()
+        val newBody = emptyBody()
         val quotientMap = mutableMapOf<Expression, Expression>()
         forEach { term ->
             if (term is Quotient) quotientMap[term.denom] = (quotientMap[term.denom] ?: zero()) + term.numer
