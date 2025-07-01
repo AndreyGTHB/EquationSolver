@@ -12,10 +12,6 @@ import expressions.unit
 import expressions.zero
 import utils.isInt
 
-const val firstPrioritySigns = "^"
-const val secondPrioritySigns = "*/"
-const val thirdPrioritySigns = "+-"
-
 const val expressionSigns = "+-*/^"
 
 fun String.parse() = standardize()._parse()

@@ -1,7 +1,5 @@
 package utils
 
-import expressions.number.Rational
-import expressions.number.Real
 import kotlin.math.abs
 
 fun gcd(a: Int, b: Int): Int {
@@ -18,13 +16,6 @@ fun gcd(a: Int, b: Int): Int {
         small = t % small
     }
     return big
-}
-
-fun Collection<Int>.gcd(): Int {
-    var cd = 0
-    this.forEach { if (it != 0) cd = gcd(it, cd) }
-    if (cd == 0) TODO("Zero collection")
-    return cd
 }
 
 fun Int.factorise(): Map<Int, Int> {
@@ -44,7 +35,6 @@ fun Int.factorise(): Map<Int, Int> {
 
 fun Int.power(exponent: Int): Int {
     val exponentsOfTwo = mutableListOf<Int>()
-    var n = 0
     var currPowerOfTwo = 1
     var currExponentOfTwo = 0
     var remainingExponent = exponent
