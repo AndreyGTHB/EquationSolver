@@ -135,7 +135,7 @@ private fun String.indexOfOpeningBracket(indexOfClosing: Int): Int {
     return -1
 }
 
-fun String.toMonomial(): Monomial {
+private fun String.toMonomial(): Monomial {
     val varMap = mutableMapOf<Char, Rational>()
     forEach {
         varMap[it] = (varMap[it] ?: zero()) + unit()
@@ -144,5 +144,3 @@ fun String.toMonomial(): Monomial {
 }
 
 fun areIntersect(str1: String, str2: String) = str1.any { it in str2 }
-
-fun Char.isBracket() = equals('(') || equals(')')
