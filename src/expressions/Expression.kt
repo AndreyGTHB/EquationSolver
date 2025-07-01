@@ -105,5 +105,6 @@ abstract class Expression (
 }
 
 
-fun Expression.isUnitRational(): Boolean = this is Rational && this.isUnit()
-fun Expression.isZeroRational(): Boolean = this is Rational && this.isZero()
+fun Expression.isUnitRational() = this is Rational && this.isUnit()
+fun Expression.isZeroRational() = this is Rational && this.isZero()
+fun Expression.isIntegerRational() = this is Rational && this.isInteger()
