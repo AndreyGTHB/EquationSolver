@@ -3,10 +3,13 @@ package parser
 import expressions.buildExpressionFromZero
 import expressions.monomials.Monomial
 import expressions.number.toRational
+import expressions.three
 import expressions.two
 import expressions.unit
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import kotlin.reflect.KFunction
+import kotlin.time.measureTime
 
 class ParserTest {
     val a = Monomial('a' to unit()).simplify()
@@ -41,5 +44,20 @@ class ParserTest {
         }
         assertEquals(squareOfSum, "a^2 + 2ab + b^2".parse())
         assertEquals(squareOfSum, "(a^2) + 2a*b + b^((2))".parse())
+
+        assertEquals("(x-y)(x-y)(x-y)".parse().simplify(), "(x-y)^3".parse().simplify())
+
+        println("-a".parse())
+    }
+
+    @Test
+    fun benchMark() {
+        val str = "(((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2)/(((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) + (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) - (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) * (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) ^ (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) / (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) + (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) * (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) / (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) - (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) -(((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) + (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2)"
+        val timeNeeded = measureTime {
+            for (i in 0 ..< 10000) {
+                val parsed = str.parse()
+            }
+        }
+        println(timeNeeded)
     }
 }

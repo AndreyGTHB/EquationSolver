@@ -28,7 +28,7 @@ fun String._parse(): Expression {
     else                toMonomial()
 }
 
-private fun String.parseSum(): Sum? {
+private fun String.parseSum(): Expression? {
     val body = mutableListOf<Expression>()
     var exprEnd = lastIndex
     forEachIndexedOutsideBracketsReverse { i, c ->
@@ -36,8 +36,8 @@ private fun String.parseSum(): Sum? {
         if (c == '-') { body.add(0, -slice(i+1 .. exprEnd)._parse()); exprEnd = i - 1  }
     }
     if (exprEnd == lastIndex) return null
-    body.add(0, slice(0 .. exprEnd)._parse())
-    return Sum(body)
+    if (exprEnd != -1) body.add(0, slice(0 .. exprEnd)._parse())
+    return if (body.size > 1) Sum(body) else body[0]
 }
 
 private fun String.parseProductOrQuotient(): Expression? {
