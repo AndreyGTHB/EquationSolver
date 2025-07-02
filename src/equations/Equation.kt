@@ -1,13 +1,10 @@
 package equations
 
-import expressions.Expression
+import expressions.*
 import expressions.binary.Quotient
-import expressions.isZeroRational
 import expressions.longs.Product
 import expressions.longs.Sum
 import expressions.monomials.Monomial
-import expressions.unit
-import expressions.zero
 
 class Equation (body: Pair<Expression, Expression>, final: Boolean = false) : Condition(body, final) {
     private val xMonomial = Monomial('x' to unit()).simplify()
@@ -35,7 +32,7 @@ class Equation (body: Pair<Expression, Expression>, final: Boolean = false) : Co
     }
 
     private fun Pair<Expression, Expression>.multiplyByDenoms(): Pair<Expression, Expression> {
-        val leftSum = wrapWithSum(first)
+        val leftSum = first.asSum()
         var newLeft = Product(first)
         leftSum.body.forEach { if (it is Quotient) newLeft *= it.denom }
         val newBody = newLeft to second
@@ -43,7 +40,7 @@ class Equation (body: Pair<Expression, Expression>, final: Boolean = false) : Co
     }
 
     private fun Pair<Expression, Expression>.separateByX(): Pair<Expression, Expression> {
-        val leftSum = wrapWithSum(first)
+        val leftSum = first.asSum()
         var newLeft = Sum()
         var newRight = Sum()
         leftSum.body.forEach {
@@ -62,8 +59,6 @@ class Equation (body: Pair<Expression, Expression>, final: Boolean = false) : Co
 
     private fun Pair<Expression, Expression>.simplify() = first.simplify() to second.simplify()
     private fun Pair<Expression, Expression>.domain() = first.domain * second.domain
-
-    fun wrapWithSum(expr: Expression) = (expr as? Sum) ?: Sum(expr)
 }
 
 

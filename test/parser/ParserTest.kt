@@ -34,6 +34,7 @@ class ParserTest {
     @Test
     fun parse() {
         assertEquals(a, "a".parse())
+        assertEquals(-a, "-a".parse())
         assertEquals(eleven, "11".parse())
         assertEquals(ab, "ab".parse())
         assertEquals(eleven*ab, "11ab".parse())
@@ -47,15 +48,13 @@ class ParserTest {
         assertEquals(squareOfSum, "(a^2) + 2a*b + b^((2))".parse())
 
         assertEquals("(x-y)(x-y)(x-y)".parse().simplify(), "(x-y)^3".parse().simplify())
-
-        println("-a".parse())
     }
 
     @Test
-    fun benchMark() {
+    fun benchmark() {
         val str = "(((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2)/(((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) + (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) - (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) * (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) ^ (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) / (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) + (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) * (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) / (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) - (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) -(((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) + (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2)"
         val timeNeeded = measureTime {
-            for (i in 0 ..< 10000) {
+            for (i in 0 ..< 5000) {
                 val parsed = str.parse()
             }
         }

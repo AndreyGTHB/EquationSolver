@@ -20,12 +20,8 @@ fun String.parse() = standardize()._parse()
 fun String._parse(): Expression {
     if (last() == ')' && indexOfOpeningBracket(lastIndex) == 0) return slice(1 ..< lastIndex)._parse()
 
-    parseSum().let               { if (it != null) return it }
-    parseProductOrQuotient().let { if (it != null) return it }
-    parsePower().let             { if (it != null) return it }
-
-    return if (isInt()) toInt().toRational()
-    else                toMonomial()
+    val parsed = parseSum() ?: parseProductOrQuotient() ?: parsePower()
+    return parsed ?: if (isInt()) toInt().toRational() else toMonomial()
 }
 
 private fun String.parseSum(): Expression? {

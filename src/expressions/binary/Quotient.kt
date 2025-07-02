@@ -4,7 +4,11 @@ import equations.Domain
 import equations.FullDomain
 import equations.equateTo
 import expressions.*
+import expressions.longs.Product
 import expressions.number.Rational
+import expressions.number.Real
+import expressions.number.power
+import expressions.number.toRational
 
 class Quotient (
     body: Pair<Expression, Expression>,
@@ -42,7 +46,10 @@ class Quotient (
         return sQuotient
     }
     private fun simplifySoftly(): Quotient {
-        val (sNumer, sDenom) = simplifyBody()
+        val sBody = simplifyBody()
+        sBody.removeIrrationalityInDenom().apply { if (this != null) return Quotient(first to second).simplifySoftly() }
+
+        val (sNumer, sDenom) = sBody
         if (!sDenom.isNumber()) addDomainRestriction(sDenom equateTo zero())
         if (sNumer.isZeroRational()) return zeroQuotient()
 
@@ -50,6 +57,25 @@ class Quotient (
         val reducedNumer = sNumer.reduce(cf)
         val reducedDenom = sDenom.reduce(cf)
         return Quotient(reducedNumer to reducedDenom)
+    }
+
+    private fun Pair<Expression, Expression>.removeIrrationalityInDenom(): Pair<Expression, Expression>? {
+        val newNumerBody = first.asProduct().body.toMutableList()
+        val newDenomBody = mutableListOf<Expression>()
+        var changed = false
+        second.asProduct().body.forEach {
+            if (it is Real) {
+                newNumerBody.add(it.base.power(unit() - it.exponent))
+                newDenomBody.add(it.base.toRational())
+                changed = true
+            }
+            else newDenomBody.add(it)
+        }
+
+        if (!changed) return null
+        val newNumer = if (newNumerBody.size > 1) Product(newNumerBody) else newNumerBody[0]
+        val newDenom = if (newDenomBody.size > 1) Product(newDenomBody) else newDenomBody[0]
+        return newNumer to newDenom
     }
 
     override fun _commonFactor(other: Expression): Expression {
@@ -62,26 +88,26 @@ class Quotient (
     }
 
     override fun rationalPart(): Rational {
-        if (!final) TODO("Must be simplified")
+        assert(final)
         return numer.rationalPart()
     }
     override fun nonRationalPart(): Expression {
-        if (!final) TODO("Must be simplified")
+        assert(final)
         return Quotient(numer.nonRationalPart() to denom).apply { final = true }
     }
     override fun numericalPart(): Expression {
-        if (!final) TODO("Must be simplified")
+        assert(final)
         val numerNumPart = numer.numericalPart()
         val denomNumPart = denom.numericalPart()
         return if (denomNumPart.isUnitRational()) numerNumPart
-          else                                    Quotient(numerNumPart to denomNumPart).apply { final = true }
+               else                               Quotient(numerNumPart to denomNumPart).apply { final = true }
     }
     override fun nonNumericalPart(): Expression {
-        if (!final) TODO("Must be simplified")
+        assert(final)
         val numerNonNumPart = numer.nonNumericalPart()
         val denomNonNumPart = denom.nonNumericalPart()
         return if (denomNonNumPart.isUnitRational()) numerNonNumPart
-               else Quotient(numerNonNumPart to denomNonNumPart).apply { final = true }
+               else                                  Quotient(numerNonNumPart to denomNonNumPart).apply { final = true }
     }
 
     fun sumAsQuotient(other: Quotient): Quotient {

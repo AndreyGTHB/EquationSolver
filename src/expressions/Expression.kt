@@ -107,4 +107,6 @@ abstract class Expression (
 
 fun Expression.isUnitRational() = this is Rational && this.isUnit()
 fun Expression.isZeroRational() = this is Rational && this.isZero()
-fun Expression.isIntegerRational() = this is Rational && this.isInteger()
+
+fun Expression.asProduct() = if (this is Product) this else Product(this)
+fun Expression.asSum() = if (this is Sum) this else Sum(this)
