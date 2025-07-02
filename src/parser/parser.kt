@@ -79,6 +79,8 @@ fun String.standardize() = this
 private fun String.removeSpaces() = replace(" ", "")
 
 private fun String.removeExtraStars(): String {
+    if (length < 3) return this
+
     var newString = ""
     subStrings(3).forEach {
         val (l, c, r) = it.toCharArray()

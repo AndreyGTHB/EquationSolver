@@ -33,6 +33,7 @@ class ParserTest {
 
     @Test
     fun parse() {
+        assertEquals(a, "a".parse())
         assertEquals(eleven, "11".parse())
         assertEquals(ab, "ab".parse())
         assertEquals(eleven*ab, "11ab".parse())

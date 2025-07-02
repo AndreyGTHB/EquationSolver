@@ -3,6 +3,7 @@ package expressions.longs
 import equations.Domain
 import equations.FullDomain
 import expressions.*
+import expressions.binary.Power
 import expressions.binary.Quotient
 import expressions.monomials.Monomial
 import expressions.number.Rational
@@ -51,11 +52,24 @@ class Product (
     }
     private fun simplifySoftly(): Product {
         val newBody = simplifyBody()
+            .combinePowers()
             .expandProducts()
             .factorOutSumsIfNeeded()
             .combineByTypes()
             .sorted()
         return Product(newBody)
+    }
+
+    private fun List<Expression>.combinePowers(): List<Expression> {
+        val newBody = emptyBody()
+        val baseMap = mutableMapOf<Expression, Expression>()
+        forEach {
+            if (it is Power) baseMap[it.base] = (baseMap[it.base] ?: zero()) + it.exponent
+            else             newBody.add(it)
+        }
+
+        baseMap.forEach { base, exp -> newBody.add(Power(base to exp).simplify()) }
+        return newBody
     }
 
     private fun List<Expression>.expandProducts(): List<Expression> {
@@ -87,7 +101,8 @@ class Product (
     private fun List<Expression>.combineByTypes(): List<Expression> {
         val newBody = emptyBody()
         var rationalFactor = unit()
-        val realBaseMap = mutableMapOf<Int, Rational>()
+        val realFactors1 = mutableListOf<Real>()
+        val powerBaseMap = mutableMapOf<Expression, Expression>()
         var monomialFactor = unitMonomial()
         var quotientFactor = unitQuotient()
         forEach {
@@ -96,38 +111,64 @@ class Product (
                     if (it.isZero()) return listOf(zero())
                     rationalFactor *= it
                 }
-                is Real ->     realBaseMap[it.base] = (realBaseMap[it.base] ?: zero()) + it.exponent
+                is Real ->     realFactors1.add(it)
+                is Power    -> powerBaseMap[it.base] = (powerBaseMap[it.base] ?: zero()) + it.exponent
                 is Monomial -> monomialFactor *= it
                 is Quotient -> quotientFactor *= it
                 else        -> newBody.add(it)
             }
         }
 
-        // Continue simplifying the real numbers
-        val realFactors = mutableListOf<Real>()
-        realBaseMap.forEach { base, exp ->
-            val (sRational, sReal) = base.power(exp).simplifyAndSeparate()
-            rationalFactor *= sRational
-            if (!sReal.isUnit()) realFactors.add(sReal)
-
+        var realFactors2: List<Real> = realFactors1
+        realFactors2.combineByBases().also { (extractedRational, combined) ->
+            rationalFactor *= extractedRational
+            realFactors2 = combined
         }
-        val rootsMap = mutableMapOf<Int, Int>()
-        realFactors.forEach {
-            val (intExp, rootIndex) = it.exponent.body
-            rootsMap[rootIndex] = (rootsMap[rootIndex] ?: 1) * it.base.power(intExp)
+        realFactors2.combineByExponents().also { (extractedRational, combined) ->
+            rationalFactor *= extractedRational
+            realFactors2 = combined
         }
-        rootsMap.forEach { index, base ->
-            val rootExp = index.toRational().flip()
-            val (sRational, sReal) = base.power(rootExp).simplifyAndSeparate()
-            rationalFactor *= sRational
-            newBody.add(sReal)
-        }
+        newBody.addAll(realFactors2)
 
         arrayOf(rationalFactor, monomialFactor, quotientFactor).forEach {
             val sFactor = it.simplify()
             if (!sFactor.isUnitRational()) newBody.add(sFactor)
         }
         return newBody
+    }
+
+    private fun List<Real>.combineByBases(): Pair<Rational, List<Real>> {
+        val basesMap = mutableMapOf<Int, Rational>()
+        forEach { basesMap[it.base] = (basesMap[it.base] ?: zero()) + it.exponent }
+
+        val combined = mutableListOf<Real>()
+        var extractedRational = unit()
+        basesMap.forEach { base, exp ->
+            val (sRational, sReal) = base.power(exp).simplifyAndSeparate()
+            extractedRational *= sRational
+            if (!sReal.isUnit()) combined.add(sReal)
+        }
+
+        return extractedRational to combined
+    }
+
+    private fun List<Real>.combineByExponents(): Pair<Rational, List<Real>> {
+        val rootsMap = mutableMapOf<Int, Int>()
+        forEach {
+            val (intExp, rootIndex) = it.exponent.body
+            rootsMap[rootIndex] = (rootsMap[rootIndex] ?: 1) * it.base.power(intExp)
+        }
+
+        val combined = mutableListOf<Real>()
+        var extractedRational = unit()
+        rootsMap.forEach { index, base ->
+            val rootExp = index.toRational().flip()
+            val (sRational, sReal) = base.power(rootExp).simplifyAndSeparate()
+            extractedRational *= sRational
+            combined.add(sReal)
+        }
+
+        return extractedRational to combined
     }
 
     fun expandBrackets(): Sum {
