@@ -1,23 +1,23 @@
 package parser
 
-class SubStringsIterator(val str: String, val subLength: Int) : Iterator<String> {
+class SubStringsIterator(val str: String, val length: Int) : Iterator<String> {
     private var i = 0
 
-    init { assert(subLength > 0) }
+    init { assert(length > 0) }
 
-    override fun hasNext() = i + subLength <= str.length
+    override fun hasNext() = i + length <= str.length
 
     override fun next(): String {
-        val next = str.slice(i ..< i+subLength)
+        val next = str.slice(i ..< i+length)
         i++
         return next
     }
 }
 
 
-fun String.subStrings(subLength: Int): Iterable<String> {
-    assert(subLength > 0)
+fun String.subStrings(length: Int): Iterable<String> {
+    assert(length > 0)
     return object : Iterable<String> {
-        override fun iterator() = SubStringsIterator(this@subStrings, subLength)
+        override fun iterator() = SubStringsIterator(this@subStrings, length)
     }
 }

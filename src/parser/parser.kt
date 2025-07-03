@@ -53,10 +53,10 @@ private fun String.parseProductOrQuotient(): Expression? {
            else if (denomBody.size == 1) denomBody[0]
            else                          null
 
-    return if (denom == null)                          numer
+    return if (denom == null) numer
       else if (numer is Rational && denom is Rational
             && numer.isInteger() && denom.isInteger()) numer / denom
-      else                                             Quotient(numer to denom)
+      else Quotient(numer to denom)
 }
 
 private fun String.parsePower(): Expression? {

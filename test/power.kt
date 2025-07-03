@@ -1,10 +1,8 @@
 import expressions.number.toRational
 import expressions.unit
-import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import parser.parse
-import utils.toMonomial
 import kotlin.time.measureTime
 
 val logger: Logger = LoggerFactory.getLogger("power")
