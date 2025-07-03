@@ -18,6 +18,8 @@ fun gcd(a: Int, b: Int): Int {
     return big
 }
 
+fun Collection<Int>.gcd(): Int = fold(0, ::gcd)
+
 fun Int.factorise(): Map<Int, Int> {
     val decomp = mutableMapOf<Int, Int>()
     var remainder = this

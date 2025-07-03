@@ -33,28 +33,38 @@ class Real (
         val (intExponent, rootIndex) = sReal.exponent.body
         if (rootIndex == 1) return base.power(intExponent).toRational()
 
-        val decomp = base.factorise().mapValues { it.value * intExponent }
+        val baseDecomp = base.factorise().mapValues { it.value * intExponent }
 
         var outerPart = 1
         var innerPart = 1
-        for ((multipleBase, multipleExp) in decomp) {
+        for ((multipleBase, multipleExp) in baseDecomp) {
             val outerExp = multipleExp / rootIndex
             val innerExp = multipleExp % rootIndex
             if (outerExp != 0) outerPart *= multipleBase.power(outerExp)
             if (innerExp != 0) innerPart *= multipleBase.power(innerExp)
         }
 
-        return if (outerPart == 1) sReal
-          else if (innerPart == 1) outerPart.toRational()
-          else {
-              val radical = Real(innerPart to rootIndex.toRational().flip())
-              val asProduct = outerPart.toRational() * radical
-              asProduct.simplify()
-          }
+        val innerPartDecompose = innerPart.factorise()
+        val newIntExponent = innerPartDecompose.values.gcd()
+        if (newIntExponent != 1) innerPart = innerPartDecompose.root(newIntExponent)
+        val realFactor = Real(innerPart to (newIntExponent over rootIndex)).apply { final = true }
+        val integerFactor = outerPart.toRational()
+
+        return if (outerPart == 1) realFactor
+          else if (innerPart == 1) integerFactor
+          else                     integerFactor * realFactor
     }
+
     private fun simplifySoftly(): Real {
         val sExponent = exponent.simplify()
         return Real(base to sExponent)
+    }
+
+    private fun Map<Int, Int>.root(index: Int): Int {
+        val reduced = mapValues{ (_, exp) -> exp / index }
+        var result = 1
+        reduced.forEach { (factor, exp) -> result *= factor.power(exp) }
+        return result
     }
 
     fun simplifyAndSeparate(): Pair<Rational, Real> {
@@ -79,6 +89,7 @@ class Real (
     }
 
     override fun _reduceOrNull(other: Expression): Expression? {
+        if (other is Rational) return other.flip() * this
         if (other !is Real) return null
         if (this.base % other.base != 0 || this.exponent < other.exponent) return null
         val factor1 = other.base.power(this.exponent - other.exponent)

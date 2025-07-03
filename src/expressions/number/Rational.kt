@@ -92,6 +92,6 @@ class Rational (
 
 
 infix fun Int.over(other: Int) = Rational(this to other)
-fun Int.toRational() = this over 1
+fun Int.toRational() = Rational(this to 1, final=true)
 
 fun min(a: Rational, b: Rational): Rational = if ((a - b).isNegative()) a else b

@@ -7,6 +7,7 @@ import expressions.longs.Product
 import expressions.longs.Sum
 import expressions.monomials.Monomial
 import expressions.number.Rational
+import expressions.number.Real
 import expressions.number.toRational
 import expressions.unit
 import expressions.zero
@@ -58,11 +59,11 @@ private fun String.parseProductOrQuotient(): Expression? {
       else                                             Quotient(numer to denom)
 }
 
-private fun String.parsePower(): Power? {
+private fun String.parsePower(): Expression? {
     forEachIndexedOutsideBracketsReverse { i, c -> if (c == '^') {
         val base = slice(0 ..< i)._parse()
         val exp = slice(i+1 ..< length)._parse()
-        return Power(base to exp)
+        return if (base is Rational && base.denom == 1 && exp is Rational) Real(base.numer to exp) else Power(base to exp)
     }}
     return null
 }

@@ -1,11 +1,10 @@
 package parser
 
-import expressions.buildExpressionFromZero
+import expressions.*
+import expressions.binary.Power
 import expressions.monomials.Monomial
+import expressions.number.squareRoot
 import expressions.number.toRational
-import expressions.three
-import expressions.two
-import expressions.unit
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import kotlin.reflect.KFunction
@@ -36,6 +35,7 @@ class ParserTest {
         assertEquals(a, "a".parse())
         assertEquals(-a, "-a".parse())
         assertEquals(eleven, "11".parse())
+        assertEquals(five() * 11.squareRoot(), "5 * 11^(1/2)".parse())
         assertEquals(ab, "ab".parse())
         assertEquals(eleven*ab, "11ab".parse())
 

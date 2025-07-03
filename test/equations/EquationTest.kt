@@ -33,7 +33,7 @@ class EquationTest {
 
     @Test
     fun `Simple equations`() {
-        val eq1 = Monomial('x' to unit()) equateTo (25.power(1 over 3))
+        val eq1 = Monomial('x' to unit()) equateTo (5.power(2 over 3))
         eq1.solve().apply {
             assertTrue { this is Equation && left == eq1.left && right == eq1.right && final }
         }
