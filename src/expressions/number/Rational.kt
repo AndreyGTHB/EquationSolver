@@ -15,9 +15,10 @@ class Rational (
     val numer = body.first
     val denom = body.second
 
+    override val isNumber = true
+
     init { assert(denom != 0) }
 
-    override fun _isNumber() = true
     override fun rationalPart() = this
     override fun nonRationalPart() = unit()
 
@@ -82,12 +83,8 @@ class Rational (
 
     override operator fun unaryMinus() = -numer over denom
 
-    operator fun inc(): Rational {
-        return this + 1
-    }
-
-    override fun toString(): String = "$numer/$denom"
-    fun toFloat(): Float = numer.toFloat() / denom
+    override fun toString() = "$numer/$denom"
+    fun toFloat() = numer.toFloat() / denom
 }
 
 

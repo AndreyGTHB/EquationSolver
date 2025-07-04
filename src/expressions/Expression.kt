@@ -38,7 +38,7 @@ abstract class Expression (
     var final = final
         protected set
 
-    private var isNumber: Boolean? = null
+    open val isNumber: Boolean = false
 
     protected abstract fun _simplify(): Expression
     open fun simplify(): Expression {
@@ -56,12 +56,6 @@ abstract class Expression (
     protected fun addDomainRestriction(restr: Equation) { domain *= RestrictingDomain(restr) }
     protected fun makeInvalid() { domain = EmptyDomain }
 
-    protected open fun _isNumber(): Boolean = false
-    fun isNumber(): Boolean {
-        if (isNumber == null) isNumber = _isNumber()
-        return isNumber!!
-    }
-
     protected open fun _commonFactor(other: Expression): Expression? = null
 
     protected open fun _reduceOrNull(other: Expression): Expression? = null
@@ -77,8 +71,8 @@ abstract class Expression (
 
     open fun rationalPart(): Rational = unit()
     open fun nonRationalPart(): Expression = this
-    open fun numericalPart(): Expression = if (isNumber()) this else unit()
-    open fun nonNumericalPart(): Expression = if (isNumber()) unit() else this
+    open fun numericalPart(): Expression = if (isNumber) this else unit()
+    open fun nonNumericalPart(): Expression = if (isNumber) unit() else this
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false

@@ -15,14 +15,15 @@ class Real (
     val base = body.first
     val exponent = body.second
 
+    override val isNumber = true
+
     init {
         if (base == 0 && !exponent.isPositive()) TODO("Division by zero")
         if (base < 0 && !exponent.isInteger()) TODO("Domain of definition")
     }
 
-    override fun _isNumber() = true
-
-    override fun _simplify(): Expression {
+    override fun
+            _simplify(): Expression {
         if (exponent.isNegative()) {
             val opposite = Real(base to -exponent)
             return (unit() / opposite).simplify()

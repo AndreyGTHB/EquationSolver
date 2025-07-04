@@ -77,10 +77,7 @@ class Sum (
             val nonNumPart = term.nonNumericalPart()
             val numPart = term.numericalPart()
             if (nonNumPart.isUnitRational()) newBody.add(term)
-            else {
-                val prevCoeff = termMap[nonNumPart]
-                termMap[nonNumPart] = if (prevCoeff == null) numPart else prevCoeff + numPart
-            }
+            else                             termMap[nonNumPart] = termMap[nonNumPart]?.plus(numPart) ?: numPart
         }
         termMap.forEach { expr, coeff ->
             val reducedTerm = (coeff * expr).simplify()

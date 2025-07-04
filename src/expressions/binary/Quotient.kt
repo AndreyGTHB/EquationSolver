@@ -51,7 +51,7 @@ class Quotient (
         sBody.removeIrrationalityInDenom().apply { if (this != null) return Quotient(first to second).simplifySoftly() }
 
         val (sNumer, sDenom) = sBody
-        if (!sDenom.isNumber()) addDomainRestriction(sDenom equateTo zero())
+        if (!sDenom.isNumber) addDomainRestriction(sDenom equateTo zero())
         if (sNumer.isZeroRational()) return zeroQuotient()
 
         val cf = commonFactor(sNumer, sDenom)

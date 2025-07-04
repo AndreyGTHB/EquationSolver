@@ -10,9 +10,9 @@ abstract class LongExpression (
     domain: Domain = FullDomain,
     final: Boolean = false
 ) : Expression(domain, final) {
-    private var bodyDomain: Domain = FullDomain
+    override val isNumber by lazy { body.all { it.isNumber } }
 
-    override fun _isNumber() = body.all { it.isNumber() }
+    private var bodyDomain: Domain = FullDomain
 
     override fun _fullDomain() = bodyDomain * domain
 

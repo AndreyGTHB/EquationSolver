@@ -10,9 +10,9 @@ abstract class BinaryExpression (
     domain: Domain = FullDomain,
     final: Boolean
 ) : Expression(domain, final) {
-    private lateinit var bodyDomain: Domain
+    override val isNumber by lazy { body.run { first.isNumber && second.isNumber } }
 
-    override fun _isNumber() = body.first.isNumber() && body.second.isNumber()
+    private lateinit var bodyDomain: Domain
 
     protected fun simplifyBody(): Pair<Expression, Expression> {
         return (body.first.simplify() to body.second.simplify()).also {

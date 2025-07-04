@@ -29,7 +29,7 @@ class Product (
 
     private fun simplifyWithOneSum(): Expression {
         val sumFactor = body.first { it is Sum }
-        return if (sumFactor.isNumber()) simplifyIgnoringSums()
+        return if (sumFactor.isNumber) simplifyIgnoringSums()
         else                             expandBrackets().simplify()
     }
 
@@ -262,7 +262,7 @@ class Product (
     }
     override fun numericalPart(): Expression {
         assert(final)
-        val numPartSize = body.indexOfFirst { !it.isNumber() }
+        val numPartSize = body.indexOfFirst { !it.isNumber }
         return when (numPartSize) {
             -1   -> this
             0    -> unit()
@@ -272,7 +272,7 @@ class Product (
     }
     override fun nonNumericalPart(): Expression {
         assert(final)
-        val numPartSize = body.indexOfFirst { !it.isNumber() }
+        val numPartSize = body.indexOfFirst { !it.isNumber }
         return when (numPartSize) {
             -1          -> unit()
             0           -> this
