@@ -2,64 +2,68 @@ package equations
 
 import expressions.*
 import expressions.binary.Quotient
-import expressions.longs.Product
 import expressions.longs.Sum
 import expressions.monomials.Monomial
+import statements.*
 
-class Equation (body: Pair<Expression, Expression>, final: Boolean = false) : Condition(body, final) {
-    private val xMonomial = Monomial('x' to unit()).simplify()
+class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
+    var left = left
+        private set
+    var right = right
+        private set
 
-    override fun _solve(): Domain {
-        var newBody = body
-            .moveAllToTheLeft()
-            .multiplyByDenoms()
-            .separateByX()
+    val aimMonomial = Monomial(mapOf(aimChar to unit()), final=true)
 
-        if (newBody.first.isZeroRational()) {
-            return if (newBody.second.isZeroRational()) newBody.domain()
-            else                                        EmptyDomain
+    val domain: StatementSet
+        get() = left.domain * right.domain
+
+    fun solve(): Solution {
+        moveAllToTheLeft()
+        multiplyByDenoms()
+        separateByX()
+
+        if (left.isZeroRational()) {
+            return if (right.isZeroRational()) Solution(aimChar equalsTo UniversalExpression, UniversalSet)
+            else                               Solution(aimChar equalsTo InvalidExpression, UniversalSet)
         }
 
-        newBody = newBody.expressX()
-        val sThis = Equation(newBody, true)
-        val result = sThis * newBody.domain()
-        return result.solve()
+        expressX()
+        val answer = EqualsTo(aimChar, right)
+        return Solution(answer, domain)
     }
 
-    private fun Pair<Expression, Expression>.moveAllToTheLeft(): Pair<Expression, Expression> {
-        val newBody = (first - second) to zero()
-        return newBody.simplify()
+    private fun moveAllToTheLeft() {
+        left -= right
+        right = zero()
+        simplifyBody()
     }
 
-    private fun Pair<Expression, Expression>.multiplyByDenoms(): Pair<Expression, Expression> {
-        val leftSum = first.asSum()
-        var newLeft = Product(first)
-        leftSum.body.forEach { if (it is Quotient) newLeft *= it.denom }
-        val newBody = newLeft to second
-        return newBody.simplify()
+    private fun multiplyByDenoms() {
+        val leftSum = left.asSum()
+        leftSum.body.forEach { if (it is Quotient) left *= it.denom }
+        simplifyBody()
     }
 
-    private fun Pair<Expression, Expression>.separateByX(): Pair<Expression, Expression> {
-        val leftSum = first.asSum()
-        var newLeft = Sum()
-        var newRight = Sum()
+    private fun separateByX() {
+        val leftSum = left.asSum()
+        left = Sum()
+        right = Sum()
         leftSum.body.forEach {
-            if (it.reduceOrNull(xMonomial) != null) newLeft += it
-            else                                    newRight -= it
+            if (it.reduceOrNull(aimMonomial) != null) left += it
+            else                                      right -= it
         }
-        val newBody = newLeft to newRight
-        return newBody.simplify()
+        simplifyBody()
     }
 
-    private fun Pair<Expression, Expression>.expressX(): Pair<Expression, Expression> {
-        val xCoeff = first.reduce(xMonomial)
-        val newBody = xMonomial to (second / xCoeff)
-        return newBody.simplify()
+    private fun expressX() {
+        val xCoeff = left.reduce(aimMonomial)
+        left = aimMonomial
+        right /= xCoeff
+        simplifyBody()
     }
 
-    private fun Pair<Expression, Expression>.simplify() = first.simplify() to second.simplify()
-    private fun Pair<Expression, Expression>.domain() = first.domain * second.domain
+    private fun simplifyBody() {
+        left = left.simplify()
+        right = right.simplify()
+    }
 }
-
-
-infix fun Expression.equateTo(other: Expression) = Equation(this to other)

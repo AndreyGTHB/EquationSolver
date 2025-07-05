@@ -1,19 +1,15 @@
 package expressions
 
-import equations.Domain
-import equations.EmptyDomain
-import equations.RestrictingDomain
-import equations.FullDomain
-import equations.Equation
 import expressions.binary.Power
 import expressions.binary.Quotient
 import expressions.longs.Product
 import expressions.longs.Sum
 import expressions.number.Rational
+import statements.*
 
 @Suppress("FunctionName")
 abstract class Expression (
-    domain: Domain = FullDomain,
+    domain: StatementSet = UniversalSet,
     final: Boolean = false
 ) : Comparable<Expression> {
     companion object {
@@ -45,7 +41,7 @@ abstract class Expression (
         if (final) return this
         val sThis = _simplify()
         val sDomain = _fullDomain()
-        return if (sDomain == EmptyDomain) InvalidExpression
+        return if (sDomain == EmptySet) InvalidExpression
                else                        sThis.apply {
                                                domain = sDomain
                                                final = true
@@ -53,8 +49,8 @@ abstract class Expression (
     }
 
     protected open fun _fullDomain() = domain
-    protected fun addDomainRestriction(restr: Equation) { domain *= RestrictingDomain(restr) }
-    protected fun makeInvalid() { domain = EmptyDomain }
+    protected fun addConstraints(constraints: StatementSet) { domain *= constraints }
+    protected fun makeInvalid() { domain = EmptySet }
 
     protected open fun _commonFactor(other: Expression): Expression? = null
 
@@ -84,8 +80,8 @@ abstract class Expression (
 
     override fun compareTo(other: Expression): Int {
         val typeComparisonCode = compareExpressionTypes(this, other)
-        return if (typeComparisonCode == 0) this.toString() compareTo other.toString()
-          else                              typeComparisonCode
+        return if (typeComparisonCode != 0) typeComparisonCode
+          else                              this.toString() compareTo other.toString()
     }
 
     open operator fun unaryMinus(): Expression = (-unit()) * this

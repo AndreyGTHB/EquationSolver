@@ -1,7 +1,5 @@
 package expressions.binary
 
-import equations.Domain
-import equations.FullDomain
 import expressions.Expression
 import expressions.longs.Product
 import expressions.monomials.Monomial
@@ -12,8 +10,7 @@ import expressions.unit
 
 class Power (
     body: Pair<Expression, Expression>,
-    domain: Domain = FullDomain
-) : BinaryExpression(body, domain, false) {
+) : BinaryExpression(body, final=false) {
     val base = body.first
     val exponent = body.second
 

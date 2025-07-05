@@ -1,7 +1,5 @@
 package expressions.number
 
-import equations.Domain
-import equations.FullDomain
 import expressions.*
 import utils.gcd
 import utils.power
@@ -9,9 +7,8 @@ import kotlin.math.abs
 
 class Rational (
     override val body: Pair<Int, Int>,
-    domain: Domain = FullDomain,
     final: Boolean = false
-) : Expression(domain, final) {
+) : Expression(final = final) {
     val numer = body.first
     val denom = body.second
 

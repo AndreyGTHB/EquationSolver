@@ -1,8 +1,6 @@
 package expressions.binary
 
-import equations.Domain
-import equations.FullDomain
-import equations.equateTo
+import equations.Equation
 import expressions.*
 import expressions.longs.Product
 import expressions.number.Rational
@@ -12,8 +10,7 @@ import expressions.number.toRational
 
 class Quotient (
     body: Pair<Expression, Expression>,
-    domain: Domain = FullDomain
-) : BinaryExpression(body, domain, false) {
+) : BinaryExpression(body, final=false) {
     val numer = body.first
     val denom = body.second
 
@@ -51,7 +48,10 @@ class Quotient (
         sBody.removeIrrationalityInDenom().apply { if (this != null) return Quotient(first to second).simplifySoftly() }
 
         val (sNumer, sDenom) = sBody
-        if (!sDenom.isNumber) addDomainRestriction(sDenom equateTo zero())
+        if (!sDenom.isNumber) {
+            val (newConstraint, denomDomain) = Equation(sDenom, zero()).solve()
+            addConstraints((-newConstraint) * denomDomain)
+        }
         if (sNumer.isZeroRational()) return zeroQuotient()
 
         val cf = commonFactor(sNumer, sDenom)

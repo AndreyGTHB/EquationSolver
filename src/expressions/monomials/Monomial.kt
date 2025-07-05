@@ -1,7 +1,5 @@
 package expressions.monomials
 
-import equations.Domain
-import equations.FullDomain
 import expressions.Expression
 import expressions.zero
 import expressions.number.Rational
@@ -9,12 +7,11 @@ import expressions.number.min
 import expressions.unit
 
 
-class Monomial private constructor (
+class Monomial internal constructor (
     override val body: Map<Char, Rational>,
-    domain: Domain = FullDomain,
     final: Boolean
-) : Expression(domain, final) {
-    constructor(body: Map<Char, Rational>, domain: Domain = FullDomain) : this(body, domain, false)
+) : Expression(final=final) {
+    constructor(body: Map<Char, Rational>) : this(body, false)
     constructor(vararg body: Pair<Char, Rational>) : this(body.toMap())
 
     val varMap = body
@@ -32,8 +29,8 @@ class Monomial private constructor (
             }
         }
         return  if (numerVarMap.isNotEmpty() && denomVarMap.isNotEmpty()) {
-                    Monomial(numerVarMap, final=true) / Monomial(denomVarMap, final=true)
-                } else if (denomVarMap.isNotEmpty()) unit() / Monomial(denomVarMap, final=true)
+                    Monomial(numerVarMap, true) / Monomial(denomVarMap, true)
+                } else if (denomVarMap.isNotEmpty()) unit() / Monomial(denomVarMap, true)
                   else                               sMonomial
     }
     private fun simplifySoftly(): Monomial {
@@ -89,7 +86,7 @@ class Monomial private constructor (
     }
     fun power(exp: Rational): Expression {
         val newVarMap = varMap.mapValues { (v, d) -> (d * exp).simplify() }
-        return if (final && exp.isPositive()) Monomial(newVarMap, final=true)
+        return if (final && exp.isPositive()) Monomial(newVarMap, true)
           else                                Monomial(newVarMap)
     }
 

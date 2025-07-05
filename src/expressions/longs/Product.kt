@@ -1,7 +1,5 @@
 package expressions.longs
 
-import equations.Domain
-import equations.FullDomain
 import expressions.*
 import expressions.binary.Power
 import expressions.binary.Quotient
@@ -14,8 +12,7 @@ import utils.power
 
 class Product (
     body: List<Expression>,
-    domain: Domain = FullDomain,
-) : LongExpression(body, domain, false) {
+) : LongExpression(body, final=false) {
     constructor(vararg body: Expression) : this(body.toList())
 
     override fun _simplify(): Expression { simplifySoftly().apply {

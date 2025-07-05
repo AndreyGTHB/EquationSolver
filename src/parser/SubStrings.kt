@@ -15,9 +15,6 @@ class SubStringsIterator(val str: String, val length: Int) : Iterator<String> {
 }
 
 
-fun String.subStrings(length: Int): Iterable<String> {
-    assert(length > 0)
-    return object : Iterable<String> {
+fun String.subStrings(length: Int) = object : Iterable<String> {
         override fun iterator() = SubStringsIterator(this@subStrings, length)
-    }
 }

@@ -21,3 +21,5 @@ fun two() = 2.toRational()
 fun three() = 3.toRational()
 fun four() = 4.toRational()
 fun five() = 5.toRational()
+
+fun xMon() = Monomial(mapOf('x' to unit()), true)

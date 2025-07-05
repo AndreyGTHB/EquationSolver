@@ -1,15 +1,12 @@
 package expressions.longs
 
-import equations.Domain
-import equations.FullDomain
 import expressions.*
 import expressions.binary.Quotient
 import expressions.number.Rational
 
 class Sum (
     body: List<Expression>,
-    domain: Domain = FullDomain
-) : LongExpression(body, domain, false) {
+) : LongExpression(body, final=false) {
     constructor(vararg body: Expression) : this(body.toList())
 
     val commonInternalFactor by lazy(::genCommonInternalFactor)

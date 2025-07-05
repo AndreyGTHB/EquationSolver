@@ -1,20 +1,19 @@
 package expressions.longs
 
-import equations.Domain
-import equations.FullDomain
+import expressions.CompoundExpression
 import expressions.Expression
 import expressions.InvalidExpression
+import expressions.monomials.Monomial
+import statements.Conjunction
+import statements.Statement
+import statements.StatementSet
+import statements.UniversalSet
 
 abstract class LongExpression (
     override val body: List<Expression>,
-    domain: Domain = FullDomain,
     final: Boolean = false
-) : Expression(domain, final) {
+) : CompoundExpression(final=final) {
     override val isNumber by lazy { body.all { it.isNumber } }
-
-    private var bodyDomain: Domain = FullDomain
-
-    override fun _fullDomain() = bodyDomain * domain
 
     protected fun simplifyBody(): List<Expression> {
         val newBody = body.map { subExpr ->
@@ -27,6 +26,16 @@ abstract class LongExpression (
     }
 
     protected fun emptyBody() = mutableListOf<Expression>()
+
+    override fun firstVariable(): Char? {
+        body.forEach { subExpr ->
+            when (subExpr) {
+                is Monomial ->           subExpr.body.keys.firstOrNull().let { if (it != null) return it }
+                is CompoundExpression -> subExpr.firstVariable().let { if (it != null) return it }
+            }
+        }
+        return null
+    }
 
     override fun toString(): String {
         var asString = "${this::class.simpleName}:\n"

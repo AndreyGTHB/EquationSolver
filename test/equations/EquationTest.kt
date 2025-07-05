@@ -1,17 +1,17 @@
 package equations
 
-import expressions.buildExpressionFromUnit
-import expressions.buildExpressionFromZero
+import expressions.*
 import expressions.monomials.Monomial
 import expressions.number.over
 import expressions.number.power
 import expressions.number.squareRoot
 import expressions.number.toRational
-import expressions.unit
-import expressions.zero
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import parser.parse
+import statements.UniversalSet
+import statements.equalsTo
 import utils.toMonomial
 
 class EquationTest {
@@ -19,27 +19,27 @@ class EquationTest {
 
     @Test
     fun `Empty Equations`() {
-        val eq1 = zero() equateTo zero()
-        val eq2 = 10.power(3 over 2) equateTo (2.power(3 over 2) * 5.power(15 over 10))
-        assertEquals(eq1.solve(), FullDomain)
-        assertEquals(eq2.solve(), FullDomain)
+        val eq1 = Equation(zero(), zero())
+        val eq2 = Equation("10^(3/2)".parse(), "2^(3/2) * 5^(15/10)".parse())
+        assertEquals(eq1.solve().answer.expr, UniversalExpression)
+        assertEquals(eq2.solve().answer.expr, UniversalExpression)
 
-        val eq3 = unit() equateTo zero()
-        val eq4 = (5.squareRoot() * xMon + 7.toRational()) equateTo (10.power(3 over 2) / (2.power(3 over 2) * 5.toRational()) * xMon)
-        // eq4: 5x + 7 = (10^(3/2) / (2^(3/2) * 5))x
-        assertEquals(eq3.solve(), EmptyDomain)
-        assertEquals(eq4.solve(), EmptyDomain)
+        val eq3 = Equation(unit(), zero())
+        val eq4 = Equation("5x + 7".parse(), "10^(3/2) / (2^(3/2) * 5^(1/2)) * x".parse())
+        assertEquals(eq3.solve().answer.expr, InvalidExpression)
+        assertEquals(eq4.solve().answer.expr, InvalidExpression)
     }
 
     @Test
     fun `Simple equations`() {
-        val eq1 = Monomial('x' to unit()) equateTo (5.power(2 over 3))
+        val eq1 = Equation(xMon, 5.power(3 over 2))
         eq1.solve().apply {
-            assertTrue { this is Equation && left == eq1.left && right == eq1.right && final }
+            assertEquals(UniversalSet, domain)
+            assertEquals('x' equalsTo 5.power(3 over 2).simplify(), answer)
         }
 
-        val eq2 = "x".toMonomial() * 10.toRational() equateTo "x".toMonomial() * (7 over 1) + (9 over 1)
-        assertEquals(xMon equateTo 3.toRational(), eq2.solve())
+        val eq2 = Equation("10x".parse(), "9 + 7x".parse())
+        assertEquals(3.toRational(), eq2.solve().answer.expr)
 
         val left3 = buildExpressionFromUnit {
             times(4.toRational() - 2.power(5 over 3))
@@ -72,7 +72,7 @@ class EquationTest {
 //                plus(2.squareRoot())
 //            }
 //        }
-        val eq3 = left3 equateTo right3
+        val eq3 = Equation(left3, right3)
         println(eq3.solve())
     }
 }

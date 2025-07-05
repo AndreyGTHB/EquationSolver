@@ -1,18 +1,17 @@
 package expressions.binary
 
-import equations.Domain
-import equations.FullDomain
+import expressions.CompoundExpression
 import expressions.Expression
 import expressions.InvalidExpression
+import expressions.longs.Sum
+import expressions.monomials.Monomial
+import statements.StatementSet
 
 abstract class BinaryExpression (
     override val body: Pair<Expression, Expression>,
-    domain: Domain = FullDomain,
     final: Boolean
-) : Expression(domain, final) {
+) : CompoundExpression(final=final) {
     override val isNumber by lazy { body.run { first.isNumber && second.isNumber } }
-
-    private lateinit var bodyDomain: Domain
 
     protected fun simplifyBody(): Pair<Expression, Expression> {
         return (body.first.simplify() to body.second.simplify()).also {
@@ -21,7 +20,10 @@ abstract class BinaryExpression (
         }
     }
 
-    override fun _fullDomain() = bodyDomain * domain
+    override fun firstVariable(): Char? {
+        val asSum = Sum(body.first + body.second)
+        return asSum.firstVariable()
+    }
 
     override fun toString(): String {
         var asString = "${this::class.simpleName}:\n"

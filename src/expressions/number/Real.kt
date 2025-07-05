@@ -1,7 +1,5 @@
 package expressions.number
 
-import equations.Domain
-import equations.FullDomain
 import expressions.Expression
 import expressions.longs.Product
 import expressions.unit
@@ -10,8 +8,7 @@ import utils.*
 
 class Real (
     override val body: Pair<Int, Rational>,
-    domain: Domain = FullDomain,
-) : Expression(domain, false) {
+) : Expression(final = false) {
     val base = body.first
     val exponent = body.second
 
