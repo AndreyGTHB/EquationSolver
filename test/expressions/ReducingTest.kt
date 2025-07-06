@@ -6,7 +6,7 @@ import expressions.monomials.Monomial
 import expressions.number.over
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import parser.parse
+import parser.parseExpression
 
 class ReducingTest {
     val a = Monomial(mapOf('a' to unit()), true)
@@ -20,16 +20,16 @@ class ReducingTest {
 
     @Test
     fun `Products and sums`() {
-        val sum1 = "a + b".parse().simplify()
-        val sum2 = "a + b".parse().simplify()
+        val sum1 = "a + b".parseExpression().simplify()
+        val sum2 = "a + b".parseExpression().simplify()
         assertEquals(sum1, commonFactor(sum1, sum2))
         assertEquals(unit(), sum1.reduce(sum2))
 
-        val sum3 = "(5^(1/2) - 1)a^2 + (5^(1/2) - 1)ab".parse().simplify()
+        val sum3 = "(5^(1/2) - 1)a^2 + (5^(1/2) - 1)ab".parseExpression().simplify()
         assertEquals(sum1, commonFactor(sum1, sum3))
-        assertEquals("(5^(1/2) - 1)a".parse().simplify(), sum3.reduce(sum1))
+        assertEquals("(5^(1/2) - 1)a".parseExpression().simplify(), sum3.reduce(sum1))
 
-        val sum4 = "(5^(1/2) - 1)a + (5^(1/2) - 1)x".parse().simplify()
+        val sum4 = "(5^(1/2) - 1)a + (5^(1/2) - 1)x".parseExpression().simplify()
         println((sum4 as Sum).commonInternalFactor)
     }
 }

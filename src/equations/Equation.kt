@@ -14,10 +14,10 @@ class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
 
     val aimMonomial = Monomial(mapOf(aimChar to unit()), final=true)
 
-    val domain: StatementSet
-        get() = left.domain * right.domain
+    private var domain: StatementSet = UniversalSet
 
     fun solve(): Solution {
+        loadDomain()
         moveAllToTheLeft()
         multiplyByDenoms()
         separateByAim()
@@ -30,6 +30,11 @@ class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
         expressX()
         val answer = EqualsTo(aimChar, right)
         return Solution(answer, domain)
+    }
+
+    private fun loadDomain() {
+        simplifyBody()
+        domain = left.domain * right.domain
     }
 
     private fun moveAllToTheLeft() {
@@ -46,8 +51,8 @@ class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
 
     private fun separateByAim() {
         val leftSum = left.asSum()
-        left = Sum(domain=left.domain)
-        right = Sum(domain=right.domain)
+        left = Sum()
+        right = Sum()
         leftSum.body.forEach {
             if (it.reduceOrNull(aimMonomial) != null) left += it
             else                                      right -= it

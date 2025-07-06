@@ -1,13 +1,11 @@
 package parser
 
 import expressions.*
-import expressions.binary.Power
 import expressions.monomials.Monomial
 import expressions.number.squareRoot
 import expressions.number.toRational
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import kotlin.reflect.KFunction
 import kotlin.time.measureTime
 
 class ParserTest {
@@ -18,9 +16,9 @@ class ParserTest {
 
     @Test
     fun _parse() {
-        assertEquals(eleven, "11"._parse())
-        assertEquals(ab, "ab"._parse())
-        assertEquals(eleven*ab, "11*ab"._parse())
+        assertEquals(eleven, "11"._parseExpression())
+        assertEquals(ab, "ab"._parseExpression())
+        assertEquals(eleven*ab, "11*ab"._parseExpression())
     }
 
     @Test
@@ -32,22 +30,22 @@ class ParserTest {
 
     @Test
     fun parse() {
-        assertEquals(a, "a".parse())
-        assertEquals(-a, "-a".parse())
-        assertEquals(eleven, "11".parse())
-        assertEquals(five() * 11.squareRoot(), "5 * 11^(1/2)".parse())
-        assertEquals(ab, "ab".parse())
-        assertEquals(eleven*ab, "11ab".parse())
+        assertEquals(a, "a".parseExpression())
+        assertEquals(-a, "-a".parseExpression())
+        assertEquals(eleven, "11".parseExpression())
+        assertEquals(five() * 11.squareRoot(), "5 * 11^(1/2)".parseExpression())
+        assertEquals(ab, "ab".parseExpression())
+        assertEquals(eleven*ab, "11ab".parseExpression())
 
         val squareOfSum = buildExpressionFromZero {
             base(a raisedTo two())
             plus(two() * ab)
             plus (b raisedTo two())
         }
-        assertEquals(squareOfSum, "a^2 + 2ab + b^2".parse())
-        assertEquals(squareOfSum, "(a^2) + 2a*b + b^((2))".parse())
+        assertEquals(squareOfSum, "a^2 + 2ab + b^2".parseExpression())
+        assertEquals(squareOfSum, "(a^2) + 2a*b + b^((2))".parseExpression())
 
-        assertEquals("(x-y)(x-y)(x-y)".parse().simplify(), "(x-y)^3".parse().simplify())
+        assertEquals("(x-y)(x-y)(x-y)".parseExpression().simplify(), "(x-y)^3".parseExpression().simplify())
     }
 
     @Test
@@ -55,7 +53,7 @@ class ParserTest {
         val str = "(((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2)/(((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) + (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) - (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) * (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) ^ (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) / (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) + (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) * (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) / (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) - (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) -(((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2) + (((x*x + 2*x*y + y*y)^(a*b^(5/2) - 12))/(a^(-x^(-a*(-b)))))*(a + b/2)"
         val timeNeeded = measureTime {
             for (i in 0 ..< 5000) {
-                val parsed = str.parse()
+                val parsed = str.parseExpression()
             }
         }
         println(timeNeeded)

@@ -21,7 +21,7 @@ abstract class BinaryExpression (
     }
 
     override fun firstVariable(): Char? {
-        val asSum = Sum(body.first + body.second)
+        val asSum = Sum(body.toList())
         return asSum.firstVariable()
     }
 

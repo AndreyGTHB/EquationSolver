@@ -2,7 +2,7 @@ import expressions.number.toRational
 import expressions.unit
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import parser.parse
+import parser.parseExpression
 import kotlin.time.measureTime
 
 val logger: Logger = LoggerFactory.getLogger("power")
@@ -14,7 +14,7 @@ fun main() {
 }
 
 fun test(numberOfTests: Int) { repeat(numberOfTests) {
-    val s1 = "a + b".parse()
+    val s1 = "a + b".parseExpression()
     val exponents2 = arrayOf(unit(), 2.toRational(), 3.toRational(), 4.toRational())
     exponents2.forEach {
         val p = s1 raisedTo it

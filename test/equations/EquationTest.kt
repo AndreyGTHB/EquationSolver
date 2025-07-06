@@ -7,13 +7,12 @@ import expressions.number.power
 import expressions.number.squareRoot
 import expressions.number.toRational
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import parser.parse
+import parser.parseEquation
+import parser.parseExpression
 import statements.UniversalSet
 import statements.equalsTo
 import statements.notEqualsTo
-import utils.toMonomial
 
 class EquationTest {
     val xMon = Monomial('x' to unit()).simplify()
@@ -21,12 +20,12 @@ class EquationTest {
     @Test
     fun `Empty Equations`() {
         val eq1 = Equation(zero(), zero())
-        val eq2 = Equation("10^(3/2)".parse(), "2^(3/2) * 5^(15/10)".parse())
+        val eq2 = Equation("10^(3/2)".parseExpression(), "2^(3/2) * 5^(15/10)".parseExpression())
         assertEquals(eq1.solve().answer.expr, UniversalExpression)
         assertEquals(eq2.solve().answer.expr, UniversalExpression)
 
         val eq3 = Equation(unit(), zero())
-        val eq4 = Equation("5x + 7".parse(), "10^(3/2) / (2^(3/2) * 5^(1/2)) * x".parse())
+        val eq4 = Equation("5x + 7".parseExpression(), "10^(3/2) / (2^(3/2) * 5^(1/2)) * x".parseExpression())
         assertEquals(eq3.solve().answer.expr, InvalidExpression)
         assertEquals(eq4.solve().answer.expr, InvalidExpression)
     }
@@ -39,7 +38,7 @@ class EquationTest {
             assertEquals('x' equalsTo 5.power(3 over 2).simplify(), answer)
         }
 
-        val eq2 = Equation("10x".parse(), "9 + 7x".parse())
+        val eq2 = Equation("10x".parseExpression(), "9 + 7x".parseExpression())
         assertEquals(3.toRational(), eq2.solve().answer.expr)
 
         val left3 = buildExpressionFromUnit {
@@ -79,11 +78,14 @@ class EquationTest {
 
     @Test
     fun `With parameters`() {
-        val eq1 = Equation(xMon, "a/a".parse())
+        val eq1 = Equation(xMon, "a/a".parseExpression())
         assertEquals(Solution('x' equalsTo unit(), 'a' notEqualsTo zero()), eq1.solve())
 
-        val eq2 = Equation(xMon, "a / (b - 1)".parse())
+        val eq2 = Equation(xMon, "a / (b - 1)".parseExpression())
         println(eq2.solve())
+
+        val eq3 = "ax - a = 0".parseEquation()
+        println(eq3.solve())
     }
 }
 

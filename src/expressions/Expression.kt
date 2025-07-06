@@ -6,6 +6,7 @@ import expressions.longs.Product
 import expressions.longs.Sum
 import expressions.number.Rational
 import statements.*
+import kotlin.contracts.contract
 
 @Suppress("FunctionName")
 abstract class Expression (
@@ -120,8 +121,14 @@ abstract class Expression (
 }
 
 
-fun Expression.isUnitRational() = this is Rational && this.isUnit()
-fun Expression.isZeroRational() = this is Rational && this.isZero()
+fun Expression.isUnitRational(): Boolean {
+    contract { returns(true) implies(this@isUnitRational is Rational) }
+    return this is Rational && this.isUnit()
+}
+fun Expression.isZeroRational(): Boolean {
+    contract { returns(true) implies(this@isZeroRational is Rational) }
+    return this is Rational && this.isZero()
+}
 
 fun Expression.asProduct() = if (this is Product) this else Product(this)
 fun Expression.asSum() = if (this is Sum) this else Sum(this)

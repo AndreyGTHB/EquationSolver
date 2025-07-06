@@ -5,11 +5,11 @@ import expressions.number.power
 import expressions.number.toRational
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import parser.parse
+import parser.parseExpression
 import utils.toMonomial
 
 class ProductTest {
-    val a = "a".parse().simplify()
+    val a = "a".parseExpression().simplify()
 
     @Test
     fun `Zero product`() {
@@ -19,7 +19,7 @@ class ProductTest {
 
     @Test
     fun `Product with powers`() {
-        val p1 = "a^(1/2) * a^(1/2) + 5/4".parse()
+        val p1 = "a^(1/2) * a^(1/2) + 5/4".parseExpression()
         assertEquals((5 over 4) + a, p1.simplify())
     }
 }

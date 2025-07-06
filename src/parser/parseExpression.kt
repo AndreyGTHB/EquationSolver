@@ -15,11 +15,11 @@ import utils.isInt
 
 const val expressionSigns = "+-*/^"
 
-fun String.parse() = standardize()._parse()
+fun String.parseExpression() = standardize()._parseExpression()
 
 @Suppress("FunctionName")
-fun String._parse(): Expression {
-    if (last() == ')' && indexOfOpeningBracket(lastIndex) == 0) return slice(1 ..< lastIndex)._parse()
+fun String._parseExpression(): Expression {
+    if (last() == ')' && indexOfOpeningBracket(lastIndex) == 0) return slice(1 ..< lastIndex)._parseExpression()
 
     val parsed = parseSum() ?: parseProductOrQuotient() ?: parsePower()
     return parsed ?: if (isInt()) toInt().toRational() else toMonomial()
@@ -29,11 +29,11 @@ private fun String.parseSum(): Expression? {
     val body = mutableListOf<Expression>()
     var exprEnd = lastIndex
     forEachIndexedOutsideBracketsReverse { i, c ->
-        if (c == '+') { body.add(0, slice(i+1 .. exprEnd)._parse()); exprEnd = i - 1 }
-        if (c == '-') { body.add(0, -slice(i+1 .. exprEnd)._parse()); exprEnd = i - 1  }
+        if (c == '+') { body.add(0, slice(i+1 .. exprEnd)._parseExpression()); exprEnd = i - 1 }
+        if (c == '-') { body.add(0, -slice(i+1 .. exprEnd)._parseExpression()); exprEnd = i - 1  }
     }
     if (exprEnd == lastIndex) return null
-    if (exprEnd != -1) body.add(0, slice(0 .. exprEnd)._parse())
+    if (exprEnd != -1) body.add(0, slice(0 .. exprEnd)._parseExpression())
     return if (body.size > 1) Sum(body) else body[0]
 }
 
@@ -42,11 +42,11 @@ private fun String.parseProductOrQuotient(): Expression? {
     val denomBody = mutableListOf<Expression>()
     var exprEnd = lastIndex
     forEachIndexedOutsideBracketsReverse { i, c ->
-        if (c == '*') { numerBody.add(0, slice(i+1 .. exprEnd)._parse()); exprEnd = i - 1 }
-        if (c == '/') { denomBody.add(0, slice(i+1 .. exprEnd)._parse()); exprEnd = i - 1 }
+        if (c == '*') { numerBody.add(0, slice(i+1 .. exprEnd)._parseExpression()); exprEnd = i - 1 }
+        if (c == '/') { denomBody.add(0, slice(i+1 .. exprEnd)._parseExpression()); exprEnd = i - 1 }
     }
     if (exprEnd == lastIndex) return null
-    numerBody.add(0, slice(0 .. exprEnd)._parse())
+    numerBody.add(0, slice(0 .. exprEnd)._parseExpression())
 
     val numer = if (numerBody.size > 1) Product(numerBody) else numerBody[0]
     val denom = if (denomBody.size > 1)  Product(denomBody)
@@ -61,8 +61,8 @@ private fun String.parseProductOrQuotient(): Expression? {
 
 private fun String.parsePower(): Expression? {
     forEachIndexedOutsideBracketsReverse { i, c -> if (c == '^') {
-        val base = slice(0 ..< i)._parse()
-        val exp = slice(i+1 ..< length)._parse()
+        val base = slice(0 ..< i)._parseExpression()
+        val exp = slice(i+1 ..< length)._parseExpression()
         return if (base is Rational && base.denom == 1 && exp is Rational) Real(base.numer to exp) else Power(base to exp)
     }}
     return null
