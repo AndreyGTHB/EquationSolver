@@ -16,6 +16,8 @@ class Monomial internal constructor (
 
     val varMap = body
 
+    override val isNumber = varMap.isEmpty()
+
     override fun _simplify(): Expression {
         val sMonomial = simplifySoftly()
         if (sMonomial.varMap.isEmpty()) return unit()
