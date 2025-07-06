@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test
 import parser.parse
 import statements.UniversalSet
 import statements.equalsTo
+import statements.notEqualsTo
 import utils.toMonomial
 
 class EquationTest {
@@ -79,7 +80,10 @@ class EquationTest {
     @Test
     fun `With parameters`() {
         val eq1 = Equation(xMon, "a/a".parse())
-        println(eq1.solve())
+        assertEquals(Solution('x' equalsTo unit(), 'a' notEqualsTo zero()), eq1.solve())
+
+        val eq2 = Equation(xMon, "a / (b - 1)".parse())
+        println(eq2.solve())
     }
 }
 

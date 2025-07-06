@@ -19,8 +19,7 @@ class Real (
         if (base < 0 && !exponent.isInteger()) TODO("Domain of definition")
     }
 
-    override fun
-            _simplify(): Expression {
+    override fun _simplify(): Expression {
         if (exponent.isNegative()) {
             val opposite = Real(base to -exponent)
             return (unit() / opposite).simplify()

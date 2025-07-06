@@ -12,6 +12,14 @@ abstract class Expression (
     domain: StatementSet = UniversalSet,
     final: Boolean = false
 ) : Comparable<Expression> {
+    abstract val body: Any?
+    var domain = domain
+        protected set
+    var final = final
+        protected set
+
+    open val isNumber = false
+
     companion object {
         fun commonFactor(a: Expression, b: Expression): Expression {
             assert (a.final && b.final)
@@ -28,19 +36,11 @@ abstract class Expression (
         }
     }
 
-    abstract val body: Any?
-    var domain = domain
-        private set
-    var final = final
-        protected set
-
-    open val isNumber: Boolean = false
-
     protected abstract fun _simplify(): Expression
     open fun simplify(): Expression {
         if (final) return this
         val sThis = _simplify()
-        val sDomain = _fullDomain()
+        val sDomain = _fullDomain().simplify()
         return if (sDomain == EmptySet) InvalidExpression
           else if (sThis == InvalidExpression || sThis == UniversalExpression) sThis
           else sThis.apply {
@@ -49,6 +49,14 @@ abstract class Expression (
           }
     }
 
+    open fun firstVariable(): Char? = null
+
+    protected fun <T : Expression> T.applyLoadingDomainFrom(loader: Expression) = apply { domain = loader.domain }
+    protected fun <T : Expression> T.applyLoadingDomainFrom(vararg loaders: Expression) = apply {
+        var newDomain: StatementSet = UniversalSet
+        loaders.forEach { newDomain *= it.domain }
+        domain = newDomain
+    }
     protected open fun _fullDomain() = domain
     protected fun addConstraints(constraints: StatementSet) { domain *= constraints }
     protected fun makeInvalid() { domain = EmptySet }
@@ -66,10 +74,15 @@ abstract class Expression (
     }
     fun reduce(other: Expression): Expression = reduceOrNull(other)!!
 
-    open fun rationalPart(): Rational = unit()
-    open fun nonRationalPart(): Expression = this
-    open fun numericalPart(): Expression = if (isNumber) this else unit()
-    open fun nonNumericalPart(): Expression = if (isNumber) unit() else this
+    open fun _rationalPart(): Rational = unit()
+    fun rationalPart() = _rationalPart().applyLoadingDomainFrom(this)
+    open fun _nonRationalPart(): Expression = this
+    fun nonRationalPart() = _nonRationalPart().applyLoadingDomainFrom(this)
+
+    open fun _numericalPart(): Expression = if (isNumber) this else unit()
+    fun numericalPart() = _numericalPart().applyLoadingDomainFrom(this)
+    open fun _nonNumericalPart(): Expression = if (isNumber) unit() else this
+    fun nonNumericalPart() = _nonNumericalPart().applyLoadingDomainFrom(this)
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
@@ -85,12 +98,23 @@ abstract class Expression (
           else                              this.toString() compareTo other.toString()
     }
 
-    open operator fun unaryMinus(): Expression = (-unit()) * this
-    open operator fun plus(other: Expression)  = Sum(listOf(this, other))
-    open operator fun minus(other: Expression) = Sum(listOf(this, -other))
-    open operator fun times(other: Expression) = Product(listOf(this, other))
-    open operator fun div(other: Expression)   = Quotient(this to other)
-    infix fun raisedTo(other: Expression)      = Power(this to other)
+    protected open fun _unaryMinus(): Expression = Product(-unit(), this)
+    open operator fun unaryMinus() = _unaryMinus().applyLoadingDomainFrom(this)
+
+    protected open fun _plus(other: Expression) = Sum(this, other)
+    operator fun plus(other: Expression) = _plus(other).applyLoadingDomainFrom(this, other)
+
+    protected open fun _minus(other: Expression) = Sum(this, -other)
+    operator fun minus(other: Expression) = _minus(other).applyLoadingDomainFrom(this, other)
+
+    protected open fun _times(other: Expression) = Product(this, other)
+    operator fun times(other: Expression) = _times(other).applyLoadingDomainFrom(this, other)
+
+    protected open fun _div(other: Expression) = Quotient(this to other)
+    operator fun div(other: Expression) = _div(other).applyLoadingDomainFrom(this, other)
+
+    protected open fun _raisedTo(other: Expression) = Power(this to other)
+    infix fun raisedTo(other: Expression) = _raisedTo(other).applyLoadingDomainFrom(this, other)
 
     abstract override fun toString(): String
 }

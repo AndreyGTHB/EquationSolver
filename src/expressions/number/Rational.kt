@@ -16,8 +16,8 @@ class Rational (
 
     init { assert(denom != 0) }
 
-    override fun rationalPart() = this
-    override fun nonRationalPart() = unit()
+    override fun _rationalPart() = this
+    override fun _nonRationalPart() = unit()
 
     override fun simplify() = super.simplify() as Rational
     override fun _simplify(): Rational {
@@ -78,7 +78,8 @@ class Rational (
                                     else          flip().power(-exp)
     infix fun raisedTo(exp: Int): Rational = power(exp)
 
-    override operator fun unaryMinus() = -numer over denom
+    override fun _unaryMinus() = -numer over denom
+    override fun unaryMinus() = super.unaryMinus() as Rational
 
     override fun toString() = "$numer/$denom"
     fun toFloat() = numer.toFloat() / denom

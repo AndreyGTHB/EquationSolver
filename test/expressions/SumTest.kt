@@ -24,8 +24,7 @@ class SumTest {
 
     @Test
     fun commonInternalFactorTest() {
-        var s1 = (5 over 1)*"a*b".toMonomial() + (5 over 1)*"a".toMonomial() + (5 over 1)
-//        s1 = s1.simplify() as Sum
-        println((s1.simplify() as Sum).commonInternalFactor)
+        val s1 = (5 over 1)*"a*b".toMonomial() + (5 over 1)*"a".toMonomial() + (5 over 1)
+        assertEquals(five(), (s1.simplify() as Sum).commonInternalFactor)
     }
 }

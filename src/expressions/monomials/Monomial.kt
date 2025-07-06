@@ -41,6 +41,8 @@ class Monomial internal constructor (
         return Monomial(sVarMap)
     }
 
+    override fun firstVariable() = if (body.isNotEmpty()) body.keys.first() else null
+
     override fun _commonFactor(other: Expression): Expression? {
         return when (other) {
             is Monomial -> commonFactorWithMonomial(other)

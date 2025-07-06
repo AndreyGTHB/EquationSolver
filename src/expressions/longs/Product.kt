@@ -12,7 +12,8 @@ import utils.power
 
 class Product (
     body: List<Expression>,
-) : LongExpression(body, final=false) {
+    final: Boolean = false
+) : LongExpression(body, final=final) {
     constructor(vararg body: Expression) : this(body.toList())
 
     override fun _simplify(): Expression { simplifySoftly().apply {
@@ -27,7 +28,7 @@ class Product (
     private fun simplifyWithOneSum(): Expression {
         val sumFactor = body.first { it is Sum }
         return if (sumFactor.isNumber) simplifyIgnoringSums()
-        else                             expandBrackets().simplify()
+        else                           expandBrackets().simplify()
     }
 
     private fun simplifyIgnoringSums(): Expression {
@@ -193,6 +194,7 @@ class Product (
             is Rational -> commonFactor(other, body[0])
             is Real     -> commonFactorWithReal(other)
             is Monomial -> commonFactorWithMonomial(other)
+            is Sum      -> commonFactorWithSum(other)
             is Product  -> commonFactorWithProduct(other)
             else        -> null
         }
@@ -212,13 +214,20 @@ class Product (
         body.forEach { if (it is Monomial) return commonFactor(it, other) }
         return null
     }
+    private fun commonFactorWithSum(other: Sum): Expression {
+        val sumFactor = body.firstOrNull { it is Sum }
+        if (sumFactor == null) return commonFactor(this, other.commonInternalFactor)
+
+        val (otherCif, reducedOther) = other.separatedWithCommonInternalFactor
+        return commonFactor(this, otherCif) * commonFactor(sumFactor, reducedOther)
+    }
     private fun commonFactorWithProduct(other: Product): Expression {
         val cfBody = emptyBody()
         val currOtherBody = other.body.toMutableList()
-        this.body.forEach { fact1 ->
-            var currFact1 = fact1
-            currOtherBody.forEachIndexed { i, fact2 ->
-                val factCf = commonFactor(currFact1, fact2)
+        this.body.forEach { factor1 ->
+            var currFact1 = factor1
+            currOtherBody.forEachIndexed { i, factor2 ->
+                val factCf = commonFactor(currFact1, factor2)
                 if (factCf.isUnitRational()) return@forEachIndexed
                 cfBody.add(factCf)
                 currFact1 = currFact1.reduce(factCf)
@@ -236,28 +245,30 @@ class Product (
         val newBody = emptyBody()
         var currOther = other
         body.forEach {
-            if (currOther is Rational) return@forEach
-            val cf = commonFactor(it, currOther)
-            newBody.add(it.reduce(cf))
-            currOther = currOther.reduce(cf)
+            if (currOther !is Rational) {
+                val cf = commonFactor(it, currOther)
+                newBody.add(it.reduce(cf))
+                currOther = currOther.reduce(cf)
+            }
+            else newBody.add(it)
         }
         if (currOther is Rational) return Product(newBody) * (currOther as Rational).flip()
         return null
     }
 
-    override fun rationalPart(): Rational {
+    override fun _rationalPart(): Rational {
         assert(final)
         return if (body[0] is Rational) body[0] as Rational
           else                          unit()
     }
-    override fun nonRationalPart(): Expression {
+    override fun _nonRationalPart(): Expression {
         assert(final)
         return if (body[0] !is Rational) this
           else if (body.size == 1)       unit()
           else if (body.size == 2)       body[1]
           else                           Product(body.slice(1 until body.size)).apply { final = true }
     }
-    override fun numericalPart(): Expression {
+    override fun _numericalPart(): Expression {
         assert(final)
         val numPartSize = body.indexOfFirst { !it.isNumber }
         return when (numPartSize) {
@@ -267,7 +278,7 @@ class Product (
             else -> Product(body.slice(0 until numPartSize)).apply { final = true }
         }
     }
-    override fun nonNumericalPart(): Expression {
+    override fun _nonNumericalPart(): Expression {
         assert(final)
         val numPartSize = body.indexOfFirst { !it.isNumber }
         return when (numPartSize) {
@@ -278,14 +289,11 @@ class Product (
         }
     }
 
-    override operator fun times(other: Expression): Product {
-        return Product(listOf(other) + body)
+    override fun _times(other: Expression): Product {
+        return Product(body + other)
     }
-    override operator fun unaryMinus(): Expression {
+    override fun _unaryMinus(): Expression {
         if (body.isEmpty()) return -unit()
-
-        val newBody = body.toMutableList()
-        newBody[0] = -newBody[0]
-        return Product(newBody)
+        return Product(listOf(-body[0]) + body.slice(1 .. body.lastIndex))
     }
 }

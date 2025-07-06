@@ -13,6 +13,7 @@ class Sum (
     constructor(vararg body: Expression) : this(body.toList())
 
     val commonInternalFactor by lazy(::genCommonInternalFactor)
+    val separatedWithCommonInternalFactor by lazy(::genSeparatedWithCommonInternalFactor)
 
     override fun _simplify(): Expression {
         val sThis = simplifySoftly()
@@ -100,9 +101,20 @@ class Sum (
         return newBody
     }
 
-    override fun _commonFactor(other: Expression): Expression {
-        return commonFactor(commonInternalFactor, other)
+    override fun _commonFactor(other: Expression) = when (other) {
+        is Sum     -> commonFactorWithSum(other)
+        is Product -> null
+        else       -> commonFactor(commonInternalFactor, other)
     }
+    private fun commonFactorWithSum(other: Sum): Expression {
+        val reducedThis = this.reduce(this.commonInternalFactor)
+        val reducedOther = other.reduce(other.commonInternalFactor)
+
+        var cf = commonFactor(this.commonInternalFactor, other.commonInternalFactor)
+        if (reducedThis == reducedOther) cf *= reducedThis
+        return cf
+    }
+
     private fun genCommonInternalFactor(): Expression {
         assert(final)
 
@@ -112,21 +124,35 @@ class Sum (
         }
         return cf
     }
-
-    override fun _reduceOrNull(other: Expression): Expression? {
-        val newBody = body.map { it.reduceOrNull(other) ?: return null }
-        return Sum(newBody)
+    private fun genSeparatedWithCommonInternalFactor(): Pair<Expression, Expression> {
+        return commonInternalFactor to reduceEachOrNull(commonInternalFactor)!!
     }
 
-    override operator fun unaryMinus(): Sum {
+    override fun _reduceOrNull(other: Expression): Expression? {
+        if (this == other) return unit()
+        if (!commonInternalFactor.isUnitRational()) {
+            val thisSeparated = Product(separatedWithCommonInternalFactor.toList(), true)
+            return thisSeparated.reduceOrNull(other)
+        }
+
+        return reduceEachOrNull(other)
+    }
+
+    private fun reduceEachOrNull(other: Expression): Expression? {
+        assert(this.final && other.final)
+        val newBody = body.map { it.reduceOrNull(other) ?: return null }
+        return Sum(newBody).simplify()
+    }
+
+    override fun unaryMinus(): Sum {
         val newBody = body.map { -it }.toList()
         return Sum(newBody)
     }
 
-    override operator fun plus(other: Expression):  Sum {
+    override fun _plus(other: Expression):  Sum {
         return Sum(body + other)
     }
-    override operator fun minus(other: Expression): Sum {
+    override fun _minus(other: Expression): Sum {
         return Sum(body + (-other))
     }
 }

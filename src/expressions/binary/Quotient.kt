@@ -49,7 +49,7 @@ class Quotient (
 
         val (sNumer, sDenom) = sBody
         if (!sDenom.isNumber) {
-            val (newConstraint, denomDomain) = Equation(sDenom, zero(), firstVariable()!!).solve()
+            val (newConstraint, denomDomain) = Equation(sDenom, zero(), sDenom.firstVariable()!!).solve()
             addConstraints((-newConstraint) * denomDomain)
         }
         if (sNumer.isZeroRational()) return zeroQuotient()
@@ -88,25 +88,25 @@ class Quotient (
         return Quotient(reducedNumer to denom)
     }
 
-    override fun rationalPart(): Rational {
+    override fun _rationalPart(): Rational {
         assert(final)
-        return numer.rationalPart()
+        return numer._rationalPart()
     }
-    override fun nonRationalPart(): Expression {
+    override fun _nonRationalPart(): Expression {
         assert(final)
-        return Quotient(numer.nonRationalPart() to denom).apply { final = true }
+        return Quotient(numer._nonRationalPart() to denom).apply { final = true }
     }
-    override fun numericalPart(): Expression {
+    override fun _numericalPart(): Expression {
         assert(final)
-        val numerNumPart = numer.numericalPart()
-        val denomNumPart = denom.numericalPart()
+        val numerNumPart = numer._numericalPart()
+        val denomNumPart = denom._numericalPart()
         return if (denomNumPart.isUnitRational()) numerNumPart
                else                               Quotient(numerNumPart to denomNumPart).apply { final = true }
     }
-    override fun nonNumericalPart(): Expression {
+    override fun _nonNumericalPart(): Expression {
         assert(final)
-        val numerNonNumPart = numer.nonNumericalPart()
-        val denomNonNumPart = denom.nonNumericalPart()
+        val numerNonNumPart = numer._nonNumericalPart()
+        val denomNonNumPart = denom._nonNumericalPart()
         return if (denomNonNumPart.isUnitRational()) numerNonNumPart
                else                                  Quotient(numerNonNumPart to denomNonNumPart).apply { final = true }
     }
@@ -123,7 +123,7 @@ class Quotient (
         return Quotient(newNumer to newDenom)
     }
 
-    override operator fun unaryMinus(): Quotient {
+    override fun unaryMinus(): Quotient {
         return Quotient(-numer to denom)
     }
 }
