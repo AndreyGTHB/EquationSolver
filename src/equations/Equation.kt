@@ -20,7 +20,7 @@ class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
     fun solve(): Solution {
         moveAllToTheLeft()
         multiplyByDenoms()
-        separateByX()
+        separateByAim()
 
         if (left.isZeroRational()) {
             return if (right.isZeroRational()) Solution(aimChar equalsTo UniversalExpression, UniversalSet)
@@ -44,10 +44,10 @@ class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
         simplifyBody()
     }
 
-    private fun separateByX() {
+    private fun separateByAim() {
         val leftSum = left.asSum()
-        left = Sum()
-        right = Sum()
+        left = Sum(domain=left.domain)
+        right = Sum(domain=right.domain)
         leftSum.body.forEach {
             if (it.reduceOrNull(aimMonomial) != null) left += it
             else                                      right -= it

@@ -10,6 +10,5 @@ abstract class CompoundExpression (
     protected var bodyDomain: StatementSet = UniversalSet
 
     override fun _fullDomain() = bodyDomain * domain
-
     abstract fun firstVariable(): Char?
 }

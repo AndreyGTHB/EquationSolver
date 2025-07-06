@@ -75,5 +75,11 @@ class EquationTest {
         val eq3 = Equation(left3, right3)
         println(eq3.solve())
     }
+
+    @Test
+    fun `With parameters`() {
+        val eq1 = Equation(xMon, "a/a".parse())
+        println(eq1.solve())
+    }
 }
 

@@ -11,8 +11,9 @@ import statements.UniversalSet
 
 abstract class LongExpression (
     override val body: List<Expression>,
+    domain: StatementSet = UniversalSet,
     final: Boolean = false
-) : CompoundExpression(final=final) {
+) : CompoundExpression(domain, final) {
     override val isNumber by lazy { body.all { it.isNumber } }
 
     protected fun simplifyBody(): List<Expression> {

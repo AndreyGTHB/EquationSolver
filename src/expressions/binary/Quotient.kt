@@ -49,7 +49,7 @@ class Quotient (
 
         val (sNumer, sDenom) = sBody
         if (!sDenom.isNumber) {
-            val (newConstraint, denomDomain) = Equation(sDenom, zero()).solve()
+            val (newConstraint, denomDomain) = Equation(sDenom, zero(), firstVariable()!!).solve()
             addConstraints((-newConstraint) * denomDomain)
         }
         if (sNumer.isZeroRational()) return zeroQuotient()

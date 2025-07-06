@@ -42,10 +42,11 @@ abstract class Expression (
         val sThis = _simplify()
         val sDomain = _fullDomain()
         return if (sDomain == EmptySet) InvalidExpression
-               else                        sThis.apply {
-                                               domain = sDomain
-                                               final = true
-                                           }
+          else if (sThis == InvalidExpression || sThis == UniversalExpression) sThis
+          else sThis.apply {
+              domain = sDomain
+              final = true
+          }
     }
 
     protected open fun _fullDomain() = domain
@@ -76,7 +77,7 @@ abstract class Expression (
         other as Expression
         return this.body == other.body
     }
-    override fun hashCode(): Int = body.hashCode()
+    override fun hashCode() = body.hashCode()
 
     override fun compareTo(other: Expression): Int {
         val typeComparisonCode = compareExpressionTypes(this, other)

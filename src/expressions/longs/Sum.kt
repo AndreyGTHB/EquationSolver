@@ -3,10 +3,13 @@ package expressions.longs
 import expressions.*
 import expressions.binary.Quotient
 import expressions.number.Rational
+import statements.StatementSet
+import statements.UniversalSet
 
 class Sum (
-    body: List<Expression>,
-) : LongExpression(body, final=false) {
+    body: List<Expression> = listOf(),
+    domain: StatementSet = UniversalSet
+) : LongExpression(body, domain, false) {
     constructor(vararg body: Expression) : this(body.toList())
 
     val commonInternalFactor by lazy(::genCommonInternalFactor)
