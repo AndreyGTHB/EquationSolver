@@ -54,7 +54,6 @@ class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
             }}
             left = left.simplify()
         }
-        simplifyBody()
     }
 
     private fun separateByAim() {

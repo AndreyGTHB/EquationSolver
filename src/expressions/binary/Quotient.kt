@@ -79,6 +79,8 @@ class Quotient (
         return newNumer to newDenom
     }
 
+    override fun _substitute(variable: Char, value: Expression) = Quotient(substituteIntoBody(variable, value))
+
     override fun _commonFactor(other: Expression): Expression {
         return commonFactor(numer, other)
     }

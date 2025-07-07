@@ -1,6 +1,7 @@
 package expressions.monomials
 
 import expressions.Expression
+import expressions.binary.Power
 import expressions.zero
 import expressions.number.Rational
 import expressions.number.min
@@ -44,6 +45,17 @@ class Monomial internal constructor (
     }
 
     override fun firstVariable() = if (body.isNotEmpty()) body.keys.first() else null
+    override fun contains(variable: Char) = body.contains(variable)
+    override fun _substitute(variable: Char, value: Expression): Expression {
+        val newMonomialBody = body.toMutableMap()
+        val substituted = body[variable]?.let { exp ->
+            newMonomialBody.remove(variable)
+            value raisedTo exp
+        }
+        return if (substituted == null) this
+          else if (newMonomialBody.isEmpty()) substituted
+          else                                Monomial(newMonomialBody) * substituted
+    }
 
     override fun _commonFactor(other: Expression): Expression? {
         return when (other) {

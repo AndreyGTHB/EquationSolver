@@ -4,8 +4,6 @@ import expressions.CompoundExpression
 import expressions.Expression
 import expressions.InvalidExpression
 import expressions.monomials.Monomial
-import statements.Conjunction
-import statements.Statement
 import statements.StatementSet
 import statements.UniversalSet
 
@@ -36,6 +34,12 @@ abstract class LongExpression (
             }
         }
         return null
+    }
+
+    override fun contains(variable: Char) = body.any { it.contains(variable) }
+
+    protected fun substituteIntoBody(variable: Char, value: Expression) = body.map {
+        if (variable in it) it.substitute(variable, value) else it
     }
 
     override fun toString(): String {

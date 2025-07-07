@@ -189,6 +189,8 @@ class Product (
 
     private fun List<Expression>.countSums() = count { it is Sum }
 
+    override fun _substitute(variable: Char, value: Expression) = Product(substituteIntoBody(variable, value))
+
     override fun _commonFactor(other: Expression): Expression? {
         return when (other) {
             is Rational -> commonFactor(other, body[0])

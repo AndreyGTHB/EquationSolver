@@ -25,6 +25,12 @@ abstract class BinaryExpression (
         return asSum.firstVariable()
     }
 
+    override fun contains(variable: Char) = body.first.contains(variable) || body.second.contains(variable)
+
+    protected fun substituteIntoBody(variable: Char, value: Expression): Pair<Expression, Expression> {
+        return body.first.substitute(variable, value) to body.second.substitute(variable, value)
+    }
+
     override fun toString(): String {
         var asString = "${this::class.simpleName}:\n"
         arrayOf(body.first, body.second).forEach { subExp ->

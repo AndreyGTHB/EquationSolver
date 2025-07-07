@@ -64,6 +64,8 @@ class Power (
         }
     }
 
+    override fun _substitute(variable: Char, value: Expression) = Power(substituteIntoBody(variable, value))
+
     override fun _commonFactor(other: Expression): Expression? {
         return if (other is Power) return commonFactorWithPower(other)
           else                            commonFactor(base, other)

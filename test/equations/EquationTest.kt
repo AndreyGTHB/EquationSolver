@@ -4,7 +4,6 @@ import expressions.*
 import expressions.monomials.Monomial
 import expressions.number.over
 import expressions.number.power
-import expressions.number.squareRoot
 import expressions.number.toRational
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -48,7 +47,10 @@ class EquationTest {
         assertEquals(Solution('x' equalsTo unit(), 'a' notEqualsTo zero()), eq1.solve())
 
         val eq2 = Equation(xMon, "a / (b - 1)".parseExpression())
-        println(eq2.solve())
+        eq2.solve().also { (answer, domain) ->
+            assertEquals('x' equalsTo "a / ((-1) + b)".parseExpression(), answer)
+            assertEquals('b' notEqualsTo unit(), domain)
+        }
 
         val eq3 = "ax - a = 0".parseEquation()
         println(eq3.solve())

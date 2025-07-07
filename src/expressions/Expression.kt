@@ -1,6 +1,5 @@
 package expressions
 
-import expressions.Expression.Companion.commonFactor
 import expressions.binary.Power
 import expressions.binary.Quotient
 import expressions.longs.Product
@@ -52,6 +51,10 @@ abstract class Expression (
     }
 
     open fun firstVariable(): Char? = null
+    open operator fun contains(variable: Char) = false
+
+    protected open fun _substitute(variable: Char, value: Expression) = this
+    fun substitute(variable: Char, value: Expression) = _substitute(variable, value).applyLoadingDomainFrom(this)
 
     protected fun <T : Expression> T.applyLoadingDomainFrom(loader: Expression) = apply { domain = loader.domain }
     protected fun <T : Expression> T.applyLoadingDomainFrom(vararg loaders: Expression) = apply {
