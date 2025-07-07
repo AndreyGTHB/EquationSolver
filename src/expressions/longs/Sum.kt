@@ -3,13 +3,11 @@ package expressions.longs
 import expressions.*
 import expressions.binary.Quotient
 import expressions.number.Rational
-import statements.StatementSet
-import statements.UniversalSet
 
 class Sum (
     body: List<Expression> = listOf(),
-    domain: StatementSet = UniversalSet
-) : LongExpression(body, domain, false) {
+    final: Boolean = false
+) : LongExpression(body, final=final) {
     constructor(vararg body: Expression) : this(body.toList())
 
     val commonInternalFactor by lazy(::genCommonInternalFactor)
@@ -107,11 +105,11 @@ class Sum (
         else       -> commonFactor(commonInternalFactor, other)
     }
     private fun commonFactorWithSum(other: Sum): Expression {
-        val reducedThis = this.reduce(this.commonInternalFactor)
-        val reducedOther = other.reduce(other.commonInternalFactor)
+        val reducedThis = this.reduce(this.commonInternalFactor) as Sum
+        val reducedOther = other.reduce(other.commonInternalFactor) as Sum
 
         var cf = commonFactor(this.commonInternalFactor, other.commonInternalFactor)
-        if (reducedThis == reducedOther) cf *= reducedThis
+        if (reducedThis == reducedOther || reducedThis == reducedOther.opposite()) cf *= reducedThis
         return cf
     }
 
@@ -124,24 +122,71 @@ class Sum (
         }
         return cf
     }
-    private fun genSeparatedWithCommonInternalFactor(): Pair<Expression, Expression> {
-        return commonInternalFactor to reduceEachOrNull(commonInternalFactor)!!
+    private fun genSeparatedWithCommonInternalFactor(): Pair<Expression, Sum> {
+        return commonInternalFactor to (reduceEachTermOrNull(commonInternalFactor)!! as Sum)
+    }
+
+    fun opposite(): Sum {
+        val newBody = if (final) body.map { (-it).simplify() }.sorted()
+                      else       body.map { -it }
+        return Sum(newBody, final)
     }
 
     override fun _reduceOrNull(other: Expression): Expression? {
-        if (this == other) return unit()
-        if (!commonInternalFactor.isUnitRational()) {
-            val thisSeparated = Product(separatedWithCommonInternalFactor.toList(), true)
-            return thisSeparated.reduceOrNull(other)
+        return when (other) {
+            is Sum     -> reduceBySumOrNull(other)
+            is Product -> reduceByProductOrNull(other)
+            else       -> reduceEachTermOrNull(other)
         }
-
-        return reduceEachOrNull(other)
     }
 
-    private fun reduceEachOrNull(other: Expression): Expression? {
+    private fun reduceBySumOrNull(other: Sum): Expression? {
+        val thisProductBody = this.separatedWithCommonInternalFactor.run { mutableListOf(first, second) }
+        val otherProductBody = other.separatedWithCommonInternalFactor.run { mutableListOf(first, second) }
+        thisProductBody.replaceAll { thisFactor ->
+            var currThisFactor = thisFactor
+            otherProductBody.replaceAll { otherFactor ->
+                var currOtherFactor = otherFactor
+                if (currThisFactor is Sum) {
+                    if (otherFactor is Sum) {
+                        if (currThisFactor == otherFactor) {
+                            currThisFactor = unit()
+                            currOtherFactor = unit()
+                        }
+                        else if (currThisFactor == otherFactor.opposite()) {
+                            currThisFactor = -unit()
+                            currOtherFactor = unit()
+                        }
+                    }
+                    else {
+                        val cf = commonFactor(currThisFactor, otherFactor)
+                        currThisFactor = currThisFactor.reduce(cf)
+                        currOtherFactor = otherFactor.reduce(cf)
+                    }
+                }
+                else {
+                    val cf = commonFactor(currThisFactor, otherFactor)
+                    currThisFactor = currThisFactor.reduce(cf)
+                    currOtherFactor = otherFactor.reduce(cf)
+                }
+                currOtherFactor
+            }
+            currThisFactor
+        }
+
+        otherProductBody.forEach { if(!it.isUnitRational()) return null }
+        return Product(thisProductBody)
+    }
+
+    private fun reduceByProductOrNull(other: Product): Expression? {
+        val separated = Product(separatedWithCommonInternalFactor.toList(), true)
+        return separated.reduceOrNull(other)
+    }
+
+    private fun reduceEachTermOrNull(other: Expression): Expression? {
         assert(this.final && other.final)
-        val newBody = body.map { it.reduceOrNull(other) ?: return null }
-        return Sum(newBody).simplify()
+        val newBody = body.map { it.reduceOrNull(other) ?: return null }.sorted()
+        return Sum(newBody, true)
     }
 
     override fun unaryMinus(): Sum {

@@ -1,5 +1,6 @@
 package expressions
 
+import expressions.Expression.Companion.commonFactor
 import expressions.binary.Power
 import expressions.binary.Quotient
 import expressions.longs.Product

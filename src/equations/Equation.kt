@@ -19,7 +19,7 @@ class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
     fun solve(): Solution {
         loadDomain()
         moveAllToTheLeft()
-        multiplyByDenoms()
+        removeQuotients()
         separateByAim()
 
         if (left.isZeroRational()) {
@@ -43,9 +43,17 @@ class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
         simplifyBody()
     }
 
-    private fun multiplyByDenoms() {
-        val leftSum = left.asSum()
-        leftSum.body.forEach { if (it is Quotient) left *= it.denom }
+    private fun removeQuotients() {
+        var thereAreQuotients = true
+        while (thereAreQuotients) {
+            thereAreQuotients = false
+            val leftAsSum = left.asSum()
+            leftAsSum.body.forEach { if (it is Quotient) {
+                left *= it.denom
+                thereAreQuotients = true
+            }}
+            left = left.simplify()
+        }
         simplifyBody()
     }
 

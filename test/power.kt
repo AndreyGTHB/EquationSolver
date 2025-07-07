@@ -8,9 +8,10 @@ import kotlin.time.measureTime
 val logger: Logger = LoggerFactory.getLogger("power")
 
 fun main() {
-    val timeNeeded = measureTime { test(1) }
+    val n = 1_000
+    val timeNeeded = measureTime { test(n) }
     logger.info("Time needed: $timeNeeded")
-    logger.info("Time per single test: {}", timeNeeded / 1)
+    logger.info("Time per single test: {}", timeNeeded / n)
 }
 
 fun test(numberOfTests: Int) { repeat(numberOfTests) {
@@ -18,6 +19,6 @@ fun test(numberOfTests: Int) { repeat(numberOfTests) {
     val exponents2 = arrayOf(unit(), 2.toRational(), 3.toRational(), 4.toRational())
     exponents2.forEach {
         val p = s1 raisedTo it
-        println(p.simplify())
+        p.simplify()
     }
 }}

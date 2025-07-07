@@ -79,8 +79,6 @@ class Monomial internal constructor (
         return Monomial(newVarMap)
     }
 
-    fun isUnit() = simplify().equals(1)
-
     operator fun times(other: Monomial): Monomial {
         val newVarMap = varMap.toMutableMap()
         for ((v, d) in other.varMap) {
@@ -89,7 +87,7 @@ class Monomial internal constructor (
         return Monomial(newVarMap)
     }
     fun power(exp: Rational): Expression {
-        val newVarMap = varMap.mapValues { (v, d) -> (d * exp).simplify() }
+        val newVarMap = varMap.mapValues { (_, d) -> (d * exp).simplify() }
         return if (final && exp.isPositive()) Monomial(newVarMap, true)
           else                                Monomial(newVarMap)
     }

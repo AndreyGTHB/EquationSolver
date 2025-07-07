@@ -40,40 +40,6 @@ class EquationTest {
 
         val eq2 = Equation("10x".parseExpression(), "9 + 7x".parseExpression())
         assertEquals(3.toRational(), eq2.solve().answer.expr)
-
-        val left3 = buildExpressionFromUnit {
-            times(4.toRational() - 2.power(5 over 3))
-            times(xMon)
-        }
-        val right3 = buildExpressionFromUnit {
-            times {
-                times(7.squareRoot() - unit())
-                times(7.toRational() * 28.squareRoot() + 2.toRational())
-                minus {
-                    times(2.toRational())
-                    times(2.power(1 over 3))
-                    times(xMon)
-                }
-            }
-            div {
-                plus(2.power(-2 over 3))
-            }
-        }
-//        val left3 = buildExpressionFromUnit { times(2.toRational()) }
-//        val right3 = buildExpressionFromUnit {
-//            times {
-//                minus {
-////                    times(2.toRational())
-////                    times(2.power(1 over 3))
-//                    times(xMon)
-//                }
-//            }
-//            div {
-//                plus(2.squareRoot())
-//            }
-//        }
-        val eq3 = Equation(left3, right3)
-        println(eq3.solve())
     }
 
     @Test

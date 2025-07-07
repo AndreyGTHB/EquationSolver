@@ -215,11 +215,21 @@ class Product (
         return null
     }
     private fun commonFactorWithSum(other: Sum): Expression {
-        val sumFactor = body.firstOrNull { it is Sum }
+        var sumFactor: Sum? = null
+        val bodyWithoutSum = emptyBody()
+        for ((i, factor) in body.withIndex()) {
+            if (factor is Sum) {
+                sumFactor = factor
+                bodyWithoutSum.addAll(body.slice(i+1 ..< body.size))
+                break
+            }
+            else bodyWithoutSum.add(factor)
+        }
         if (sumFactor == null) return commonFactor(this, other.commonInternalFactor)
 
-        val (otherCif, reducedOther) = other.separatedWithCommonInternalFactor
-        return commonFactor(this, otherCif) * commonFactor(sumFactor, reducedOther)
+        val thisReducedBySum = Product(bodyWithoutSum, true)
+        val (otherCif, otherReducedByCif) = other.separatedWithCommonInternalFactor
+        return commonFactor(thisReducedBySum, otherCif) * commonFactor(sumFactor, otherReducedByCif)
     }
     private fun commonFactorWithProduct(other: Product): Expression {
         val cfBody = emptyBody()

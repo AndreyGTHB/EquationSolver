@@ -10,6 +10,7 @@ import parser.parseExpression
 
 class ReducingTest {
     val a = Monomial(mapOf('a' to unit()), true)
+    val t = Monomial(mapOf('t' to unit()), true)
 
     @Test
     fun `Rational cf`() {
@@ -30,6 +31,10 @@ class ReducingTest {
         assertEquals("(5^(1/2) - 1)a".parseExpression().simplify(), sum3.reduce(sum1))
 
         val sum4 = "(5^(1/2) - 1)a + (5^(1/2) - 1)x".parseExpression().simplify()
-        println((sum4 as Sum).commonInternalFactor)
+//        println((sum4 as Sum).commonInternalFactor)
+
+        val sum5 = "(-a) + ab".parseExpression().simplify() as Sum
+        val sum6 = "t(-1 + b)".parseExpression().simplify() as Sum
+        assertEquals(a / t, (sum5 / sum6).simplify())
     }
 }

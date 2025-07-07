@@ -111,12 +111,6 @@ class Quotient (
                else                                  Quotient(numerNonNumPart to denomNonNumPart).apply { final = true }
     }
 
-    fun sumAsQuotient(other: Quotient): Quotient {
-        val newNumer = this.numer * other.denom + other.numer * this.denom
-        val newDenom = this.denom * other.denom
-        return Quotient(newNumer to newDenom)
-    }
-
     operator fun times(other: Quotient): Quotient {
         val newNumer = this.numer * other.numer
         val newDenom = this.denom * other.denom
