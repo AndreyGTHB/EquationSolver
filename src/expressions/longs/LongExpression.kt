@@ -1,5 +1,6 @@
 package expressions.longs
 
+import console.Clr
 import expressions.CompoundExpression
 import expressions.Expression
 import expressions.InvalidExpression
@@ -43,11 +44,16 @@ abstract class LongExpression (
     }
 
     override fun toString(): String {
-        var asString = "${this::class.simpleName}:\n"
-        body.forEach { subExp ->
-            val subExpStrs = subExp.toString().split("\n")
-            subExpStrs.forEach { subExpStr -> asString += "  $subExpStr\n" }
+        var thisString = "${this::class.simpleName}:".coloured()
+        body.forEach { subExpr ->
+            val subExprString = subExpr.toString()
+                .split("\n")
+                .joinToString("\n") { "  $it" }
+                .run { "\u00b7".coloured() + slice(1 .. lastIndex) }
+            thisString += "\n" + subExprString
         }
-        return asString
+        return thisString
     }
+
+    private fun String.coloured() = Clr.fg(Clr.palette[2]) + this + Clr.RC
 }

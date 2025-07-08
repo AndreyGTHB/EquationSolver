@@ -1,5 +1,6 @@
 package expressions.number
 
+import console.Clr
 import expressions.Expression
 import expressions.longs.Product
 import expressions.unit
@@ -95,7 +96,7 @@ class Real (
     }
 
     override fun toString(): String {
-        val str = "$base^($exponent)"
+        val str = Clr.fg(Clr.palette[0]) + "$base^($exponent" + Clr.fg(Clr.palette[0]) + ')' + Clr.RC
         return str
     }
 }

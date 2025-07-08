@@ -1,11 +1,10 @@
 package expressions.binary
 
+import console.Clr
 import expressions.CompoundExpression
 import expressions.Expression
 import expressions.InvalidExpression
 import expressions.longs.Sum
-import expressions.monomials.Monomial
-import statements.StatementSet
 
 abstract class BinaryExpression (
     override val body: Pair<Expression, Expression>,
@@ -32,11 +31,16 @@ abstract class BinaryExpression (
     }
 
     override fun toString(): String {
-        var asString = "${this::class.simpleName}:\n"
-        arrayOf(body.first, body.second).forEach { subExp ->
-            val subExpStrs = subExp.toString().split("\n")
-            subExpStrs.forEach { subExpStr -> asString += "  $subExpStr\n" }
+        var thisString = "${this::class.simpleName}:".coloured()
+        body.toList().forEach { subExpr ->
+            val subExprString = subExpr.toString()
+                .split("\n")
+                .joinToString("\n") { "  $it" }
+                .run { "\u00b7".coloured() + slice(1 .. lastIndex) }
+            thisString += "\n" + subExprString
         }
-        return asString
+        return thisString
     }
+
+    private fun String.coloured() = Clr.fg(Clr.palette[3]) + this + Clr.RC
 }

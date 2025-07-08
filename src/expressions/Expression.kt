@@ -56,8 +56,8 @@ abstract class Expression (
     protected open fun _substitute(variable: Char, value: Expression) = this
     fun substitute(variable: Char, value: Expression) = _substitute(variable, value).applyLoadingDomainFrom(this)
 
-    protected fun <T : Expression> T.applyLoadingDomainFrom(loader: Expression) = apply { domain = loader.domain }
-    protected fun <T : Expression> T.applyLoadingDomainFrom(vararg loaders: Expression) = apply {
+    private fun <T : Expression> T.applyLoadingDomainFrom(loader: Expression) = apply { domain = loader.domain }
+    private fun <T : Expression> T.applyLoadingDomainFrom(vararg loaders: Expression) = apply {
         var newDomain: StatementSet = UniversalSet
         loaders.forEach { newDomain *= it.domain }
         domain = newDomain

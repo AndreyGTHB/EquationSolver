@@ -1,5 +1,6 @@
 package expressions.monomials
 
+import console.Clr
 import expressions.Expression
 import expressions.binary.Power
 import expressions.zero
@@ -50,7 +51,7 @@ class Monomial internal constructor (
         val newMonomialBody = body.toMutableMap()
         val substituted = body[variable]?.let { exp ->
             newMonomialBody.remove(variable)
-            value raisedTo exp
+            if (!exp.isUnit()) value raisedTo exp else value
         }
         return if (substituted == null) this
           else if (newMonomialBody.isEmpty()) substituted
@@ -105,9 +106,9 @@ class Monomial internal constructor (
     }
 
     override fun toString(): String {
-        var str = "M: "
+        var str = Clr.fg(Clr.palette[1]) + "M: " + Clr.RC
         for ((v, d) in varMap) {
-            str += "$v^$d "
+            str += Clr.fg(Clr.palette[1]) + "$v^" + Clr.RC + "$d "
         }
         str = str.slice(0 until str.lastIndex)
         return str

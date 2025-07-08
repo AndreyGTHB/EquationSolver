@@ -1,5 +1,6 @@
 package expressions.number
 
+import console.Clr
 import expressions.*
 import utils.gcd
 import utils.power
@@ -81,7 +82,7 @@ class Rational (
     override fun _unaryMinus() = -numer over denom
     override fun unaryMinus() = super.unaryMinus() as Rational
 
-    override fun toString() = "$numer/$denom"
+    override fun toString() = Clr.fg(Clr.palette[0]) + "$numer/$denom" + Clr.RC
     fun toFloat() = numer.toFloat() / denom
 }
 

@@ -54,6 +54,9 @@ class EquationTest {
 
         val eq3 = "ax - a = 0".parseEquation()
         println(eq3.solve())
+
+        val eq5 = "(7^(1/2) - 1)ax + (b/a)x = a^2x - b/5".parseEquation()
+        println(eq5.solve())
     }
 }
 

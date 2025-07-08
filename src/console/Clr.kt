@@ -25,8 +25,8 @@ object Clr {
     fun bg(n: Int) = "${esc}48;5;${n}m" // Set a background color.
 
     // RGB Colors
-    fun rgbFg(r: Int, g: Int, b: Int) = "${esc}38;2;$r;$g;${b}m" // Set a RGB foreground color.
-    fun rgbBg(r: Int, g: Int, b: Int) = "${esc}48;2;$r;$g;${b}m" // Set a RGB background color.
+    fun rgbFg(r: Int, g: Int, b: Int) = "${esc}38;2;$r;$g;${b}m" // Set an RGB foreground color.
+    fun rgbBg(r: Int, g: Int, b: Int) = "${esc}48;2;$r;$g;${b}m" // Set an RGB background color.
 
     // predefined "nice" colors
     val palette = arrayOf(120, 229, 135, 4, 5, 6, 249, 179, 227)
