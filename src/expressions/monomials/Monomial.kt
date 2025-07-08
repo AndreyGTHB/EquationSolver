@@ -106,11 +106,21 @@ class Monomial internal constructor (
     }
 
     override fun toString(): String {
-        var str = Clr.fg(Clr.palette[1]) + "M: " + Clr.RC
+        var str = "M:("
         for ((v, d) in varMap) {
-            str += Clr.fg(Clr.palette[1]) + "$v^" + Clr.RC + "$d "
+            str += "$v^$d "
+        }
+        str = str.slice(0 until str.lastIndex) + ')'
+        return str
+    }
+    override fun toColouredString(): String {
+        var str = "M: ".coloured()
+        for ((v, d) in varMap) {
+            str += "$v^".coloured() + d.toColouredString() + ' '
         }
         str = str.slice(0 until str.lastIndex)
         return str
     }
+
+    private fun String.coloured() = Clr.fg(Clr.palette[1]) + this + Clr.RC
 }

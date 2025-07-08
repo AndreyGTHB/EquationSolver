@@ -95,9 +95,9 @@ class Real (
         return factor1 * factor2
     }
 
-    override fun toString(): String {
-        val str = Clr.fg(Clr.palette[0]) + "$base^($exponent" + Clr.fg(Clr.palette[0]) + ')' + Clr.RC
-        return str
+    override fun toString() = "$base^($exponent)"
+    override fun toColouredString(): String {
+        return Clr.fg(Clr.palette[0]) + "$base^($exponent" + Clr.fg(Clr.palette[0]) + ')' + Clr.RC
     }
 }
 

@@ -38,15 +38,18 @@ abstract class LongExpression (
     }
 
     override fun contains(variable: Char) = body.any { it.contains(variable) }
-
-    protected fun substituteIntoBody(variable: Char, value: Expression) = body.map {
-        if (variable in it) it.substitute(variable, value) else it
-    }
+    protected fun substituteIntoBody(variable: Char, value: Expression) = body.map { it.substitute(variable, value) }
 
     override fun toString(): String {
+        var thisString = "${this::class.simpleName}:("
+        body.forEach { thisString += "$it " }
+        thisString = thisString.slice(0 until thisString.lastIndex) + ')'
+        return thisString
+    }
+    override fun toColouredString(): String {
         var thisString = "${this::class.simpleName}:".coloured()
         body.forEach { subExpr ->
-            val subExprString = subExpr.toString()
+            val subExprString = subExpr.toColouredString()
                 .split("\n")
                 .joinToString("\n") { "  $it" }
                 .run { "\u00b7".coloured() + slice(1 .. lastIndex) }

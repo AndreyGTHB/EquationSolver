@@ -5,6 +5,8 @@ import expressions.binary.Quotient
 import expressions.longs.Sum
 import expressions.monomials.Monomial
 import statements.*
+import utils.fold
+import utils.replaceAllIndexed
 
 class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
     var left = left
@@ -47,11 +49,22 @@ class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
         var thereAreQuotients = true
         while (thereAreQuotients) {
             thereAreQuotients = false
-            val leftAsSum = left.asSum()
-            leftAsSum.body.forEach { if (it is Quotient) {
-                left *= it.denom
-                thereAreQuotients = true
-            }}
+            val leftSumBody = left.asSum().body.toMutableList()
+            val denomsMap = mutableMapOf<Int, Expression>()
+            leftSumBody.replaceAllIndexed { i, term ->
+                if (term is Quotient) {
+                    thereAreQuotients = true
+                    denomsMap[i] = term.denom
+                    term.numer
+                }
+                else term
+            }
+            left = leftSumBody.mapIndexed { i, term ->
+                if (i in denomsMap) denomsMap.fold(term as Expression) { acc, (j, denom) ->
+                    if (i != j) acc * denom else acc
+                }
+                else                denomsMap.fold(term) { acc, (_, denom) -> acc * denom }
+            }.let { Sum(it) }
             left = left.simplify()
         }
     }

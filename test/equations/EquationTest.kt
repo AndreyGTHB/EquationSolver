@@ -27,6 +27,9 @@ class EquationTest {
         val eq4 = Equation("5x + 7".parseExpression(), "10^(3/2) / (2^(3/2) * 5^(1/2)) * x".parseExpression())
         assertEquals(eq3.solve().answer.expr, InvalidExpression)
         assertEquals(eq4.solve().answer.expr, InvalidExpression)
+
+        val eq5 = "(x + 1) / ((x + 1)(x - 1)) = 0".parseEquation()
+        println(eq5.solve())
     }
 
     @Test

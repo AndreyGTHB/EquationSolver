@@ -2,7 +2,6 @@ package expressions.longs
 
 import expressions.*
 import expressions.binary.Quotient
-import expressions.monomials.Variable
 import expressions.number.Rational
 
 class Sum (

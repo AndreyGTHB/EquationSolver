@@ -31,9 +31,15 @@ abstract class BinaryExpression (
     }
 
     override fun toString(): String {
+        var thisString = "${this::class.simpleName}:("
+        body.toList().forEach { thisString += "$it " }
+        thisString = thisString.slice(0 until thisString.lastIndex) + ')'
+        return thisString
+    }
+    override fun toColouredString(): String {
         var thisString = "${this::class.simpleName}:".coloured()
         body.toList().forEach { subExpr ->
-            val subExprString = subExpr.toString()
+            val subExprString = subExpr.toColouredString()
                 .split("\n")
                 .joinToString("\n") { "  $it" }
                 .run { "\u00b7".coloured() + slice(1 .. lastIndex) }

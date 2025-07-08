@@ -122,6 +122,8 @@ abstract class Expression (
     infix fun raisedTo(other: Expression) = _raisedTo(other).applyLoadingDomainFrom(this, other)
 
     abstract override fun toString(): String
+    abstract fun toColouredString(): String
+    fun printlnColoured() { println(toColouredString()) }
 }
 
 
