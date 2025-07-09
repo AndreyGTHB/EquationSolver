@@ -20,6 +20,19 @@ object Clr {
     const val BLUE = "${esc}38;5;27m"
     const val ORANGE = "${esc}38;5;208m"
 
+    const val RATIONAL = 120
+    const val REAL = 120
+    const val MONOMIAL = 229
+    const val LONG_EXPR = 135
+    const val BIN_EXPR = 4
+    const val INVALID_EXPR = 214
+    const val UNIVERSAL_EXPR = 41
+
+    const val EQUALITY = 179
+    const val LONG_STATEMENT = 70
+    const val CONTRADICTION = 214
+    const val TAUTOLOGY = 41
+
     // 256 Colors
     fun fg(n: Int) = "${esc}38;5;${n}m" // Set a foreground color.
     fun bg(n: Int) = "${esc}48;5;${n}m" // Set a background color.
@@ -41,3 +54,5 @@ object Clr {
     }
 
 }
+
+

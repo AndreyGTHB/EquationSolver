@@ -1,6 +1,8 @@
 package expressions.binary
 
 import console.Clr
+import console.colouredUnder
+import console.toStringUnder
 import expressions.CompoundExpression
 import expressions.Expression
 import expressions.InvalidExpression
@@ -30,23 +32,6 @@ abstract class BinaryExpression (
         return body.first.substitute(variable, value) to body.second.substitute(variable, value)
     }
 
-    override fun toString(): String {
-        var thisString = "${this::class.simpleName}:("
-        body.toList().forEach { thisString += "$it " }
-        thisString = thisString.slice(0 until thisString.lastIndex) + ')'
-        return thisString
-    }
-    override fun toColouredString(): String {
-        var thisString = "${this::class.simpleName}:".coloured()
-        body.toList().forEach { subExpr ->
-            val subExprString = subExpr.toColouredString()
-                .split("\n")
-                .joinToString("\n") { "  $it" }
-                .run { "\u00b7".coloured() + slice(1 .. lastIndex) }
-            thisString += "\n" + subExprString
-        }
-        return thisString
-    }
-
-    private fun String.coloured() = Clr.fg(Clr.palette[3]) + this + Clr.RC
+    override fun toString() = body.toList().toStringUnder(this::class.simpleName!!)
+    override fun coloured() = body.toList().colouredUnder(this::class.simpleName!!, Clr.BIN_EXPR)
 }

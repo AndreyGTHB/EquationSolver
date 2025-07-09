@@ -16,7 +16,7 @@ class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
 
     val aimMonomial = Monomial(mapOf(aimChar to unit()), final=true)
 
-    private var domain: StatementSet = UniversalSet
+    private var domain: Statement = Tautology
 
     fun solve(): Solution {
         loadDomain()
@@ -25,8 +25,8 @@ class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
         separateByAim()
 
         if (left.isZeroRational()) {
-            return if (right.isZeroRational()) Solution(aimChar equalsTo UniversalExpression, UniversalSet)
-            else                               Solution(aimChar equalsTo InvalidExpression, UniversalSet)
+            return if (right.isZeroRational()) Solution(aimChar equalsTo UniversalExpression, Tautology)
+            else                               Solution(aimChar equalsTo InvalidExpression, Tautology)
         }
 
         expressX()

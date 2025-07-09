@@ -1,5 +1,6 @@
 package expressions
 
+import console.Colourable
 import expressions.binary.Power
 import expressions.binary.Quotient
 import expressions.longs.Product
@@ -10,9 +11,9 @@ import kotlin.contracts.contract
 
 @Suppress("FunctionName")
 abstract class Expression (
-    domain: StatementSet = UniversalSet,
+    domain: Statement = Tautology,
     final: Boolean = false
-) : Comparable<Expression> {
+) : Comparable<Expression>, Colourable {
     abstract val body: Any?
     var domain = domain
         protected set
@@ -42,7 +43,7 @@ abstract class Expression (
         if (final) return this
         val sThis = _simplify()
         val sDomain = _fullDomain().simplify()
-        return if (sDomain == EmptySet) InvalidExpression
+        return if (sDomain == Contradiction) InvalidExpression
           else if (sThis == InvalidExpression || sThis == UniversalExpression) sThis
           else sThis.apply {
               domain = sDomain
@@ -58,13 +59,11 @@ abstract class Expression (
 
     private fun <T : Expression> T.applyLoadingDomainFrom(loader: Expression) = apply { domain = loader.domain }
     private fun <T : Expression> T.applyLoadingDomainFrom(vararg loaders: Expression) = apply {
-        var newDomain: StatementSet = UniversalSet
-        loaders.forEach { newDomain *= it.domain }
-        domain = newDomain
+        domain = loaders.fold(Tautology as Statement) { acc, it -> acc * it.domain }
     }
     protected open fun _fullDomain() = domain
-    protected fun addConstraints(constraints: StatementSet) { domain *= constraints }
-    protected fun makeInvalid() { domain = EmptySet }
+    protected fun addConstraints(constraints: Statement) { domain *= constraints }
+    protected fun makeInvalid() { domain = Contradiction }
 
     protected open fun _commonFactor(other: Expression): Expression? = null
 
@@ -122,8 +121,6 @@ abstract class Expression (
     infix fun raisedTo(other: Expression) = _raisedTo(other).applyLoadingDomainFrom(this, other)
 
     abstract override fun toString(): String
-    abstract fun toColouredString(): String
-    fun printlnColoured() { println(toColouredString()) }
 }
 
 

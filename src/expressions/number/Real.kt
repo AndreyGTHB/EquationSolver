@@ -1,6 +1,7 @@
 package expressions.number
 
 import console.Clr
+import console.coloured
 import expressions.Expression
 import expressions.longs.Product
 import expressions.unit
@@ -96,9 +97,7 @@ class Real (
     }
 
     override fun toString() = "$base^($exponent)"
-    override fun toColouredString(): String {
-        return Clr.fg(Clr.palette[0]) + "$base^($exponent" + Clr.fg(Clr.palette[0]) + ')' + Clr.RC
-    }
+    override fun coloured() = "$base^(${exponent.numer}/${exponent.denom})".coloured(Clr.REAL)
 }
 
 

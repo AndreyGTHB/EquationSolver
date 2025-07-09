@@ -1,6 +1,7 @@
 package expressions.number
 
 import console.Clr
+import console.coloured
 import expressions.*
 import utils.gcd
 import utils.power
@@ -32,7 +33,7 @@ class Rational (
 
     override fun _commonFactor(other: Expression): Rational? {
         if (other !is Rational) return null
-        val commonDenom = this.denom * other.denom
+        val commonDenom = abs(this.denom * other.denom)
         val thisNumer = this.numer * other.denom
         val otherNumer = this.denom * other.numer
         val cfAbs = gcd(thisNumer, otherNumer) over commonDenom
@@ -83,7 +84,7 @@ class Rational (
     override fun unaryMinus() = super.unaryMinus() as Rational
 
     override fun toString() = "$numer/$denom"
-    override fun toColouredString() = Clr.fg(Clr.palette[0]) + "$numer/$denom" + Clr.RC
+    override fun coloured() = "$numer/$denom".coloured(Clr.RATIONAL)
 }
 
 

@@ -1,20 +1,28 @@
 package statements
 
-import expressions.Expression
+import console.Colourable
 
-abstract class Statement (val variable: Char, val expr: Expression) : StatementSet() {
-    override fun _intersect(other: StatementSet): Conjunction? {
-        val otherAsStatement = (other as? Statement) ?: return null
-        return Conjunction(this, otherAsStatement)
+abstract class Statement : Comparable<Statement>, Colourable {
+    abstract val body: Any?
+
+    abstract fun simplify(): Statement
+
+    protected abstract fun _intersect(other: Statement): Statement?
+    operator fun times(other: Statement): Statement {
+        return this._intersect(other) ?: other._intersect(this) ?: Contradiction
     }
 
-    override fun hashCode() = (variable to expr).hashCode()
+    override fun hashCode() = body.hashCode()
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
-        if (this::class != other::class) return false
+        if (other::class != this::class) return false
         other as Statement
-
-        return this.variable == other.variable
-            && this.expr == other.expr
+        return other.body == this.body
     }
+
+    override fun compareTo(other: Statement) = this.toString() compareTo other.toString()
+
+    abstract operator fun unaryMinus(): Statement
+
+    abstract override fun toString(): String
 }

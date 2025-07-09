@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import parser.parseEquation
 import parser.parseExpression
-import statements.UniversalSet
+import statements.Tautology
 import statements.equalsTo
 import statements.notEqualsTo
 
@@ -36,7 +36,7 @@ class EquationTest {
     fun `Simple equations`() {
         val eq1 = Equation(xMon, 5.power(3 over 2))
         eq1.solve().apply {
-            assertEquals(UniversalSet, domain)
+            assertEquals(Tautology, domain)
             assertEquals('x' equalsTo 5.power(3 over 2).simplify(), answer)
         }
 

@@ -1,13 +1,13 @@
 package expressions
 
-import statements.StatementSet
-import statements.UniversalSet
+import statements.Statement
+import statements.Tautology
 
 abstract class CompoundExpression (
-    domain: StatementSet = UniversalSet,
+    domain: Statement = Tautology,
     final: Boolean = false
 ) : Expression(domain, final) {
-    protected var bodyDomain: StatementSet = UniversalSet
+    protected var bodyDomain: Statement = Tautology
     override fun _fullDomain() = bodyDomain * domain
 
     abstract override fun firstVariable(): Char?

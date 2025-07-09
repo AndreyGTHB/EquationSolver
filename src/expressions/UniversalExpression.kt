@@ -1,11 +1,12 @@
 package expressions
 
 import console.Clr
+import console.coloured
 
 object UniversalExpression : Expression(final=true) {
     override val body = null
 
     override fun _simplify() = this
     override fun toString() = "UE"
-    override fun toColouredString() = Clr.ORANGE + "UE" + Clr.RC
+    override fun coloured() = "UE".coloured(Clr.UNIVERSAL_EXPR)
 }

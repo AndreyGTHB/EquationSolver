@@ -18,9 +18,8 @@ val exprOrderMap = mapOf(
     Sum::class to 7
 )
 
-internal fun compareExpressionTypes(a: Expression, b: Expression): Int {
+fun compareExpressionTypes(a: Expression, b: Expression): Int {
     return if (a.isNumber && !b.isNumber) -1
       else if (!a.isNumber && b.isNumber)  1
       else                                    exprOrderMap[a::class]!! - exprOrderMap[b::class]!!
-//      else                                    a.toString() compareTo b.toString()
 }

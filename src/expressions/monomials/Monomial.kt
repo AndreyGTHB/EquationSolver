@@ -1,8 +1,8 @@
 package expressions.monomials
 
 import console.Clr
+import console.coloured
 import expressions.Expression
-import expressions.binary.Power
 import expressions.zero
 import expressions.number.Rational
 import expressions.number.min
@@ -113,14 +113,12 @@ class Monomial internal constructor (
         str = str.slice(0 until str.lastIndex) + ')'
         return str
     }
-    override fun toColouredString(): String {
-        var str = "M: ".coloured()
+    override fun coloured(): String {
+        var str = "M: "
         for ((v, d) in varMap) {
-            str += "$v^".coloured() + d.toColouredString() + ' '
+            str += "$v^$d  "
         }
-        str = str.slice(0 until str.lastIndex)
+        str = str.slice(0 until str.length - 2).coloured(Clr.MONOMIAL)
         return str
     }
-
-    private fun String.coloured() = Clr.fg(Clr.palette[1]) + this + Clr.RC
 }

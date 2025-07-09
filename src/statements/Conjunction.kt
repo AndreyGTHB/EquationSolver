@@ -1,17 +1,34 @@
 package statements
 
-class Conjunction (val statements: Set<Statement>) : StatementSet() {
-    constructor(vararg statements: Statement) : this(statements.toSet())
+class Conjunction (body: Set<Statement>) : LongStatement(body) {
+    constructor(vararg body: Statement) : this(body.toSet())
 
-    override fun simplify() = if (statements.isEmpty()) UniversalSet
-                         else if (statements.size == 1) statements.first().simplify()
-                         else                           this
+    override fun simplify(): Statement {
+        val newBody = simplifyBody()
+            .expandConjunctions()
+            .toSortedSet()
+        return when (newBody.size) {
+            0    -> throw RuntimeException("Empty long statement")
+            1    -> newBody.first()
+            else -> Conjunction(newBody)
+        }
+    }
 
-    override fun _intersect(other: StatementSet): Conjunction? { return when (other) {
-        is Statement   -> Conjunction(statements + other)
-        is Conjunction -> Conjunction(this.statements.union(other.statements))
-        else           -> null
-    }}
+    private fun Set<Statement>.expandConjunctions(): Set<Statement> {
+        val newBody = mutableSetOf<Statement>()
+        forEach {
+            if (it is Conjunction) newBody.addAll(it.body)
+            else                   newBody.add(it)
+        }
+        return newBody
+    }
 
-    override fun unaryMinus() = TODO()
+    override fun _intersect(other: Statement): Conjunction {
+        return when (other) {
+            is Conjunction -> Conjunction(this.body.union(other.body))
+            else           -> Conjunction(body + other)
+        }
+    }
+
+    override fun unaryMinus() = Disjunction(body.map { -it }.toSet())
 }

@@ -1,16 +1,18 @@
 package expressions.longs
 
 import console.Clr
+import console.colouredUnder
+import console.toStringUnder
 import expressions.CompoundExpression
 import expressions.Expression
 import expressions.InvalidExpression
 import expressions.monomials.Monomial
-import statements.StatementSet
-import statements.UniversalSet
+import statements.Statement
+import statements.Tautology
 
 abstract class LongExpression (
     override val body: List<Expression>,
-    domain: StatementSet = UniversalSet,
+    domain: Statement = Tautology,
     final: Boolean = false
 ) : CompoundExpression(domain, final) {
     override val isNumber by lazy { body.all { it.isNumber } }
@@ -40,23 +42,6 @@ abstract class LongExpression (
     override fun contains(variable: Char) = body.any { it.contains(variable) }
     protected fun substituteIntoBody(variable: Char, value: Expression) = body.map { it.substitute(variable, value) }
 
-    override fun toString(): String {
-        var thisString = "${this::class.simpleName}:("
-        body.forEach { thisString += "$it " }
-        thisString = thisString.slice(0 until thisString.lastIndex) + ')'
-        return thisString
-    }
-    override fun toColouredString(): String {
-        var thisString = "${this::class.simpleName}:".coloured()
-        body.forEach { subExpr ->
-            val subExprString = subExpr.toColouredString()
-                .split("\n")
-                .joinToString("\n") { "  $it" }
-                .run { "\u00b7".coloured() + slice(1 .. lastIndex) }
-            thisString += "\n" + subExprString
-        }
-        return thisString
-    }
-
-    private fun String.coloured() = Clr.fg(Clr.palette[2]) + this + Clr.RC
+    override fun toString() = body.toStringUnder(this::class.simpleName!!)
+    override fun coloured() = body.colouredUnder(this::class.simpleName!!, Clr.LONG_EXPR)
 }
