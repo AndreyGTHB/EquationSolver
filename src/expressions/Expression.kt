@@ -11,7 +11,7 @@ import kotlin.contracts.contract
 
 @Suppress("FunctionName")
 abstract class Expression (
-    domain: Statement = Tautology,
+    domain: Rule = Tautology,
     final: Boolean = false
 ) : Comparable<Expression>, Colourable {
     abstract val body: Any?
@@ -59,10 +59,10 @@ abstract class Expression (
 
     private fun <T : Expression> T.applyLoadingDomainFrom(loader: Expression) = apply { domain = loader.domain }
     private fun <T : Expression> T.applyLoadingDomainFrom(vararg loaders: Expression) = apply {
-        domain = loaders.fold(Tautology as Statement) { acc, it -> acc * it.domain }
+        domain = loaders.fold(Tautology as Rule) { acc, it -> acc * it.domain }
     }
     protected open fun _fullDomain() = domain
-    protected fun addConstraints(constraints: Statement) { domain *= constraints }
+    protected fun addConstraints(constraints: Rule) { domain *= constraints }
     protected fun makeInvalid() { domain = Contradiction }
 
     protected open fun _commonFactor(other: Expression): Expression? = null

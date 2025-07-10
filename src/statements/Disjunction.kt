@@ -1,17 +1,15 @@
 package statements
 
-class Disjunction(body: Set<Statement>) : LongStatement(body) {
-    constructor(vararg body: Statement) : this(body.toSet())
+class Disjunction(body: Set<Rule>) : LongRule(body) {
+    constructor(vararg body: Rule) : this(body.toSet())
 
-    override fun simplify(): Statement {
+    override fun simplify(): Rule {
         TODO("Not yet implemented")
     }
 
-    override fun _intersect(other: Statement): Statement {
-        return when (other) {
-            is Conjunction -> Conjunction(other.body + this)
-            else           -> Conjunction(this, other)
-        }
+    override fun _union(other: Rule): Rule {
+        return if (other is Disjunction) Disjunction(this.body + other.body)
+               else                      Disjunction(this.body + other)
     }
 
     override fun unaryMinus() = Conjunction(body.map { -it }.toSet())

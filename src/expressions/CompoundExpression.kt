@@ -1,13 +1,13 @@
 package expressions
 
-import statements.Statement
+import statements.Rule
 import statements.Tautology
 
 abstract class CompoundExpression (
-    domain: Statement = Tautology,
+    domain: Rule = Tautology,
     final: Boolean = false
 ) : Expression(domain, final) {
-    protected var bodyDomain: Statement = Tautology
+    protected var bodyDomain: Rule = Tautology
     override fun _fullDomain() = bodyDomain * domain
 
     abstract override fun firstVariable(): Char?

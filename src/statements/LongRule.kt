@@ -4,7 +4,7 @@ import console.Clr
 import console.colouredUnder
 import console.toStringUnder
 
-abstract class LongStatement (override val body: Set<Statement>) : Statement() {
+abstract class LongRule (override val body: Set<Rule>) : Rule() {
     protected fun simplifyBody() = body.map { it.simplify() }.toSet()
 
     override fun toString() = body.toStringUnder(this::class.simpleName!!)

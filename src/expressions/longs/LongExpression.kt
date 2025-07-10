@@ -7,12 +7,12 @@ import expressions.CompoundExpression
 import expressions.Expression
 import expressions.InvalidExpression
 import expressions.monomials.Monomial
-import statements.Statement
+import statements.Rule
 import statements.Tautology
 
 abstract class LongExpression (
     override val body: List<Expression>,
-    domain: Statement = Tautology,
+    domain: Rule = Tautology,
     final: Boolean = false
 ) : CompoundExpression(domain, final) {
     override val isNumber by lazy { body.all { it.isNumber } }

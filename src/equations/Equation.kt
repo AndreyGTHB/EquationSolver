@@ -16,7 +16,7 @@ class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
 
     val aimMonomial = Monomial(mapOf(aimChar to unit()), final=true)
 
-    private var domain: Statement = Tautology
+    private var domain: Rule = Tautology
 
     fun solve(): Solution {
         loadDomain()

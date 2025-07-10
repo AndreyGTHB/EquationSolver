@@ -1,6 +1,6 @@
 package equations
 
-import statements.SimpleStatement
 import statements.Statement
+import statements.Rule
 
-data class Solution (val answer: SimpleStatement, val domain: Statement)
+data class Solution (val answer: Statement, val domain: Rule)

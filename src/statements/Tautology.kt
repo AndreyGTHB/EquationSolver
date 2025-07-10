@@ -3,11 +3,12 @@ package statements
 import console.Clr
 import console.coloured
 
-object Tautology : Statement() {
+object Tautology : Rule() {
     override val body = null
 
     override fun simplify() = this
-    override fun _intersect(other: Statement) = other
+    override fun _intersect(other: Rule) = other
+    override fun _union(other: Rule) = this
     override fun unaryMinus() = Contradiction
 
     override fun toString() = "Tautology"

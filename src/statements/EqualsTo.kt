@@ -4,7 +4,7 @@ import console.Clr
 import console.coloured
 import expressions.Expression
 
-class EqualsTo(variable: Char, expr: Expression) : SimpleStatement(variable to expr) {
+class EqualsTo(variable: Char, expr: Expression) : Statement(variable to expr) {
     override fun simplify() = EqualsTo(variable, expr.simplify())
     override fun unaryMinus() = variable notEqualsTo expr
 
