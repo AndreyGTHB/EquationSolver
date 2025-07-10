@@ -4,7 +4,9 @@ import expressions.*
 import expressions.binary.Quotient
 import expressions.longs.Sum
 import expressions.monomials.Monomial
-import statements.*
+import rules.*
+import rules.statements.EqualsTo
+import rules.statements.equalsTo
 import utils.fold
 import utils.replaceAllIndexed
 

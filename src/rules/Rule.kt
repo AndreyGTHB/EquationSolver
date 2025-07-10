@@ -1,4 +1,4 @@
-package statements
+package rules
 
 import console.Colourable
 

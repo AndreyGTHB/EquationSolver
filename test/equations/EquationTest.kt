@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import parser.parseEquation
 import parser.parseExpression
-import statements.Tautology
-import statements.equalsTo
-import statements.notEqualsTo
+import rules.Tautology
+import rules.statements.equalsTo
+import rules.statements.notEqualsTo
 
 class EquationTest {
     val xMon = Monomial('x' to unit()).simplify()

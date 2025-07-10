@@ -1,4 +1,4 @@
-package statements
+package rules
 
 import console.Clr
 import console.coloured

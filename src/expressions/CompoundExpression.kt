@@ -1,7 +1,7 @@
 package expressions
 
-import statements.Rule
-import statements.Tautology
+import rules.Rule
+import rules.Tautology
 
 abstract class CompoundExpression (
     domain: Rule = Tautology,

@@ -7,8 +7,8 @@ import expressions.CompoundExpression
 import expressions.Expression
 import expressions.InvalidExpression
 import expressions.monomials.Monomial
-import statements.Rule
-import statements.Tautology
+import rules.Rule
+import rules.Tautology
 
 abstract class LongExpression (
     override val body: List<Expression>,

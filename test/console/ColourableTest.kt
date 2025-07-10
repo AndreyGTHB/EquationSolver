@@ -3,7 +3,9 @@ package console
 import expressions.*
 import org.junit.jupiter.api.Test
 import parser.parseExpression
-import statements.*
+import rules.*
+import rules.statements.equalsTo
+import rules.statements.notEqualsTo
 
 class ColourableTest {
     @Test

@@ -6,7 +6,7 @@ import expressions.binary.Quotient
 import expressions.longs.Product
 import expressions.longs.Sum
 import expressions.number.Rational
-import statements.*
+import rules.*
 import kotlin.contracts.contract
 
 @Suppress("FunctionName")
