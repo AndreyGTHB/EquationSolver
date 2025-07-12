@@ -23,6 +23,11 @@ abstract class Expression (
     open val isNumber = false
 
     companion object {
+        private fun <T : Expression> T.applyLoadingDomainFrom(loader: Expression) = apply { domain = loader.domain }
+        private fun <T : Expression> T.applyLoadingDomainFrom(vararg loaders: Expression) = apply {
+            domain = loaders.fold(Tautology as Rule) { acc, it -> acc * it.domain }
+        }
+
         fun commonFactor(a: Expression, b: Expression): Expression {
             assert (a.final && b.final)
 
@@ -34,7 +39,7 @@ abstract class Expression (
             }
 
             val cf = a._commonFactor(b) ?: b._commonFactor(a) ?: unit()
-            return cf.simplify().apply { domain *= a.domain * b.domain }
+            return cf.simplify().applyLoadingDomainFrom(a, b)
         }
     }
 
@@ -57,24 +62,21 @@ abstract class Expression (
     protected open fun _substitute(variable: Char, value: Expression) = this
     fun substitute(variable: Char, value: Expression) = _substitute(variable, value).applyLoadingDomainFrom(this)
 
-    private fun <T : Expression> T.applyLoadingDomainFrom(loader: Expression) = apply { domain = loader.domain }
-    private fun <T : Expression> T.applyLoadingDomainFrom(vararg loaders: Expression) = apply {
-        domain = loaders.fold(Tautology as Rule) { acc, it -> acc * it.domain }
-    }
     protected open fun _fullDomain() = domain
     protected fun addConstraints(constraints: Rule) { domain *= constraints }
-    protected fun makeInvalid() { domain = Contradiction }
+    protected fun makeInvalid() { domain = Contradiction
+    }
 
-    protected open fun _commonFactor(other: Expression): Expression? = null
+    protected abstract fun _commonFactor(other: Expression): Expression?
 
-    protected open fun _reduceOrNull(other: Expression): Expression? = null
+    protected abstract fun _reduceOrNull(other: Expression): Expression?
     fun reduceOrNull(other: Expression): Expression? {
         assert(this.final && other.final)
         assert(!other.isZeroRational())
         if (other.isUnitRational() || this.isZeroRational()) return this
 
         val reduced = _reduceOrNull(other)
-        return reduced?.simplify()?.also { it.domain *= this.domain * other.domain }
+        return reduced?.simplify()?.applyLoadingDomainFrom(this, other)
     }
     fun reduce(other: Expression): Expression = reduceOrNull(other)!!
 

@@ -8,12 +8,12 @@ import expressions.number.Real
 import expressions.number.over
 import expressions.number.toRational
 
-fun unit() = Rational(1 to 1, final=true)
+fun unit() = 1.toRational()
 fun unitReal() = Real(1 to unit())
 fun unitMonomial() = Monomial(mapOf())
 fun unitQuotient() = Quotient(unit() to unit())
 
-fun zero() = Rational(0 to 1, final=true)
+fun zero() = 0.toRational()
 fun zeroProduct() = Product(listOf(zero()))
 fun zeroQuotient() = Quotient(zero() to unit())
 

@@ -1,6 +1,5 @@
 package rules
 
-import expressions.five
 import expressions.number.squareRoot
 import expressions.unit
 import org.junit.jupiter.api.Assertions.assertEquals

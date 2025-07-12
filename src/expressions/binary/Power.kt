@@ -77,4 +77,6 @@ class Power (
         }
         else null
     }
+
+    override fun _reduceOrNull(other: Expression) = null
 }
