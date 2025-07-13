@@ -48,8 +48,7 @@ abstract class Expression (
         if (final) return this
         val sThis = _simplify()
         val sDomain = _fullDomain().simplify()
-        return if (sDomain == Contradiction) InvalidExpression
-          else if (sThis == InvalidExpression || sThis == UniversalExpression) sThis
+        return if (sThis == InvalidExpression || sDomain == Contradiction) InvalidExpression
           else sThis.apply {
               domain = sDomain
               final = true
@@ -135,5 +134,8 @@ fun Expression.isZeroRational(): Boolean {
     return this is Rational && this.isZero()
 }
 
-fun Expression.asProduct() = if (this is Product) this else Product(this)
-fun Expression.asSum() = if (this is Sum) this else Sum(this)
+fun Expression.asProduct() = this as? Product ?: Product(this)
+fun Expression.asSum() = this as? Sum ?: Sum(this)
+
+typealias ExpressionPair = Pair<Expression, Expression>
+fun ExpressionPair.simplify(): ExpressionPair = first.simplify() to second.simplify()

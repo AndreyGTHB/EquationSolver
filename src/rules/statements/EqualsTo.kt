@@ -4,7 +4,6 @@ import console.Clr
 import console.coloured
 import expressions.Expression
 import expressions.InvalidExpression
-import expressions.UniversalExpression
 import rules.Contradiction
 import rules.Rule
 import rules.Tautology

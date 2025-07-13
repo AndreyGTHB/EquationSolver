@@ -20,6 +20,8 @@ class Monomial internal constructor (
 
     override val isNumber = varMap.isEmpty()
 
+    fun degree(variable: Char): Rational = body[variable] ?: zero()
+
     override fun _simplify(): Expression {
         val sMonomial = simplifySoftly()
         if (sMonomial.varMap.isEmpty()) return unit()

@@ -2,7 +2,9 @@ package expressions.longs
 
 import expressions.*
 import expressions.binary.Quotient
+import expressions.monomials.Monomial
 import expressions.number.Rational
+import expressions.number.max
 
 class Sum (
     body: List<Expression> = listOf(),
@@ -12,6 +14,18 @@ class Sum (
 
     val commonInternalFactor by lazy(::genCommonInternalFactor)
     val separatedWithCommonInternalFactor by lazy(::genSeparatedWithCommonInternalFactor)
+
+    fun degree(variable: Char): Rational {
+        assert(final)
+        return body.fold(zero()) { currMax, term ->
+            val currDegree = when (term) {
+                is Monomial -> term.degree(variable)
+                is Product  -> term.degree(variable)
+                else        -> zero()
+            }
+            max(currMax, currDegree)
+        }
+    }
 
     override fun _simplify(): Expression {
         val sThis = simplifySoftly()

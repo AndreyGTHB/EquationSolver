@@ -16,6 +16,13 @@ class Product (
 ) : LongExpression(body, final=final) {
     constructor(vararg body: Expression) : this(body.toList())
 
+    private val monomial by lazy {
+        assert(final)
+        body.firstOrNull { it is Monomial } as Monomial?
+    }
+
+    fun degree(variable: Char): Rational = monomial?.degree(variable) ?: zero()
+
     override fun _simplify(): Expression { simplifySoftly().apply {
         val sumsCount = body.countSums()
         return when (sumsCount) {
