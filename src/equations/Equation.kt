@@ -4,56 +4,53 @@ import expressions.*
 import expressions.binary.Quotient
 import expressions.longs.Sum
 import expressions.monomials.Monomial
+import expressions.number.Rational
 import rules.*
-import rules.statements.EqualsTo
+import rules.msets.Universe
+import rules.statements.belongsTo
 import rules.statements.equalsTo
 import utils.fold
 import utils.replaceAllIndexed
 
-class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
-    var left = left
-        private set
-    var right = right
-        private set
-
-    val aimMonomial = Monomial(mapOf(aimChar to unit()), final=true)
+class Equation (val body: ExpressionPair, val aimChar: Char = body.firstVariable() ?: 'x') { // NOPT
+    val aimMonomial = Monomial(mapOf(aimChar to one()), final=true)
 
     private var domain: Rule = Tautology
 
-    fun solve(): Solution {
-        loadDomain()
-        moveAllToTheLeft()
-        removeQuotients()
-        separateByAim()
+    fun Char.raisedTo(exp: Rational): Expression = Monomial(this to exp).simplify()
 
-        if (left.isZeroRational()) {
-            return if (right.isZeroRational()) Solution(aimChar equalsTo UniversalExpression, Tautology)
-            else                               Solution(aimChar equalsTo InvalidExpression, Tautology)
+    fun solve(): Rule = _solve().run { (first * second).simplify() }
+    fun solveIgnoringDomain(): Rule = _solve().first.simplify()
+    private fun _solve(): Pair<Rule, Rule> {
+        val domain: Rule
+        val currLeft: Expression
+        body.simplify().apply {
+            domain = loadDomain()
+            currLeft = moveAllToTheLeft().removeQuotients()
         }
 
-        expressX()
-        val answer = EqualsTo(aimChar, right)
-        return Solution(answer, domain)
+        val coefficientsMap = currLeft.calculateCoefficients(aimChar)
+        val solution = when (currLeft.asSum().degree(aimChar)) { // NOPT (double degree calculation)
+            zero() -> coefficientsMap.solveAsConstantPolynomial(aimChar) // NOPT (rational keys instead of ints)
+            one()  -> coefficientsMap.solveAsLinearPolynomial(aimChar)
+            two()  -> coefficientsMap.solveAsQuadraticPolynomial(aimChar)
+            else   -> TODO()
+        }
+        return solution to domain
     }
 
-    private fun loadDomain() {
-        simplifyBody()
-        domain = left.domain * right.domain
-    }
+    private fun ExpressionPair.loadDomain(): Rule = first.domain * second.domain
 
-    private fun moveAllToTheLeft() {
-        left -= right
-        right = zero()
-        simplifyBody()
-    }
+    private fun ExpressionPair.moveAllToTheLeft(): Expression = (first - second).simplify()
 
-    private fun removeQuotients() {
+    private fun Expression.removeQuotients(): Expression {
         var thereAreQuotients = true
+        var newThis = this
         while (thereAreQuotients) {
             thereAreQuotients = false
-            val leftSumBody = left.asSum().body.toMutableList()
+            val sumBody = newThis.asSum().body.toMutableList()
             val denomsMap = mutableMapOf<Int, Expression>()
-            leftSumBody.replaceAllIndexed { i, term ->
+            sumBody.replaceAllIndexed { i, term ->
                 if (term is Quotient) {
                     thereAreQuotients = true
                     denomsMap[i] = term.denom
@@ -61,36 +58,50 @@ class Equation (left: Expression, right: Expression, val aimChar: Char = 'x') {
                 }
                 else term
             }
-            left = leftSumBody.mapIndexed { i, term ->
-                if (i in denomsMap) denomsMap.fold(term as Expression) { acc, (j, denom) ->
+            newThis = sumBody.mapIndexed { i, term ->
+                if (i in denomsMap) denomsMap.fold(term) { acc, (j, denom) ->
                     if (i != j) acc * denom else acc
                 }
                 else                denomsMap.fold(term) { acc, (_, denom) -> acc * denom }
             }.let { Sum(it) }
-            left = left.simplify()
+            newThis = newThis.simplify()
         }
+        return newThis
     }
 
-    private fun separateByAim() {
-        val leftSum = left.asSum()
-        left = Sum()
-        right = Sum()
-        leftSum.body.forEach {
-            if (it.reduceOrNull(aimMonomial) != null) left += it
-            else                                      right -= it
+    private fun Expression.calculateCoefficients(variable: Char): Map<Rational, Expression> {
+        val coefficientsMap = mutableMapOf<Rational, Expression>()
+        asSum().body.forEach {
+            val degree = it.degree(variable) ?: zero()
+            val coeff = it.reduce(aimChar.raisedTo(degree))
+            coefficientsMap[degree] = (coefficientsMap[degree] ?: zero()) + coeff
         }
-        simplifyBody()
+        return coefficientsMap.mapValues { (_, coeff) -> coeff.simplify() }
     }
 
-    private fun expressX() {
-        val xCoeff = left.reduce(aimMonomial)
-        left = aimMonomial
-        right /= xCoeff
-        simplifyBody()
+    private fun Map<Rational, Expression>.solveAsConstantPolynomial(variable: Char): Rule {
+        val a = get(zero())!!
+        if (a.isNumber) {
+            return if (a.isZeroRational()) Tautology
+                   else                    Contradiction
+        }
+        val subEquation = Equation(a to zero(), a.firstVariable()!!)
+        return subEquation.solve()
     }
-
-    private fun simplifyBody() {
-        left = left.simplify()
-        right = right.simplify()
+    private fun Map<Rational, Expression>.solveAsLinearPolynomial(variable: Char): Rule {
+        val a = get(one())!!
+        val b = get(zero()) ?: zero()
+        val firstSolution = run {
+            val aimCondition = aimChar equalsTo (-b) / a
+            val aCondition = -Equation(a to zero()).solve()
+            aimCondition * aCondition
+        }
+        val secondSolution = run {
+            val aCondition = Equation(a to zero()).solve()
+            val bCondition = Equation(b to zero()).solve()
+            aCondition * bCondition
+        }
+        return firstSolution + secondSolution
     }
+    private fun Map<Rational, Expression>.solveAsQuadraticPolynomial(variable: Char): Rule = TODO()
 }

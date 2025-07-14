@@ -2,9 +2,12 @@ package rules.statements
 
 import console.Clr
 import console.coloured
+import rules.Contradiction
 import rules.msets.MathSet
 import rules.Rule
+import rules.Tautology
 import rules.msets.EmptySet
+import rules.msets.Universe
 
 class BelongsTo (variable: Char, val set: MathSet) : Statement(variable, set) {
     override fun _contradicts(other: Statement) = when (other) {
@@ -13,7 +16,11 @@ class BelongsTo (variable: Char, val set: MathSet) : Statement(variable, set) {
         else         -> null
     }
 
-    override fun simplify() = this
+    override fun simplify(): Rule = when (set) {
+        is EmptySet -> Contradiction
+        is Universe -> Tautology
+        else        -> this
+    }
 
     override fun unaryMinus(): Rule {
         TODO("Not yet implemented")

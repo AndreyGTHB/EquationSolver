@@ -1,10 +1,9 @@
 package utils
 
-import expressions.Expression
 import expressions.longs.Product
 import expressions.monomials.Monomial
 import expressions.number.Rational
-import expressions.unit
+import expressions.one
 import expressions.zero
 
 fun String.isInt(): Boolean = this.toIntOrNull() != null
@@ -21,7 +20,7 @@ fun String.toRationalOrNull(): Rational? {
 fun String.toRational(): Rational = this.toRationalOrNull()!!
 
 fun String.toMonomial(): Product {
-    var coeff = unit()
+    var coeff = one()
     val variables: MutableMap<Char, Rational> = mutableMapOf()
 
     val splitted = this.split('*')

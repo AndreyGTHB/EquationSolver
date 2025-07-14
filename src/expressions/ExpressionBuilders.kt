@@ -40,4 +40,4 @@ fun buildExpression(start: Expression, block: ExpressionBuilderBlock): Expressio
 }
 
 fun buildExpressionFromZero(block: ExpressionBuilderBlock) = buildExpression(zero(), block)
-fun buildExpressionFromUnit(block: ExpressionBuilderBlock) = buildExpression(unit(), block)
+fun buildExpressionFromUnit(block: ExpressionBuilderBlock) = buildExpression(one(), block)

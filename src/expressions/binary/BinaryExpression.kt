@@ -16,7 +16,7 @@ abstract class BinaryExpression (
 
     protected fun simplifyBody(): Pair<Expression, Expression> {
         return (body.first.simplify() to body.second.simplify()).also {
-            if (it.first == InvalidExpression || it.second == InvalidExpression) this.makeInvalid()
+            if (it.first == InvalidExpression || it.second == InvalidExpression) makeInvalid()
             bodyDomain = it.first.domain * it.second.domain
         }
     }

@@ -19,7 +19,7 @@ class Rational (
     init { assert(denom != 0) }
 
     override fun _rationalPart() = this
-    override fun _nonRationalPart() = unit()
+    override fun _nonRationalPart() = one()
 
     override fun simplify() = super.simplify() as Rational
     override fun _simplify(): Rational {

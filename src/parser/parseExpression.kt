@@ -9,7 +9,7 @@ import expressions.monomials.Monomial
 import expressions.number.Rational
 import expressions.number.Real
 import expressions.number.toRational
-import expressions.unit
+import expressions.one
 import expressions.zero
 import utils.isInt
 
@@ -133,7 +133,7 @@ private fun String.indexOfOpeningBracket(indexOfClosing: Int): Int {
 private fun String.toMonomial(): Monomial {
     val varMap = mutableMapOf<Char, Rational>()
     forEach {
-        varMap[it] = (varMap[it] ?: zero()) + unit()
+        varMap[it] = (varMap[it] ?: zero()) + one()
     }
     return Monomial(varMap)
 }

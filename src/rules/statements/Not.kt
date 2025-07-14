@@ -2,11 +2,15 @@ package rules.statements
 
 import console.Clr
 import console.coloured
+import rules.Contradiction
+import rules.Tautology
 
 class Not (val statement: Statement) : Statement(statement.body) {
     override fun simplify() = when (val it = statement.simplify()) {
-        is Not -> it.statement
-        else   -> it
+        is Contradiction -> Tautology
+        is Tautology     -> Contradiction
+        is Not           -> it.statement
+        else             -> Not(it as Statement)
     }
 
     override fun unaryMinus() = statement

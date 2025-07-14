@@ -13,7 +13,6 @@ class ColourableTest {
         val expr = "-1 + a/(bc) + (x^2 - y^2)".parseExpression()
         expr.printlnColoured()
         InvalidExpression.printlnColoured()
-        UniversalExpression.printlnColoured()
 
         val statement = Conjunction(Disjunction('a' equalsTo five(), 'b' notEqualsTo three()), 'c' equalsTo "1 + b".parseExpression())
         statement.printlnColoured()

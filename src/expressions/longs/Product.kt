@@ -17,11 +17,11 @@ class Product (
     constructor(vararg body: Expression) : this(body.toList())
 
     private val monomial by lazy {
-        assert(final)
         body.firstOrNull { it is Monomial } as Monomial?
     }
 
-    fun degree(variable: Char): Rational = monomial?.degree(variable) ?: zero()
+    override fun _substitute(variable: Char, value: Expression) = Product(substituteIntoBody(variable, value))
+    override fun degree(variable: Char): Rational = monomial?.degree(variable) ?: zero()
 
     override fun _simplify(): Expression { simplifySoftly().apply {
         val sumsCount = body.countSums()
@@ -50,7 +50,7 @@ class Product (
         }}
 
         return when (body.size) {
-            0 -> unit()
+            0 -> one()
             1 -> body[0]
             else -> this
         }
@@ -105,7 +105,7 @@ class Product (
 
     private fun List<Expression>.combineByTypes(): List<Expression> {
         val newBody = emptyBody()
-        var rationalFactor = unit()
+        var rationalFactor = one()
         val realFactors1 = mutableListOf<Real>()
         val powerBaseMap = mutableMapOf<Expression, Expression>()
         var monomialFactor = unitMonomial()
@@ -147,7 +147,7 @@ class Product (
         forEach { basesMap[it.base] = (basesMap[it.base] ?: zero()) + it.exponent }
 
         val combined = mutableListOf<Real>()
-        var extractedRational = unit()
+        var extractedRational = one()
         basesMap.forEach { base, exp ->
             val (sRational, sReal) = base.power(exp).simplifyAndSeparate()
             extractedRational *= sRational
@@ -165,7 +165,7 @@ class Product (
         }
 
         val combined = mutableListOf<Real>()
-        var extractedRational = unit()
+        var extractedRational = one()
         rootsMap.forEach { index, base ->
             val rootExp = index.toRational().flip()
             val (sRational, sReal) = base.power(rootExp).simplifyAndSeparate()
@@ -195,8 +195,6 @@ class Product (
     }
 
     private fun List<Expression>.countSums() = count { it is Sum }
-
-    override fun _substitute(variable: Char, value: Expression) = Product(substituteIntoBody(variable, value))
 
     override fun _commonFactor(other: Expression): Expression? {
         return when (other) {
@@ -278,12 +276,12 @@ class Product (
     override fun _rationalPart(): Rational {
         assert(final)
         return if (body[0] is Rational) body[0] as Rational
-          else                          unit()
+          else                          one()
     }
     override fun _nonRationalPart(): Expression {
         assert(final)
         return if (body[0] !is Rational) this
-          else if (body.size == 1)       unit()
+          else if (body.size == 1)       one()
           else if (body.size == 2)       body[1]
           else                           Product(body.slice(1 until body.size)).apply { final = true }
     }
@@ -292,7 +290,7 @@ class Product (
         val numPartSize = body.indexOfFirst { !it.isNumber }
         return when (numPartSize) {
             -1   -> this
-            0    -> unit()
+            0    -> one()
             1    -> body[0]
             else -> Product(body.slice(0 until numPartSize)).apply { final = true }
         }
@@ -301,7 +299,7 @@ class Product (
         assert(final)
         val numPartSize = body.indexOfFirst { !it.isNumber }
         return when (numPartSize) {
-            -1          -> unit()
+            -1          -> one()
             0           -> this
             body.size-1 -> body.last()
             else        -> Product(body.slice(numPartSize until body.size)).apply { final = true }
@@ -312,7 +310,7 @@ class Product (
         return Product(body + other)
     }
     override fun _unaryMinus(): Expression {
-        if (body.isEmpty()) return -unit()
+        if (body.isEmpty()) return -one()
         return Product(listOf(-body[0]) + body.slice(1 .. body.lastIndex))
     }
 }

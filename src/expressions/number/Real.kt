@@ -4,7 +4,7 @@ import console.Clr
 import console.coloured
 import expressions.Expression
 import expressions.longs.Product
-import expressions.unit
+import expressions.one
 import expressions.unitReal
 import utils.*
 
@@ -24,7 +24,7 @@ class Real (
     override fun _simplify(): Expression {
         if (exponent.isNegative()) {
             val opposite = Real(base to -exponent)
-            return (unit() / opposite).simplify()
+            return (one() / opposite).simplify()
         }
 
         val sReal = simplifySoftly()
@@ -69,7 +69,7 @@ class Real (
     fun simplifyAndSeparate(): Pair<Rational, Real> {
         return when (val sThis = simplify()) {
             is Rational -> sThis to unitReal()
-            is Real     -> unit() to sThis
+            is Real     -> one() to sThis
             else -> {
                 sThis as Product
                 val rationalMultiple = sThis.body[0] as Rational

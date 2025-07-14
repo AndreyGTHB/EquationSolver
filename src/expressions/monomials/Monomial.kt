@@ -6,7 +6,7 @@ import expressions.Expression
 import expressions.zero
 import expressions.number.Rational
 import expressions.number.min
-import expressions.unit
+import expressions.one
 
 
 class Monomial internal constructor (
@@ -20,11 +20,11 @@ class Monomial internal constructor (
 
     override val isNumber = varMap.isEmpty()
 
-    fun degree(variable: Char): Rational = body[variable] ?: zero()
+    override fun degree(variable: Char): Rational = body[variable] ?: zero()
 
     override fun _simplify(): Expression {
         val sMonomial = simplifySoftly()
-        if (sMonomial.varMap.isEmpty()) return unit()
+        if (sMonomial.varMap.isEmpty()) return one()
 
         val numerVarMap = varMap.toMutableMap()
         val denomVarMap = mutableMapOf<Char, Rational>()
@@ -36,7 +36,7 @@ class Monomial internal constructor (
         }
         return  if (numerVarMap.isNotEmpty() && denomVarMap.isNotEmpty()) {
                     Monomial(numerVarMap, true) / Monomial(denomVarMap, true)
-                } else if (denomVarMap.isNotEmpty()) unit() / Monomial(denomVarMap, true)
+                } else if (denomVarMap.isNotEmpty()) one() / Monomial(denomVarMap, true)
                   else                               sMonomial
     }
     private fun simplifySoftly(): Monomial {

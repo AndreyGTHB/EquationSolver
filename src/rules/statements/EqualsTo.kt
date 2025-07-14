@@ -12,7 +12,6 @@ class EqualsTo(variable: Char, val expr: Expression) : Statement(variable, expr)
     override fun simplify(): Rule {
         return when (val it = expr.simplify()) {
             is InvalidExpression   -> Contradiction
-            is UniversalExpression -> Tautology
             else                   -> EqualsTo(variable, it)
         }
     }

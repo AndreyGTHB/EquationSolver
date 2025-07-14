@@ -1,5 +1,5 @@
 import expressions.number.toRational
-import expressions.unit
+import expressions.one
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import parser.parseExpression
@@ -16,7 +16,7 @@ fun main() {
 
 fun test(numberOfTests: Int) { repeat(numberOfTests) {
     val s1 = "a + b".parseExpression()
-    val exponents2 = arrayOf(unit(), 2.toRational(), 3.toRational(), 4.toRational())
+    val exponents2 = arrayOf(one(), 2.toRational(), 3.toRational(), 4.toRational())
     exponents2.forEach {
         val p = s1 raisedTo it
         p.simplify()

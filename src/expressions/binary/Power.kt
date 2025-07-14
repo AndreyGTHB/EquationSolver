@@ -6,7 +6,7 @@ import expressions.monomials.Monomial
 import expressions.number.Rational
 import expressions.number.Real
 import expressions.number.min
-import expressions.unit
+import expressions.one
 
 class Power (
     body: Pair<Expression, Expression>,
@@ -40,8 +40,8 @@ class Power (
     }
     private fun simplifyAsRationalPower(): Expression {
         exponent as Rational
-        if (exponent.isNegative()) return (unit() / Power(base to -exponent)).simplify()
-        if (exponent.isZero())     return unit()
+        if (exponent.isNegative()) return (one() / Power(base to -exponent)).simplify()
+        if (exponent.isZero())     return one()
         if (exponent.isUnit())     return base
 
         return when (base) {

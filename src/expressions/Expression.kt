@@ -35,10 +35,10 @@ abstract class Expression (
                 assert(!(a.isZeroRational() && b.isZeroRational()))
                 if (a.isZeroRational()) return b
                 if (b.isZeroRational()) return a
-                if (a.isUnitRational() || b.isUnitRational()) return unit()
+                if (a.isUnitRational() || b.isUnitRational()) return one()
             }
 
-            val cf = a._commonFactor(b) ?: b._commonFactor(a) ?: unit()
+            val cf = a._commonFactor(b) ?: b._commonFactor(a) ?: one()
             return cf.simplify().applyLoadingDomainFrom(a, b)
         }
     }
@@ -57,6 +57,7 @@ abstract class Expression (
 
     open fun firstVariable(): Char? = null
     open operator fun contains(variable: Char) = false
+    open fun degree(variable: Char): Rational? = null
 
     protected open fun _substitute(variable: Char, value: Expression) = this
     fun substitute(variable: Char, value: Expression) = _substitute(variable, value).applyLoadingDomainFrom(this)
@@ -79,14 +80,14 @@ abstract class Expression (
     }
     fun reduce(other: Expression): Expression = reduceOrNull(other)!!
 
-    open fun _rationalPart(): Rational = unit()
+    open fun _rationalPart(): Rational = one()
     fun rationalPart() = _rationalPart().applyLoadingDomainFrom(this)
     open fun _nonRationalPart(): Expression = this
     fun nonRationalPart() = _nonRationalPart().applyLoadingDomainFrom(this)
 
-    open fun _numericalPart(): Expression = if (isNumber) this else unit()
+    open fun _numericalPart(): Expression = if (isNumber) this else one()
     fun numericalPart() = _numericalPart().applyLoadingDomainFrom(this)
-    open fun _nonNumericalPart(): Expression = if (isNumber) unit() else this
+    open fun _nonNumericalPart(): Expression = if (isNumber) one() else this
     fun nonNumericalPart() = _nonNumericalPart().applyLoadingDomainFrom(this)
 
     override fun equals(other: Any?): Boolean {
@@ -103,7 +104,7 @@ abstract class Expression (
           else                              this.toString() compareTo other.toString()
     }
 
-    protected open fun _unaryMinus(): Expression = Product(-unit(), this)
+    protected open fun _unaryMinus(): Expression = Product(-one(), this)
     open operator fun unaryMinus() = _unaryMinus().applyLoadingDomainFrom(this)
 
     protected open fun _plus(other: Expression) = Sum(this, other)
@@ -139,3 +140,4 @@ fun Expression.asSum() = this as? Sum ?: Sum(this)
 
 typealias ExpressionPair = Pair<Expression, Expression>
 fun ExpressionPair.simplify(): ExpressionPair = first.simplify() to second.simplify()
+fun ExpressionPair.firstVariable(): Char? = first.firstVariable() ?: second.firstVariable()

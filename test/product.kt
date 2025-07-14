@@ -3,9 +3,8 @@ import expressions.longs.Sum
 import expressions.number.Rational
 import expressions.number.over
 import expressions.number.toRational
-import expressions.unit
+import expressions.one
 import utils.toMonomial
-import utils.toRational
 
 fun main() {
     val body1 = listOf(Rational(1 to 10), Rational(2 to 5), "n*e*e*a".toMonomial())
@@ -21,6 +20,6 @@ fun main() {
     println(emptyProduct)
     println(emptyProduct.simplify())
 
-    val pr3 = Product(listOf(-unit(), 3.toRational(), -unit() * (5 over 9)))
+    val pr3 = Product(listOf(-one(), 3.toRational(), -one() * (5 over 9)))
     println(pr3.simplify())
 }

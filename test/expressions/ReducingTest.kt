@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test
 import parser.parseExpression
 
 class ReducingTest {
-    val a = Monomial(mapOf('a' to unit()), true)
-    val t = Monomial(mapOf('t' to unit()), true)
+    val a = Monomial(mapOf('a' to one()), true)
+    val t = Monomial(mapOf('t' to one()), true)
 
     @Test
     fun `Rational cf`() {
@@ -24,7 +24,7 @@ class ReducingTest {
         val sum1 = "a + b".parseExpression().simplify()
         val sum2 = "a + b".parseExpression().simplify()
         assertEquals(sum1, commonFactor(sum1, sum2))
-        assertEquals(unit(), sum1.reduce(sum2))
+        assertEquals(one(), sum1.reduce(sum2))
 
         val sum3 = "(5^(1/2) - 1)a^2 + (5^(1/2) - 1)ab".parseExpression().simplify()
         assertEquals(sum1, commonFactor(sum1, sum3))

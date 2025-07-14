@@ -2,7 +2,7 @@ import expressions.Expression
 import expressions.longs.Sum
 import expressions.number.Rational
 import expressions.number.over
-import expressions.unit
+import expressions.one
 import utils.toMonomial
 
 fun main() {
@@ -51,7 +51,7 @@ fun main() {
     val cif_s6 = s6.commonInternalFactor
 //    println(cif_s6)
 //    println(s6.reduceOrNull(cif_s6))
-    val s7 = unit() / "a".toMonomial() + unit()*2 / "a".toMonomial() - unit()*4 / "a".toMonomial()
+    val s7 = one() / "a".toMonomial() + one()*2 / "a".toMonomial() - one()*4 / "a".toMonomial()
 //    println(s7.simplify())
 
     // Product

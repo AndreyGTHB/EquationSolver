@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test
 import kotlin.time.measureTime
 
 class ParserTest {
-    val a = Monomial('a' to unit()).simplify()
-    val b = Monomial('b' to unit()).simplify()
+    val a = Monomial('a' to one()).simplify()
+    val b = Monomial('b' to one()).simplify()
     val ab = (a * b).simplify()
     val eleven = 11.toRational().simplify()
 

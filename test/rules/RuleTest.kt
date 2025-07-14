@@ -1,7 +1,7 @@
 package rules
 
 import expressions.number.squareRoot
-import expressions.unit
+import expressions.one
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import parser.parseExpression
@@ -11,9 +11,9 @@ import rules.statements.notEqualsTo
 class RuleTest {
     @Test
     fun complement() {
-        val r1 = 'a' equalsTo unit()
+        val r1 = 'a' equalsTo one()
         val r2 = r1 * ('b' notEqualsTo 5.squareRoot())
-        assertEquals('a' notEqualsTo unit(), -r1)
+        assertEquals('a' notEqualsTo one(), -r1)
         assertEquals(Disjunction(-r1, 'b' equalsTo 5.squareRoot()), -r2)
         assertEquals(r2, -(-r2))
     }

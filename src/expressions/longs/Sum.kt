@@ -15,8 +15,8 @@ class Sum (
     val commonInternalFactor by lazy(::genCommonInternalFactor)
     val separatedWithCommonInternalFactor by lazy(::genSeparatedWithCommonInternalFactor)
 
-    fun degree(variable: Char): Rational {
-        assert(final)
+    override fun _substitute(variable: Char, value: Expression) = Sum(substituteIntoBody(variable, value))
+    override fun degree(variable: Char): Rational {
         return body.fold(zero()) { currMax, term ->
             val currDegree = when (term) {
                 is Monomial -> term.degree(variable)
@@ -113,8 +113,6 @@ class Sum (
         return newBody
     }
 
-    override fun _substitute(variable: Char, value: Expression) = Sum(substituteIntoBody(variable, value))
-
     override fun _commonFactor(other: Expression) = when (other) {
         is Sum     -> commonFactorWithSum(other)
         is Product -> null
@@ -166,12 +164,12 @@ class Sum (
                 if (currThisFactor is Sum) {
                     if (otherFactor is Sum) {
                         if (currThisFactor == otherFactor) {
-                            currThisFactor = unit()
-                            currOtherFactor = unit()
+                            currThisFactor = one()
+                            currOtherFactor = one()
                         }
                         else if (currThisFactor == otherFactor.opposite()) {
-                            currThisFactor = -unit()
-                            currOtherFactor = unit()
+                            currThisFactor = -one()
+                            currOtherFactor = one()
                         }
                     }
                     else {

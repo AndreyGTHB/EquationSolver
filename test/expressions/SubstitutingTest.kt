@@ -10,6 +10,6 @@ class SubstitutingTest {
     fun substitute() {
         val e1 = "(a + 1)^4".parseExpression()
         assertEquals(81.toRational(), e1.substitute('a', two()).simplify())
-        assertEquals(16.toRational(), e1.simplify().substitute('a', unit()).simplify())
+        assertEquals(16.toRational(), e1.simplify().substitute('a', one()).simplify())
     }
 }

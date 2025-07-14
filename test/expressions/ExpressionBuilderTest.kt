@@ -18,7 +18,7 @@ class ExpressionBuilderTest {
                 raiseTo(two())
             }
         }
-        assertEquals(unit(), one.simplify())
+        assertEquals(one(), one.simplify())
     }
 
     @Test
@@ -34,7 +34,7 @@ class ExpressionBuilderTest {
                 base(a + two() * b)
                 raiseTo(1 over 2)
                 times((a + two() * b) raisedTo (1 over 2))
-                times(-unit())
+                times(-one())
             }
         }
         assertEquals(zero(), nil.simplify())

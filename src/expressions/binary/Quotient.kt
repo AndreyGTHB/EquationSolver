@@ -49,8 +49,8 @@ class Quotient (
 
         val (sNumer, sDenom) = sBody
         if (!sDenom.isNumber) {
-            val (newConstraint, denomDomain) = Equation(sDenom, zero(), sDenom.firstVariable()!!).solve()
-            addConstraints((-newConstraint) * denomDomain)
+            val newConstraint = Equation(sDenom to zero()).solveIgnoringDomain()
+            addConstraints(-newConstraint)
         }
         if (sNumer.isZeroRational()) return zeroQuotient()
 
@@ -66,7 +66,7 @@ class Quotient (
         var changed = false
         second.asProduct().body.forEach {
             if (it is Real) {
-                newNumerBody.add(it.base.power(unit() - it.exponent))
+                newNumerBody.add(it.base.power(one() - it.exponent))
                 newDenomBody.add(it.base.toRational())
                 changed = true
             }

@@ -1,7 +1,6 @@
 import expressions.number.over
 import expressions.number.power
-import expressions.unit
-import utils.power
+import expressions.one
 
 fun main() {
     val a = 2.power(1 over 2)
@@ -13,6 +12,6 @@ fun main() {
     println(diffOfSquares.simplify())
 
     val d1 = (1 over 2) * 2.power(1 over 2)
-    val d2 = unit() / 2.power(1 over 2)
+    val d2 = one() / 2.power(1 over 2)
     println((d1 + d2).simplify())
 }

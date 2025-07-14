@@ -1,7 +1,7 @@
 import expressions.Expression
 import expressions.number.over
 import expressions.number.power
-import expressions.unit
+import expressions.one
 import kotlinx.coroutines.*
 import kotlin.time.measureTime
 
@@ -25,7 +25,7 @@ fun testJob(): Expression {
     val r73 = 7.power(1 over 3)
     val a = (r3-r2) * (r3+r2)
     val b = (r23-r73) * (r23*r23 + 14.power(1 over 3) + r73*r73)
-    val c = (r5 - unit())*(r5 - unit()) + (2 over 1)*(r5 - unit()) + unit()*unit()
+    val c = (r5 - one())*(r5 - one()) + (2 over 1)*(r5 - one()) + one()*one()
 
     val expr = a + c/b
     return expr.simplify()
