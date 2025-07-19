@@ -16,7 +16,7 @@ class BelongsTo (variable: Char, val set: MathSet) : Statement(variable, set) {
         else         -> null
     }
 
-    override fun simplify(): Rule = when (set) {
+    override fun _simplify(): Rule = when (set) {
         is EmptySet -> Contradiction
         is Universe -> Tautology
         else        -> this

@@ -5,7 +5,7 @@ import rules.statements.Statement
 class Conjunction (body: Set<Rule>) : LongRule(body) {
     constructor(vararg body: Rule) : this(body.toSet())
 
-    override fun simplify(): Rule {
+    override fun _simplify(): Rule {
         val newBody = simplifyBody()
             .expandConjunctions()
             .checkForTautologiesAndContradictions()

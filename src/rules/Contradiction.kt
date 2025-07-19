@@ -6,7 +6,7 @@ import console.coloured
 object Contradiction : Rule() {
     override val body = null
 
-    override fun simplify() = this
+    override fun _simplify() = this
     override fun _intersect(other: Rule) = this
     override fun _union(other: Rule) = other
     override fun unaryMinus() = Tautology

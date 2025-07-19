@@ -6,7 +6,7 @@ import rules.Contradiction
 import rules.Tautology
 
 class Not (val statement: Statement) : Statement(statement.body) {
-    override fun simplify() = when (val it = statement.simplify()) {
+    override fun _simplify() = when (val it = statement.simplify()) {
         is Contradiction -> Tautology
         is Tautology     -> Contradiction
         is Not           -> it.statement
@@ -15,7 +15,8 @@ class Not (val statement: Statement) : Statement(statement.body) {
 
     override fun unaryMinus() = statement
 
-    override fun _contradicts(other: Statement) = null
+    override fun _contradicts(other: Statement) = if (statement == other) true
+                                                  else                    null
 
     override fun toString() = "! $statement"
 

@@ -4,7 +4,6 @@ import expressions.*
 import expressions.monomials.Monomial
 import expressions.number.over
 import expressions.number.power
-import expressions.number.toRational
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import parser.parseEquation

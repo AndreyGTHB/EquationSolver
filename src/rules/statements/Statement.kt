@@ -11,6 +11,7 @@ abstract class Statement (val variable: Char, predicate: Any) : Rule() {
 
     protected abstract fun _contradicts(other: Statement): Boolean?
     infix fun contradicts(other: Statement): Boolean {
+        assert(this.final && other.final)
         if (this.variable != other.variable) return false
         return this._contradicts(other) ?: other._contradicts(this) ?: false
     }

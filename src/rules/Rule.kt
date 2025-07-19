@@ -4,8 +4,14 @@ import console.Colourable
 
 abstract class Rule : Comparable<Rule>, Colourable {
     abstract val body: Any?
+    var final = false
+        private set
 
-    abstract fun simplify(): Rule
+    protected abstract fun _simplify(): Rule
+    fun simplify(): Rule {
+        if (final) return this
+        return _simplify().apply { final = true }
+    }
 
     protected open fun _intersect(other: Rule): Rule? = if (other is Conjunction) Conjunction(other.body + this)
                                                         else                      Conjunction(this, other)

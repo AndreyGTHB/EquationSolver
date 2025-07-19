@@ -3,7 +3,7 @@ package rules
 class Disjunction(body: Set<Rule>) : LongRule(body) {
     constructor(vararg body: Rule) : this(body.toSet())
 
-    override fun simplify(): Rule {
+    override fun _simplify(): Rule {
         val newBody = simplifyBody()
             .expandDisjunctions()
             .checkForTautologiesAndContradictions()
