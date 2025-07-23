@@ -11,6 +11,8 @@ object Tautology : Rule() {
     override fun _union(other: Rule) = this
     override fun unaryMinus() = Contradiction
 
+    override fun _contradicts(other: Rule) = false
+
     override fun toString() = "Tautology"
     override fun coloured() = "Tautology".coloured(Clr.TAUTOLOGY)
 }

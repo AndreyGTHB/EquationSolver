@@ -10,9 +10,10 @@ import rules.msets.EmptySet
 import rules.msets.Universe
 
 class BelongsTo (variable: Char, val set: MathSet) : Statement(variable, set) {
-    override fun _contradicts(other: Statement) = when (other) {
+    override fun _1contradicts(other: Statement) = when (other) {
+        is Not if other.statement is BelongsTo -> this.set in other.statement.set
         is BelongsTo -> this.set * other.set == EmptySet
-        is EqualsTo  -> other.expr !in set
+        is EqualsTo  -> other.expr.isNumber && other.expr !in set
         else         -> null
     }
 

@@ -52,4 +52,21 @@ class Conjunction (body: Set<Rule>) : LongRule(body) {
                                            else                      Conjunction(this.body + other)
 
     override fun unaryMinus() = Disjunction(body.map { -it }.toSet())
+
+    override fun _contradicts(other: Rule): Boolean? = when (other) {
+        is Statement   -> contradictsStatement(other)
+        is Conjunction -> contradictsConjunction(other)
+        is Disjunction -> contradictsDisjunction(other)
+        else           -> null
+    }
+
+    private fun contradictsStatement(other: Statement) = body.any { it contradicts other }
+
+    private fun contradictsConjunction(other: Conjunction): Boolean {
+        return this.body.any { subRule1 -> other.body.any { subRule2 -> subRule1 contradicts subRule2 } }
+    }
+
+    private fun contradictsDisjunction(other: Disjunction): Boolean {
+        return this.body.any { subRule1 -> other.body.all { subRule2 -> subRule1 contradicts subRule2 } }
+    }
 }

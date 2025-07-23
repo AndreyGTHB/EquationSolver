@@ -1,6 +1,7 @@
 package rules
 
 import console.Colourable
+import rules.msets.EmptySet
 
 abstract class Rule : Comparable<Rule>, Colourable {
     abstract val body: Any?
@@ -27,6 +28,23 @@ abstract class Rule : Comparable<Rule>, Colourable {
         return this._union(other) ?: other._union(this) ?: Contradiction
     }
 
+    abstract operator fun unaryMinus(): Rule
+
+    protected abstract fun _contradicts(other: Rule): Boolean?
+    open infix fun contradicts(other: Rule): Boolean {
+        assert(this.final && other.final)
+        assert(this !is Contradiction && other !is Contradiction)
+        return if (this is Contradiction || other is Contradiction
+                || this is Tautology || other is Tautology) false
+          else this._contradicts(other) ?: other._contradicts(this) ?: false
+    }
+
+    protected open fun _implies(other: Rule): Boolean? = TODO()
+    infix fun implies(other: Rule): Boolean {
+        assert(this.final && other.final)
+        return this._implies(other) ?: other._implies(this) ?: false
+    }
+
     override fun hashCode() = body.hashCode()
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
@@ -36,8 +54,6 @@ abstract class Rule : Comparable<Rule>, Colourable {
     }
 
     override fun compareTo(other: Rule) = this.toString() compareTo other.toString()
-
-    abstract operator fun unaryMinus(): Rule
 
     abstract override fun toString(): String
 }

@@ -9,10 +9,10 @@ abstract class Statement (val variable: Char, predicate: Any) : Rule() {
 
     override fun unaryMinus(): Rule = Not(this)
 
-    protected abstract fun _contradicts(other: Statement): Boolean?
-    infix fun contradicts(other: Statement): Boolean {
-        assert(this.final && other.final)
-        if (this.variable != other.variable) return false
-        return this._contradicts(other) ?: other._contradicts(this) ?: false
+    protected abstract fun _1contradicts(other: Statement): Boolean?
+    override fun _contradicts(other: Rule): Boolean? {
+        return if (other !is Statement) null
+          else if (this.variable != other.variable) false
+          else _1contradicts(other)
     }
 }

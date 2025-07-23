@@ -1,5 +1,7 @@
 package rules
 
+import rules.statements.Statement
+
 class Disjunction(body: Set<Rule>) : LongRule(body) {
     constructor(vararg body: Rule) : this(body.toSet())
 
@@ -43,4 +45,15 @@ class Disjunction(body: Set<Rule>) : LongRule(body) {
 
     override fun unaryMinus() = Conjunction(body.map { -it }.toSet())
 
+    override fun _contradicts(other: Rule): Boolean? = when (other) {
+        is Statement   -> contradictsStatement(other)
+        is Disjunction -> contradictsDisjunction(other)
+        else           -> null
+    }
+
+    private fun contradictsStatement(other: Statement) = body.all { it contradicts other }
+
+    private fun contradictsDisjunction(other: Disjunction): Boolean {
+        return this.body.all { subRule1 -> other.body.all { subRule2 -> subRule1 contradicts subRule2 } }
+    }
 }

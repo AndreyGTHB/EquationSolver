@@ -6,7 +6,6 @@ import expressions.Expression
 import expressions.InvalidExpression
 import rules.Contradiction
 import rules.Rule
-import rules.Tautology
 
 class EqualsTo(variable: Char, val expr: Expression) : Statement(variable, expr) {
     override fun _simplify(): Rule {
@@ -18,7 +17,8 @@ class EqualsTo(variable: Char, val expr: Expression) : Statement(variable, expr)
 
     override fun unaryMinus() = variable notEqualsTo expr
 
-    override fun _contradicts(other: Statement) = when (other) {
+    override fun _1contradicts(other: Statement) = when (other) {
+        is Not if other.statement is EqualsTo -> this.expr == other.statement.expr
         is EqualsTo -> this.expr.isNumber && other.expr.isNumber && this.expr != other.expr
         else        -> null
     }

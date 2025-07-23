@@ -6,8 +6,6 @@ import expressions.longs.Sum
 import expressions.monomials.Monomial
 import expressions.number.Rational
 import rules.*
-import rules.msets.Universe
-import rules.statements.belongsTo
 import rules.statements.equalsTo
 import utils.fold
 import utils.replaceAllIndexed
@@ -30,11 +28,11 @@ class Equation (val body: ExpressionPair, val aimChar: Char = body.firstVariable
         }
 
         val coefficientsMap = currLeft.calculateCoefficients(aimChar)
-        val solution = when (currLeft.asSum().degree(aimChar)) { // NOPT (double degree calculation)
+        val solution = when (currLeft.degree(aimChar)) { // NOPT (double degree calculation)
             zero() -> coefficientsMap.solveAsConstantPolynomial(aimChar) // NOPT (rational keys instead of ints)
             one()  -> coefficientsMap.solveAsLinearPolynomial(aimChar)
-            two()  -> coefficientsMap.solveAsQuadraticPolynomial(aimChar)
-            else   -> TODO()
+            two()  -> ExprEqualsTo(currLeft to zero()) // coefficientsMap.solveAsQuadraticPolynomial(aimChar)
+            else   -> ExprEqualsTo(currLeft to zero())
         }
         return solution to domain
     }

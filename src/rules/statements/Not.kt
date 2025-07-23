@@ -15,8 +15,8 @@ class Not (val statement: Statement) : Statement(statement.body) {
 
     override fun unaryMinus() = statement
 
-    override fun _contradicts(other: Statement) = if (statement == other) true
-                                                  else                    null
+    override fun _1contradicts(other: Statement) = if (statement == other) true
+                                                   else                    null
 
     override fun toString() = "! $statement"
 

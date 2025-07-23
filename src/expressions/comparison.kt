@@ -9,6 +9,7 @@ import expressions.number.Rational
 import expressions.number.Real
 
 val exprOrderMap = mapOf(
+    InvalidExpression::class to 0,
     Rational::class to 1,
     Real::class to 2,
     Monomial::class to 3,

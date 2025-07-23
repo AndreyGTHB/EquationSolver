@@ -22,4 +22,10 @@ class ProductTest {
         val p1 = "a^(1/2) * a^(1/2) + 5/4".parseExpression()
         assertEquals((5 over 4) + a, p1.simplify())
     }
+
+    @Test
+    fun simplify() {
+        val p1 = "(b + c)^(1/6) * (c + b)^(1/6)".parseExpression()
+        assertEquals("(b + c)^(1/3)".parseExpression(), p1.simplify())
+    }
 }

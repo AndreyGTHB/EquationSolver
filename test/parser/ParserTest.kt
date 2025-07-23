@@ -28,6 +28,10 @@ class ParserTest {
         assertEquals("17/1+5/4*((ab)*c)*x", "17/1 + 5/4 * ((a*b)c)x".standardize())
     }
 
+    @Test fun `standardize should do nothing when no spaces`() = assertEquals("11*abc", "11a*b*c".standardize())
+    @Test fun `standardize should remove spaces`() = assertEquals("(x+y)*(x-yy)", "(x + y)(x - y*y)".standardize())
+    @Test fun `standardize random tests with brakets`() = assertEquals("17/1+5/4*((ab)*c)*x", "17/1 + 5/4 * ((a*b)c)x".standardize())
+
     @Test
     fun parse() {
         assertEquals(a, "a".parseExpression())

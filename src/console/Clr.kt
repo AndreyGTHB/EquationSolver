@@ -22,7 +22,7 @@ object Clr {
 
     const val RATIONAL = 120
     const val REAL = 120
-    const val MONOMIAL = 229
+    const val MONOMIAL = 200
     const val LONG_EXPR = 135
     const val BIN_EXPR = 4
     const val INVALID_EXPR = 214

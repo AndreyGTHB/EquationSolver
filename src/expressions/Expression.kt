@@ -5,8 +5,11 @@ import expressions.binary.Power
 import expressions.binary.Quotient
 import expressions.longs.Product
 import expressions.longs.Sum
+import expressions.monomials.Monomial
 import expressions.number.Rational
 import rules.*
+import utils.firstValue
+import utils.map
 import kotlin.contracts.contract
 
 @Suppress("FunctionName")
@@ -135,9 +138,15 @@ fun Expression.isZeroRational(): Boolean {
     return this is Rational && this.isZero()
 }
 
+fun Expression.isVariable(): Boolean {
+    contract { returns(true) implies (this@isVariable is Monomial) }
+    return this is Monomial && body.size == 1 && body.firstValue() == one()
+}
+
 fun Expression.asProduct() = this as? Product ?: Product(this)
 fun Expression.asSum() = this as? Sum ?: Sum(this)
 
 typealias ExpressionPair = Pair<Expression, Expression>
-fun ExpressionPair.simplify(): ExpressionPair = first.simplify() to second.simplify()
+fun ExpressionPair.simplify(): ExpressionPair = map { it.simplify() }
 fun ExpressionPair.firstVariable(): Char? = first.firstVariable() ?: second.firstVariable()
+fun ExpressionPair.substitute(variable: Char, value: Expression): ExpressionPair = map { it.substitute(variable, value) }

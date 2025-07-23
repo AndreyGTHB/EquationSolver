@@ -24,7 +24,7 @@ class EquationTest {
         assertEquals(Tautology, eq2.solve())
 
         val eq3 = Equation(one() to zero())
-        val eq4 = Equation("5x + 7".parseExpression() to "10^(3/2) / (2^(3/2) * 5^(1/2)) * x".parseExpression())
+        val eq4 = "5x + 7 = 10^(3/2) / (2^(3/2) * 5^(1/2)) * x".parseEquation()
         assertEquals(Contradiction, eq3.solve())
         assertEquals(Contradiction, eq4.solve())
 
@@ -50,13 +50,13 @@ class EquationTest {
         val eq2 = Equation(xMon to "a / (b - 1)".parseExpression())
         val sol2 = ('x' equalsTo "a / ((-1) + b)".parseExpression()) * ('b' notEqualsTo one())
         eq2.solve().printlnColoured()
-//        assertEquals(sol2, eq2.solve())
+
 
         val eq3 = "ax - a = 0".parseEquation()
-        println(eq3.solve())
+        println("eq3: ${eq3.solve()}")
 
         val eq5 = "(7^(1/2) - 1)ax + (b/a)x = ax - b/5".parseEquation()
-        println(eq5.solve())
+        println("eq5: ${eq5.solve()}")
     }
 }
 

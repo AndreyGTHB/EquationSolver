@@ -107,7 +107,6 @@ class Product (
         val newBody = emptyBody()
         var rationalFactor = one()
         val realFactors1 = mutableListOf<Real>()
-        val powerBaseMap = mutableMapOf<Expression, Expression>()
         var monomialFactor = unitMonomial()
         var quotientFactor = unitQuotient()
         forEach {
@@ -117,7 +116,6 @@ class Product (
                     rationalFactor *= it
                 }
                 is Real ->     realFactors1.add(it)
-                is Power    -> powerBaseMap[it.base] = (powerBaseMap[it.base] ?: zero()) + it.exponent
                 is Monomial -> monomialFactor *= it
                 is Quotient -> quotientFactor *= it
                 else        -> newBody.add(it)
@@ -269,7 +267,7 @@ class Product (
             }
             else newBody.add(it)
         }
-        if (currOther is Rational) return Product(newBody) * (currOther as Rational).flip()
+        if (currOther is Rational) return Product(newBody) * currOther.flip()
         return null
     }
 
