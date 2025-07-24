@@ -4,9 +4,7 @@ import expressions.number.squareRoot
 import expressions.one
 import expressions.three
 import expressions.two
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import parser.parseExpression
 import rules.statements.equalsTo
@@ -26,6 +24,11 @@ class RuleTest {
     fun simplification() {
         val r1 = 'a' equalsTo "5 / ((5^(1/2))^2 - 5)".parseExpression()
         assertEquals(Contradiction, r1.simplify())
+    }
+
+    @Test
+    fun vibeSimplification() {
+
     }
 
     @Test

@@ -45,7 +45,7 @@ class Quotient (
 
     private fun simplifySoftly(): Quotient {
         val sBody = simplifyBody()
-        sBody.removeIrrationalityInDenom().apply { if (this != null) return Quotient(first to second).simplifySoftly() }
+        sBody.removeIrrationalityInDenom()?.apply { return Quotient(first to second).simplifySoftly() }
 
         val (sNumer, sDenom) = sBody
         if (!sDenom.isNumber) {

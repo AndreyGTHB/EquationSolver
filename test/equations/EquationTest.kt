@@ -1,9 +1,11 @@
 package equations
 
-import expressions.*
 import expressions.monomials.Monomial
 import expressions.number.over
 import expressions.number.power
+import expressions.one
+import expressions.three
+import expressions.zero
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import parser.parseEquation
@@ -49,11 +51,11 @@ class EquationTest {
 
         val eq2 = Equation(xMon to "a / (b - 1)".parseExpression())
         val sol2 = ('x' equalsTo "a / ((-1) + b)".parseExpression()) * ('b' notEqualsTo one())
-        eq2.solve().printlnColoured()
+        assertEquals(sol2.simplify(), eq2.solve())
 
 
         val eq3 = "ax - a = 0".parseEquation()
-        println("eq3: ${eq3.solve()}")
+        println("eq3: ${eq3.solve().coloured()}")
 
         val eq5 = "(7^(1/2) - 1)ax + (b/a)x = ax - b/5".parseEquation()
         println("eq5: ${eq5.solve()}")
