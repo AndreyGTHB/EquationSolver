@@ -77,14 +77,7 @@ class Product (
         return newBody
     }
 
-    private fun List<Expression>.expandProducts(): List<Expression> {
-        val newBody = emptyBody()
-        forEach { factor ->
-            if (factor is Product) factor.body.forEach { subFactor -> newBody.add(subFactor) }
-            else                                                      newBody.add(factor)
-        }
-        return newBody
-    }
+    private fun List<Expression>.expandProducts() = flatMap { if (it is Product) it.body else listOf(it) }
 
     private fun List<Expression>.factorOutSumsIfNeeded(): List<Expression> {
         val newBody = emptyBody()

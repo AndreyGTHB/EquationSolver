@@ -20,8 +20,8 @@ fun Collection<Colourable>.colouredUnder(name: String, nameColour: Int): String 
 
 fun Collection<*>.toStringUnder(name: String): String {
     var str = "$name:("
-    forEach { str += "$it " }
-    str = str.slice(0 until str.lastIndex) + ')'
+    forEach { str += "$it, " }
+    str = str.dropLast(2) + ')'
     return str
 }
 

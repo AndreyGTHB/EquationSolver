@@ -46,26 +46,21 @@ class Sum (
     }
 
     private fun List<Expression>.expandSums(): List<Expression> {
-        val newBody = emptyBody()
-        forEach { term ->
+        return flatMap { term ->
             when (term) {
-                is Sum -> term.body.forEach { subTerm -> newBody.add(subTerm) }
+                is Sum -> term.body
                 is Product -> {
-                    val expanded = term.expandBrackets()
-                    expanded.body.forEach { subTerm -> newBody.add(subTerm.simplify()) }
+                    term.expandBrackets().body.map { subTerm -> subTerm.simplify() }
                 }
-                is Quotient -> { when (term.numer) {
-                    is Sum -> term.numer.body.forEach { numerSubTerm -> newBody.add((numerSubTerm / term.denom).simplify()) }
-                    is Product -> {
-                        val expandedNumer = term.numer.expandBrackets()
-                        expandedNumer.body.forEach { numerSubTerm -> newBody.add((numerSubTerm / term.denom).simplify()) }
-                    }
-                    else -> newBody.add(term)
-                }}
-                else -> newBody.add(term)
+                is Quotient if term.numer is Sum -> {
+                    term.numer.body.map { numerSubTerm -> (numerSubTerm / term.denom).simplify() }
+                }
+                is Quotient if term.numer is Product -> {
+                    term.numer.expandBrackets().body.map { numerSubTerm -> (numerSubTerm / term.denom).simplify() }
+                }
+                else -> listOf(term)
             }
         }
-        return newBody
     }
 
     private fun List<Expression>.combineByNonRationalPart(): List<Expression> {

@@ -16,14 +16,12 @@ class ExprEqualsTo (override val body: ExpressionPair) : Rule() {
         else ExprEqualsTo(this)
     }
 
-    override fun unaryMinus() = ExprNotEqualsTo(body)
-
     override fun _contradicts(other: Rule): Boolean? = when (other) {
         is EqualsTo -> ExprEqualsTo(body.substitute(other.variable, other.expr)).simplify() == Contradiction
         else        -> null
     }
 
-    override fun toString() = "EET: ${body.first} = ${body.second}"
+    override fun toString() = "EET: (${body.first} = ${body.second})"
 
     override fun coloured() = toString().coloured(Clr.EQUALITY)
 }

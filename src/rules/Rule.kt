@@ -28,7 +28,7 @@ abstract class Rule : Comparable<Rule>, Colourable {
         return this._union(other) ?: other._union(this) ?: Contradiction
     }
 
-    abstract operator fun unaryMinus(): Rule
+    open operator fun unaryMinus(): Rule = Complement(this)
 
     protected abstract fun _contradicts(other: Rule): Boolean?
     open infix fun contradicts(other: Rule): Boolean {
@@ -39,10 +39,10 @@ abstract class Rule : Comparable<Rule>, Colourable {
           else this._contradicts(other) ?: other._contradicts(this) ?: false
     }
 
-    protected open fun _implies(other: Rule): Boolean? = TODO()
+    protected open fun _implies(other: Rule): Boolean = this contradicts (-other).simplify()
     infix fun implies(other: Rule): Boolean {
         assert(this.final && other.final)
-        return this._implies(other) ?: other._implies(this) ?: false
+        return _implies(other)
     }
 
     override fun hashCode() = body.hashCode()

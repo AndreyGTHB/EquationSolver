@@ -29,7 +29,7 @@ class Equation (val body: ExpressionPair, val aimChar: Char = body.firstVariable
 
         val coefficientsMap = currLeft.calculateCoefficients(aimChar)
         val solution = when (currLeft.degree(aimChar)) { // NOPT (double degree calculation)
-            zero() -> coefficientsMap.solveAsConstantPolynomial(aimChar) // NOPT (rational keys instead of ints)
+            zero() -> coefficientsMap.solveAsConstantPolynomial(aimChar) // NOPT (rational keys reinitialisation)
             one()  -> coefficientsMap.solveAsLinearPolynomial(aimChar)
             two()  -> ExprEqualsTo(currLeft to zero()) // coefficientsMap.solveAsQuadraticPolynomial(aimChar)
             else   -> ExprEqualsTo(currLeft to zero())
