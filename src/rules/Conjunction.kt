@@ -1,6 +1,8 @@
 package rules
 
-class Conjunction (body: Set<Rule>) : LongRule(body) {
+import utils.allExcept
+
+class Conjunction (body: Collection<Rule>) : LongRule(body.toSet()) {
     constructor(vararg body: Rule) : this(body.toSet())
 
     override fun _simplify(): Rule {
@@ -25,16 +27,22 @@ class Conjunction (body: Set<Rule>) : LongRule(body) {
             it !is Tautology
         }
 
-    private fun List<Rule>.processPairs(): List<Rule> = mapIndexed { i, rule1 ->
+    private fun List<Rule>.processPairs(): List<Rule> = mapIndexedNotNull map@ { i, rule1 ->
         when (rule1) {
             is Disjunction -> {
                 rule1.body
-                    .filter { subRule1 -> drop(i+1).all { rule2 -> !(subRule1 contradicts rule2) } }
-                    .toSet()
+                    .filter { subRule1 -> allExcept(i) { rule2 ->
+                        if (rule2 implies subRule1) return@map null
+                        !(subRule1 contradicts rule2)
+                    }}
                     .let { Disjunction(it).simplify() }
             }
             else -> {
-                if (drop(i+1).any { rule2 -> rule1 contradicts rule2 }) return listOf(Contradiction)
+                forEachIndexed fr@ { j, rule2 ->
+                    if (i == j) return@fr
+                    if (rule2 implies rule1) return@map null
+                    if (j > i && (rule1 contradicts rule2)) return listOf(Contradiction)
+                }
                 rule1
             }
         }
@@ -52,10 +60,14 @@ class Conjunction (body: Set<Rule>) : LongRule(body) {
     }
 
     private fun contradictsConjunction(other: Conjunction): Boolean {
-        return this.body.any { subRule1 -> other.body.any { subRule2 -> subRule1 contradicts subRule2 } }
+        return this.body.any { rule1 -> other.body.any { rule2 -> rule1 contradicts rule2 } }
     }
 
     private fun contradictsDisjunction(other: Disjunction): Boolean {
-        return this.body.any { subRule1 -> other.body.all { subRule2 -> subRule1 contradicts subRule2 } }
+        var contradictions = 0
+        other.body.forEach { rule1 ->
+            if (this.body.any { rule2 -> rule1 contradicts rule2 }) contradictions++
+        }
+        return contradictions == other.body.size
     }
 }

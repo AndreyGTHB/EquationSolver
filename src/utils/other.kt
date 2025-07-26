@@ -1,12 +1,16 @@
 package utils
 
-inline fun <T, R> Iterable<T>.mapNotNullIndexed(transform: (Int, T) -> R?): List<R> {
-    return buildList { this@mapNotNullIndexed.forEachIndexed { i, el -> transform(i, el)?.let { add(it) } } }
+inline fun <T> Iterable<T>.forEachExcept(index: Int, action: (T) -> Unit) {
+    for ((i, el) in withIndex()) if (i != index) action(el)
 }
 
 inline fun <T> Iterable<T>.allIndexed(predicate: (Int, T) -> Boolean): Boolean {
     forEachIndexed { i, el -> if (!predicate(i, el)) return false }
     return true
+}
+
+inline fun <T> Iterable<T>.allExcept(index: Int, predicate: (T) -> Boolean): Boolean {
+    return allIndexed { i, el -> i == index || predicate(el) }
 }
 
 inline fun <T> Iterable<T>.anyIndexed(predicate: (Int, T) -> Boolean): Boolean {

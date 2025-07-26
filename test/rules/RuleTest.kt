@@ -11,6 +11,12 @@ import rules.statements.equalsTo
 import rules.statements.notEqualsTo
 
 class RuleTest {
+    val a1 = ('a' equalsTo one()).simplify()
+    val b2 = ('b' equalsTo two()).simplify()
+    val c3 = ('c' equalsTo three()).simplify()
+    val a2 = ('a' equalsTo two()).simplify()
+    val a3 = ('a' equalsTo three()).simplify()
+
     @Test
     fun complement() {
         val r1 = 'a' equalsTo one()
@@ -23,12 +29,12 @@ class RuleTest {
     @Test
     fun simplification() {
         val r1 = 'a' equalsTo "5 / ((5^(1/2))^2 - 5)".parseExpression()
+        val r2 = a1 * (a2 + a3)
         assertEquals(Contradiction, r1.simplify())
-    }
+        assertEquals(Contradiction, r2.simplify())
 
-    @Test
-    fun vibeSimplification() {
-
+        val r3 = (a1 * b2) + (a1 * b2 * c3)
+        println(r3.simplify())
     }
 
     @Test

@@ -5,7 +5,6 @@ import console.coloured
 import expressions.Expression
 import expressions.InvalidExpression
 import rules.Complement
-import rules.Conjunction
 import rules.Contradiction
 import rules.Rule
 
@@ -19,7 +18,7 @@ class EqualsTo(body: Pair<Char, Expression>) : Statement(body) {
         }
     }
 
-    override fun _contradictsStatement(other: Statement): Boolean? {
+    override fun contradictsStatement(other: Statement): Boolean? {
         return when (other) {
             is EqualsTo -> this.expr.isNumber && other.expr.isNumber && this.expr != other.expr
             else        -> null

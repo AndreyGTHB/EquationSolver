@@ -1,7 +1,6 @@
 package rules
 
 import console.Colourable
-import rules.msets.EmptySet
 
 abstract class Rule : Comparable<Rule>, Colourable {
     abstract val body: Any?
@@ -33,7 +32,7 @@ abstract class Rule : Comparable<Rule>, Colourable {
     protected abstract fun _contradicts(other: Rule): Boolean?
     open infix fun contradicts(other: Rule): Boolean {
         assert(this.final && other.final)
-        assert(this !is Contradiction && other !is Contradiction)
+        assert(this !is Contradiction || other !is Contradiction)
         return if (this is Contradiction || other is Contradiction
                 || this is Tautology || other is Tautology) false
           else this._contradicts(other) ?: other._contradicts(this) ?: false

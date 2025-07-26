@@ -4,16 +4,16 @@ import console.Clr
 import console.coloured
 import rules.Complement
 import rules.Contradiction
-import rules.msets.MathSet
 import rules.Rule
 import rules.Tautology
 import rules.msets.EmptySet
+import rules.msets.MathSet
 import rules.msets.Universe
 
 class BelongsTo (body: Pair<Char, MathSet>) : Statement(body) {
     val set = body.second
 
-    override fun _contradictsStatement(other: Statement) = when (other) {
+    override fun contradictsStatement(other: Statement) = when (other) {
         is BelongsTo -> this.set * other.set == EmptySet
         is EqualsTo  -> other.expr.isNumber && other.expr !in set
         else         -> null

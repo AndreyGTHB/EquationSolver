@@ -7,7 +7,9 @@ import expressions.longs.Product
 import expressions.longs.Sum
 import expressions.monomials.Monomial
 import expressions.number.Rational
-import rules.*
+import rules.Contradiction
+import rules.Rule
+import rules.Tautology
 import utils.firstValue
 import utils.map
 import kotlin.contracts.contract
@@ -67,8 +69,7 @@ abstract class Expression (
 
     protected open fun _fullDomain() = domain
     protected fun addConstraints(constraints: Rule) { domain *= constraints }
-    protected fun makeInvalid() { domain = Contradiction
-    }
+    protected fun makeInvalid() { domain = Contradiction }
 
     protected abstract fun _commonFactor(other: Expression): Expression?
 

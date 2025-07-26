@@ -2,7 +2,7 @@ package rules
 
 import utils.allIndexed
 
-class Disjunction(body: Set<Rule>) : LongRule(body) {
+class Disjunction(body: Collection<Rule>) : LongRule(body.toSet()) {
     constructor(vararg body: Rule) : this(body.toSet())
 
     override fun _simplify(): Rule {
@@ -27,11 +27,11 @@ class Disjunction(body: Set<Rule>) : LongRule(body) {
 
     private fun List<Rule>.processPairs(): List<Rule> = filterIndexed { i, rule1 ->
         when (rule1) {
-            is Conjunction -> {
-                rule1.body.all { subRule1 ->
-                    this.allIndexed { j, rule2 -> i == j || !(subRule1 implies rule2) } // NOPT: (some pairs may include already removed rules)
-                }
-            }
+//            is Conjunction -> {
+//                rule1.body.all { subRule1 ->
+//                    this.allExcept(i) { rule2 -> !(subRule1 implies rule2) } // NOPT: (some pairs may include already removed rules)
+//                }
+//            }
             else -> {
                 allIndexed { j, rule2 ->
                     if (i < j && rule1 == (-rule2).simplify()) return listOf(Tautology)
@@ -55,6 +55,6 @@ class Disjunction(body: Set<Rule>) : LongRule(body) {
     }
 
     private fun contradictsDisjunction(other: Disjunction): Boolean {
-        return this.body.all { subRule1 -> other.body.all { subRule2 -> subRule1 contradicts subRule2 } }
+        return this.body.all { rule1 -> other.body.all { rule2 -> rule1 contradicts rule2 } }
     }
 }
