@@ -49,7 +49,11 @@ class RuleTest {
 
         val r5 = ('x' equalsTo "-5a / (b + c)^(1/3)".parseExpression()).simplify()
         val r6 = ('x' notEqualsTo "(-5(a + b) + 5b) / ((b + c)^(1/6) * (c + b)^(1/6))".parseExpression()).simplify()
-        println(r6)
         assertTrue(r5 contradicts r6)
+
+        val r7 = (a1 + b2).simplify()
+        val r8 = (a1 + b2 + c3).simplify()
+        println(r7 implies r8)
+        (r7 * r8).simplify().printlnColoured()
     }
 }

@@ -1,7 +1,8 @@
 package utils
 
+
 inline fun <T> Iterable<T>.forEachExcept(index: Int, action: (T) -> Unit) {
-    for ((i, el) in withIndex()) if (i != index) action(el)
+    forEachIndexed { i, el -> if (i != index) action(el) }
 }
 
 inline fun <T> Iterable<T>.allIndexed(predicate: (Int, T) -> Boolean): Boolean {

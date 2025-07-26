@@ -1,6 +1,7 @@
 package rules
 
 import utils.allExcept
+import utils.forEachExcept
 
 class Conjunction (body: Collection<Rule>) : LongRule(body.toSet()) {
     constructor(vararg body: Rule) : this(body.toSet())
@@ -31,11 +32,9 @@ class Conjunction (body: Collection<Rule>) : LongRule(body.toSet()) {
         when (rule1) {
             is Disjunction -> {
                 rule1.body
-                    .filter { subRule1 -> allExcept(i) { rule2 ->
-                        if (rule2 implies subRule1) return@map null
-                        !(subRule1 contradicts rule2)
-                    }}
+                    .filter { subRule1 -> allExcept(i) { rule2 -> !(subRule1 contradicts rule2) } }
                     .let { Disjunction(it).simplify() }
+                    .apply { forEachExcept(i) { rule2 -> if (rule2 implies rule1) return@map null } }
             }
             else -> {
                 forEachIndexed fr@ { j, rule2 ->

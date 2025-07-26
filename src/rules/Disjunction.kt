@@ -27,11 +27,7 @@ class Disjunction(body: Collection<Rule>) : LongRule(body.toSet()) {
 
     private fun List<Rule>.processPairs(): List<Rule> = filterIndexed { i, rule1 ->
         when (rule1) {
-//            is Conjunction -> {
-//                rule1.body.all { subRule1 ->
-//                    this.allExcept(i) { rule2 -> !(subRule1 implies rule2) } // NOPT: (some pairs may include already removed rules)
-//                }
-//            }
+//            is Conjunction -> {  }
             else -> {
                 allIndexed { j, rule2 ->
                     if (i < j && rule1 == (-rule2).simplify()) return listOf(Tautology)
