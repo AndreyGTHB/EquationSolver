@@ -30,8 +30,9 @@ object Clr {
     const val INVALID_EXPR = 214
     const val UNIVERSAL_EXPR = 41
 
-    const val NOT = 166
+    const val COMPLEMENT = 166
     const val EQUALITY = 179
+    const val INEQUALITY = 181
     const val BELONGING = 184
     const val LONG_STATEMENT = 70
     const val CONTRADICTION = 214

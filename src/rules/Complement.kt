@@ -19,5 +19,5 @@ class Complement (override val body: Rule) : Rule() {
 
     override fun toString() = "!($body)"
 
-    override fun coloured() = "! ".coloured(Clr.NOT) + body.coloured()
+    override fun coloured() = "! ".coloured(Clr.COMPLEMENT) + body.coloured()
 }

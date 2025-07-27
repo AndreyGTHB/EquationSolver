@@ -16,5 +16,5 @@ class SubStringsIterator(val str: String, val length: Int) : Iterator<String> {
 
 
 fun String.subStrings(length: Int) = object : Iterable<String> {
-        override fun iterator() = SubStringsIterator(this@subStrings, length)
+    override fun iterator() = SubStringsIterator(this@subStrings, length)
 }

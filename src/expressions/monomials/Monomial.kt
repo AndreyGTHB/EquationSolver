@@ -124,3 +124,6 @@ class Monomial internal constructor (
         return str
     }
 }
+
+
+infix fun Char.raisedTo(exp: Rational): Expression = Monomial(this to exp).simplify()

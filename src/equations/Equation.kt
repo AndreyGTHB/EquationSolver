@@ -3,22 +3,19 @@ package equations
 import expressions.*
 import expressions.binary.Quotient
 import expressions.longs.Sum
-import expressions.monomials.Monomial
+import expressions.monomials.raisedTo
 import expressions.number.Rational
 import rules.*
 import rules.statements.equalsTo
 import utils.fold
 import utils.replaceAllIndexed
 
-class Equation (val body: ExpressionPair, val aimChar: Char = body.firstVariable() ?: 'x') { // NOPT
-    val aimMonomial = Monomial(mapOf(aimChar to one()), final=true)
-
-    private var domain: Rule = Tautology
-
-    fun Char.raisedTo(exp: Rational): Expression = Monomial(this to exp).simplify()
-
-    fun solve(): Rule = _solve().run { (first * second).simplify() }
-    fun solveIgnoringDomain(): Rule = _solve().first.simplify()
+class Equation (
+    val body: ExpressionPair,
+    val considerDomain: Boolean = true,
+    val aimChar: Char = body.firstVariable() ?: 'x',
+) { // NOPT
+    fun solve(): Rule = _solve().run { if (considerDomain) (first * second).simplify() else first.simplify() }
     private fun _solve(): Pair<Rule, Rule> {
         val domain: Rule
         val currLeft: Expression
@@ -71,7 +68,7 @@ class Equation (val body: ExpressionPair, val aimChar: Char = body.firstVariable
         val coefficientsMap = mutableMapOf<Rational, Expression>()
         asSum().body.forEach {
             val degree = it.degree(variable) ?: zero()
-            val coeff = it.reduce(aimChar.raisedTo(degree))
+            val coeff = it.reduce(aimChar raisedTo degree)
             coefficientsMap[degree] = (coefficientsMap[degree] ?: zero()) + coeff
         }
         return coefficientsMap.mapValues { (_, coeff) -> coeff.simplify() }
@@ -83,7 +80,7 @@ class Equation (val body: ExpressionPair, val aimChar: Char = body.firstVariable
             return if (a.isZeroRational()) Tautology
                    else                    Contradiction
         }
-        val subEquation = Equation(a to zero(), a.firstVariable()!!)
+        val subEquation = Equation(a to zero(), considerDomain, a.firstVariable()!!)
         return subEquation.solve()
     }
     private fun Map<Rational, Expression>.solveAsLinearPolynomial(variable: Char): Rule {
@@ -91,12 +88,12 @@ class Equation (val body: ExpressionPair, val aimChar: Char = body.firstVariable
         val b = get(zero()) ?: zero()
         val firstSolution = run {
             val aimCondition = aimChar equalsTo (-b) / a
-            val aCondition = -Equation(a to zero()).solve()
+            val aCondition = -Equation(a to zero(), considerDomain).solve()
             aimCondition * aCondition
         }
         val secondSolution = run {
-            val aCondition = Equation(a to zero()).solve()
-            val bCondition = Equation(b to zero()).solve()
+            val aCondition = Equation(a to zero(), considerDomain).solve()
+            val bCondition = Equation(b to zero(), considerDomain).solve()
             aCondition * bCondition
         }
         return firstSolution + secondSolution

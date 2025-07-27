@@ -28,8 +28,7 @@ class QuotientTest {
     @Test
     fun domains() {
         val e1 = "a/a".parseExpression()
-        val e2 = "a = 0".parseEquation()
-        e2.solveIgnoringDomain()
+        val e2 = "a = 0".parseEquation(false)
         e1.simplify().domain.printlnColoured()
     }
 }

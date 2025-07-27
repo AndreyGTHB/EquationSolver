@@ -12,9 +12,9 @@ class EqualsTo(body: Pair<Char, Expression>) : Statement(body) {
     val expr = body.second
 
     override fun _simplify(): Rule {
-        return when (val it = expr.simplify()) {
+        return when (val sExpr = expr.simplify()) {
             is InvalidExpression   -> Contradiction
-            else                   -> EqualsTo(variable to it)
+            else                   -> EqualsTo(variable to sExpr)
         }
     }
 

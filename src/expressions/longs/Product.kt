@@ -32,12 +32,6 @@ class Product (
         }
     }}
 
-    private fun simplifyWithOneSum(): Expression {
-        val sumFactor = body.first { it is Sum }
-        return if (sumFactor.isNumber) simplifyIgnoringSums()
-        else                           expandBrackets().simplify()
-    }
-
     private fun simplifyIgnoringSums(): Expression {
         body.forEachIndexed { i, factor -> if (factor is Quotient) {
             val numerBody = buildList {
@@ -50,10 +44,16 @@ class Product (
         }}
 
         return when (body.size) {
-            0 -> one()
-            1 -> body[0]
+            0    -> one()
+            1    -> body[0]
             else -> this
         }
+    }
+
+    private fun simplifyWithOneSum(): Expression {
+        val sumFactor = body.first { it is Sum }
+        return if (sumFactor.isNumber) simplifyIgnoringSums()
+        else                           expandBrackets().simplify()
     }
     private fun simplifySoftly(): Product {
         val newBody = simplifyBody()
