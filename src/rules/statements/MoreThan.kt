@@ -15,9 +15,7 @@ class MoreThan (body: Pair<Char, Expression>) : Statement(body) {
         return if (sExpr !is InvalidExpression) MoreThan(variable to sExpr) else Contradiction
     }
 
-    override fun contradictsStatement(other: Statement) = when (other) {
-        is EqualsTo
-    }
+    override fun contradictsStatement(other: Statement) = false
 
     override fun toString() = "$variable > $expr"
 

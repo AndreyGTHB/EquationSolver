@@ -1,10 +1,14 @@
 package expressions.longs
 
+import ch.obermuhlner.math.big.BigDecimalMath.log10
 import expressions.*
 import expressions.binary.Quotient
 import expressions.monomials.Monomial
 import expressions.number.Rational
 import expressions.number.max
+import java.math.BigDecimal
+import java.math.MathContext
+import java.math.RoundingMode
 
 class Sum (
     body: List<Expression> = listOf(),
@@ -106,6 +110,16 @@ class Sum (
             if (!reducedQuotient.isZeroRational()) newBody.add(reducedQuotient)
         }
         return newBody
+    }
+
+    private val additionalScale by lazy {
+        log10(body.size.toBigDecimal(), MathContext(2))
+        .setScale(0, RoundingMode.UP)
+        .toInt()
+    }
+    override fun _approx(scale: Int): BigDecimal {
+        val subScale = scale + additionalScale
+        return body.fold(0.toBigDecimal()) { acc, term -> acc + term.approx(subScale) }.setScale(scale, RoundingMode.HALF_UP)
     }
 
     override fun _commonFactor(other: Expression) = when (other) {

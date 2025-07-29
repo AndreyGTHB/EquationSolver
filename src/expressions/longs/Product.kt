@@ -1,5 +1,9 @@
 package expressions.longs
 
+import ch.obermuhlner.math.big.BigDecimalMath
+import ch.obermuhlner.math.big.BigDecimalMath.log10
+import ch.obermuhlner.math.big.BigDecimalMath.root
+import ch.obermuhlner.math.big.BigDecimalMath.pow
 import expressions.*
 import expressions.binary.Power
 import expressions.binary.Quotient
@@ -9,6 +13,11 @@ import expressions.number.Real
 import expressions.number.power
 import expressions.number.toRational
 import utils.power
+import java.math.BigDecimal
+import java.math.MathContext
+import java.math.RoundingMode
+import kotlin.math.absoluteValue
+
 
 class Product (
     body: List<Expression>,
@@ -186,6 +195,18 @@ class Product (
     }
 
     private fun List<Expression>.countSums() = count { it is Sum }
+
+    override fun _approx(scale: Int): BigDecimal {
+        if (body.isEmpty()) return 1.toBigDecimal()
+        val n = body.size
+        val b = body.maxOf { it.roundUp().absoluteValue }
+        val delta = 5.toBigDecimal().scaleByPowerOfTen(-scale)
+        val subScale = (b.power(n).toBigDecimal() + delta)
+            .let { root(it, n.toBigDecimal(), MathContext(b.toBigDecimal().precision() + 10, RoundingMode.DOWN)) - b.toBigDecimal() }
+            .let { -log10(it * 2.toBigDecimal(), MathContext(2)) }
+            .setScale(0, RoundingMode.UP).toInt()
+        return body.fold(1.toBigDecimal()) { acc, factor -> (acc * factor.approx(subScale)).setScale(scale, RoundingMode.HALF_UP) }
+    }
 
     override fun _commonFactor(other: Expression): Expression? {
         return when (other) {

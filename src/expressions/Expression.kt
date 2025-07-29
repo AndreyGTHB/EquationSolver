@@ -12,6 +12,8 @@ import rules.Rule
 import rules.Tautology
 import utils.firstValue
 import utils.map
+import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.contracts.contract
 
 @Suppress("FunctionName")
@@ -93,6 +95,15 @@ abstract class Expression (
     fun numericalPart() = _numericalPart().applyLoadingDomainFrom(this)
     open fun _nonNumericalPart(): Expression = if (isNumber) one() else this
     fun nonNumericalPart() = _nonNumericalPart().applyLoadingDomainFrom(this)
+
+    // Number expressions` methods:
+    protected open fun _approx(scale: Int): BigDecimal = TODO()
+    open fun approx(scale: Int): BigDecimal {
+        assert(isNumber)
+        return _approx(scale)
+    }
+
+    fun roundUp() = approx(1).setScale(0, RoundingMode.UP).toInt()
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false

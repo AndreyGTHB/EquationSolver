@@ -5,6 +5,8 @@ import console.coloured
 import expressions.*
 import utils.gcd
 import utils.power
+import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.math.abs
 
 class Rational (
@@ -41,6 +43,12 @@ class Rational (
     }
     override fun _reduceOrNull(other: Expression): Rational? = if (other is Rational) this / other
                                                                else                   null
+
+    override fun approx(m: Int): BigDecimal {
+        val numerDec = numer.toBigDecimal()
+        val denomDec = denom.toBigDecimal()
+        return numerDec.divide(denomDec, m, RoundingMode.HALF_UP)
+    }
 
     override fun compareTo(other: Expression): Int {
         return if (other is Rational) this.numer * other.denom - other.numer * this.denom

@@ -31,5 +31,6 @@
     <orderEntry type="library" name="jetbrains.kotlinx.coroutines.core" level="project" />
     <orderEntry type="library" name="junit.jupiter.api" level="project" />
     <orderEntry type="library" name="junit.jupiter.params" level="project" />
+    <orderEntry type="library" name="ch.obermuhlner.big.math" level="project" />
   </component>
 </module>
