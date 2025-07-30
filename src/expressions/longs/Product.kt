@@ -1,9 +1,7 @@
 package expressions.longs
 
-import ch.obermuhlner.math.big.BigDecimalMath
 import ch.obermuhlner.math.big.BigDecimalMath.log10
 import ch.obermuhlner.math.big.BigDecimalMath.root
-import ch.obermuhlner.math.big.BigDecimalMath.pow
 import expressions.*
 import expressions.binary.Power
 import expressions.binary.Quotient
@@ -198,14 +196,22 @@ class Product (
 
     override fun _approx(scale: Int): BigDecimal {
         if (body.isEmpty()) return 1.toBigDecimal()
-        val n = body.size
-        val b = body.maxOf { it.roundUp().absoluteValue }
+        val n = body.size.toBigDecimal()
+        val b = body.maxOf { it.roundUp().absoluteValue }.toBigDecimal()
         val delta = 5.toBigDecimal().scaleByPowerOfTen(-scale)
-        val subScale = (b.power(n).toBigDecimal() + delta)
-            .let { root(it, n.toBigDecimal(), MathContext(b.toBigDecimal().precision() + 10, RoundingMode.DOWN)) - b.toBigDecimal() }
+        val subScale = (b.toInt().power(n.toLong()).toBigDecimal() + delta)
+            .let {
+                var diff = BigDecimal.ZERO
+                var rootPrecision = b.precision()
+                while (diff <= BigDecimal.ZERO) {
+                    rootPrecision += 2
+                    diff = root(it, n, MathContext(rootPrecision, RoundingMode.DOWN)) - b
+                }
+                diff
+            }
             .let { -log10(it * 2.toBigDecimal(), MathContext(2)) }
             .setScale(0, RoundingMode.UP).toInt()
-        return body.fold(1.toBigDecimal()) { acc, factor -> (acc * factor.approx(subScale)).setScale(scale, RoundingMode.HALF_UP) }
+        return body.fold(BigDecimal.ONE) { acc, factor -> (acc * factor.approx(subScale)).setScale(subScale, RoundingMode.HALF_UP) }.setScale(scale, RoundingMode.HALF_UP)
     }
 
     override fun _commonFactor(other: Expression): Expression? {
