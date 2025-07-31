@@ -5,8 +5,13 @@ import expressions.*
 import expressions.longs.Product
 import expressions.number.Rational
 import expressions.number.Real
+import expressions.number.calcDelta
+import expressions.number.calcSubScale
 import expressions.number.power
 import expressions.number.toRational
+import java.math.BigDecimal
+import java.math.MathContext
+import java.math.RoundingMode
 
 class Quotient (
     body: Pair<Expression, Expression>,
@@ -111,6 +116,27 @@ class Quotient (
         val denomNonNumPart = denom._nonNumericalPart()
         return if (denomNonNumPart.isUnitRational()) numerNonNumPart
                else                                  Quotient(numerNonNumPart to denomNonNumPart).apply { final = true }
+    }
+
+    override fun _approx(scale: Int): BigDecimal {
+        val delta = calcDelta(scale)
+        val numerB = numer.upperBound().abs()
+        val denomB = run {
+            var value = BigDecimal.ZERO
+            var boundScale = 0
+            while (value == BigDecimal.ZERO) {
+                if (boundScale >= 100) throw ApproximationException("The denom seems to be zero")
+                boundScale += 2
+                value = denom.lowerBound(boundScale)
+            }
+            value.abs()
+        }
+        val epsilon = (delta * denomB.pow(2, MathContext(2, RoundingMode.DOWN))).divide(
+            (numerB + (BigDecimal.ONE + delta) * denomB),
+            MathContext(2, RoundingMode.DOWN)
+        )
+        val subScale = calcSubScale(epsilon)
+        return numer.approx(subScale).divide(denom.approx(subScale), scale, RoundingMode.HALF_UP)
     }
 
     operator fun times(other: Quotient): Quotient {

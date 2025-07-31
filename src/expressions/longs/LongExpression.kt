@@ -20,7 +20,7 @@ abstract class LongExpression (
     protected fun simplifyBody(): List<Expression> {
         val newBody = body.map { subExpr ->
             subExpr.simplify().also {
-                if (it == InvalidExpression) this.makeInvalid()
+                if (it == InvalidExpression) makeInvalid()
                 bodyDomain *= it.domain
             }
         }.toList()

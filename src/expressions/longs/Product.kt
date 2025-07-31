@@ -8,6 +8,8 @@ import expressions.binary.Quotient
 import expressions.monomials.Monomial
 import expressions.number.Rational
 import expressions.number.Real
+import expressions.number.calcDelta
+import expressions.number.calcSubScale
 import expressions.number.power
 import expressions.number.toRational
 import utils.power
@@ -194,26 +196,6 @@ class Product (
 
     private fun List<Expression>.countSums() = count { it is Sum }
 
-    override fun _approx(scale: Int): BigDecimal {
-        if (body.isEmpty()) return 1.toBigDecimal()
-        val n = body.size.toBigDecimal()
-        val b = body.maxOf { it.roundUp().absoluteValue }.toBigDecimal()
-        val delta = 5.toBigDecimal().scaleByPowerOfTen(-scale)
-        val subScale = (b.toInt().power(n.toLong()).toBigDecimal() + delta)
-            .let {
-                var diff = BigDecimal.ZERO
-                var rootPrecision = b.precision()
-                while (diff <= BigDecimal.ZERO) {
-                    rootPrecision += 2
-                    diff = root(it, n, MathContext(rootPrecision, RoundingMode.DOWN)) - b
-                }
-                diff
-            }
-            .let { -log10(it * 2.toBigDecimal(), MathContext(2)) }
-            .setScale(0, RoundingMode.UP).toInt()
-        return body.fold(BigDecimal.ONE) { acc, factor -> (acc * factor.approx(subScale)).setScale(subScale, RoundingMode.HALF_UP) }.setScale(scale, RoundingMode.HALF_UP)
-    }
-
     override fun _commonFactor(other: Expression): Expression? {
         return when (other) {
             is Rational -> commonFactor(other, body[0])
@@ -322,6 +304,26 @@ class Product (
             body.size-1 -> body.last()
             else        -> Product(body.slice(numPartSize until body.size)).apply { final = true }
         }
+    }
+
+    override fun _approx(scale: Int): BigDecimal {
+        val n = body.size.toBigDecimal()
+        val b = body.maxOf { it.upperBound().abs() }
+        val delta = calcDelta(scale)
+        val epsilon = (b.toInt().power(n.toLong()).toBigDecimal() + delta)
+            .let {
+                var diff = BigDecimal.ZERO
+                var rootPrecision = b.precision()
+                while (diff <= BigDecimal.ZERO) {
+                    rootPrecision += 2
+                    diff = root(it, n, MathContext(rootPrecision, RoundingMode.DOWN)) - b
+                }
+                diff
+            }
+        val subScale = calcSubScale(epsilon)
+        return body
+            .fold(BigDecimal.ONE) { acc, factor -> (acc * factor.approx(subScale)).setScale(subScale, RoundingMode.HALF_UP) }
+            .setScale(scale, RoundingMode.HALF_UP)
     }
 
     override fun _times(other: Expression): Product {

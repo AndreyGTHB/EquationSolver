@@ -16,7 +16,6 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.contracts.contract
 
-@Suppress("FunctionName")
 abstract class Expression (
     domain: Rule = Tautology,
     final: Boolean = false
@@ -30,6 +29,8 @@ abstract class Expression (
     open val isNumber = false
 
     companion object {
+        internal fun <T : Expression> T.markedFinal() = apply { final = true }
+
         private fun <T : Expression> T.applyLoadingDomainFrom(loader: Expression) = apply { domain = loader.domain }
         private fun <T : Expression> T.applyLoadingDomainFrom(vararg loaders: Expression) = apply {
             domain = loaders.fold(Tautology as Rule) { acc, it -> acc * it.domain }
@@ -42,6 +43,7 @@ abstract class Expression (
                 assert(!(a.isZeroRational() && b.isZeroRational()))
                 if (a.isZeroRational()) return b
                 if (b.isZeroRational()) return a
+                println()
                 if (a.isUnitRational() || b.isUnitRational()) return one()
             }
 
@@ -96,14 +98,20 @@ abstract class Expression (
     open fun _nonNumericalPart(): Expression = if (isNumber) one() else this
     fun nonNumericalPart() = _nonNumericalPart().applyLoadingDomainFrom(this)
 
-    // Number expressions` methods:
-    protected open fun _approx(scale: Int): BigDecimal = TODO()
+    // Number expressions` section:
+    protected open fun _approx(scale: Int): BigDecimal = throw ApproximationException("Not implemented")
     open fun approx(scale: Int): BigDecimal {
-        assert(isNumber)
+        assert(final && isNumber)
         return _approx(scale)
     }
 
-    fun roundUp() = approx(1).setScale(0, RoundingMode.UP).toInt()
+    fun upperBound(scale: Int = 0): BigDecimal {
+        return approx(scale + 1).setScale(scale, RoundingMode.DOWN) + BigDecimal.ONE.scaleByPowerOfTen(-scale)
+    }
+    fun lowerBound(scale: Int = 0): BigDecimal {
+        return approx(scale + 1).setScale(scale, RoundingMode.UP) - BigDecimal.ONE.scaleByPowerOfTen(-scale)
+    }
+    // End
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
@@ -124,7 +132,7 @@ abstract class Expression (
 
     protected open fun _plus(other: Expression) = Sum(this, other)
     operator fun plus(other: Expression) = _plus(other).applyLoadingDomainFrom(this, other)
-
+    
     protected open fun _minus(other: Expression) = Sum(this, -other)
     operator fun minus(other: Expression) = _minus(other).applyLoadingDomainFrom(this, other)
 

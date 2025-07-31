@@ -119,7 +119,9 @@ class Sum (
     }
     override fun _approx(scale: Int): BigDecimal {
         val subScale = scale + additionalScale
-        return body.fold(0.toBigDecimal()) { acc, term -> acc + term.approx(subScale) }.setScale(scale, RoundingMode.HALF_UP)
+        return body
+            .fold(0.toBigDecimal()) { acc, term -> acc + term.approx(subScale) }
+            .setScale(scale, RoundingMode.HALF_UP)
     }
 
     override fun _commonFactor(other: Expression) = when (other) {

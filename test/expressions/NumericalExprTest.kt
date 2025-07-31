@@ -1,7 +1,8 @@
 package expressions
 
-import expressions.longs.Product
+import expressions.number.calcSubScale
 import expressions.number.over
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import parser.parseExpression
 
@@ -11,6 +12,12 @@ class NumericalExprTest {
     fun approx() {
         println(a.approx(0))
         println("1/2 - 1/3".parseExpression().approx(5))
-        println(Product(1 over 10, 2 over 10, 200 over 1, 1 over 4, 4 over 3).approx(2))
+        println("(1/10)*(1/10)*100 / (1/2 - 1/3)".parseExpression().approx(2))
+    }
+
+    @Test
+    fun utils() {
+        val eps1 = "0.5".toBigDecimal().scaleByPowerOfTen(-4)
+        assertEquals(4, calcSubScale(eps1))
     }
 }

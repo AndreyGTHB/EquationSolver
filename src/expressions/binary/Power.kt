@@ -1,12 +1,17 @@
 package expressions.binary
 
+import ch.obermuhlner.math.big.BigDecimalMath.pow
 import expressions.Expression
+import expressions.isZeroRational
 import expressions.longs.Product
 import expressions.monomials.Monomial
 import expressions.number.Rational
 import expressions.number.Real
+import expressions.number.calcDelta
 import expressions.number.min
 import expressions.one
+import expressions.zero
+import java.math.BigDecimal
 
 class Power (
     body: Pair<Expression, Expression>,
@@ -77,6 +82,29 @@ class Power (
         }
         else null
     }
+
+    override fun _approx(scale: Int): BigDecimal {
+        return if (base > zero())         approxWithPositiveBase(scale)
+          else if (base.isZeroRational()) approxWithZeroBase(scale)
+          else                            approxWithNegativeBase(scale)
+    }
+
+    private fun approxWithPositiveBase(scale: Int): BigDecimal {
+        val baseB = base.upperBound()
+        val expB = exponent.upperBound()
+        val requiredDelta = calcDelta(scale)
+        var subScale = scale
+        do {
+            val epsilon = calcDelta(subScale)
+            val currDelta = pow(baseB + epsilon, expB + epsilon, MathContext())
+        }
+    }
+
+    private fun approxWithZeroBase(scale: Int): BigDecimal {
+        TODO()
+    }
+
+    private fun approxWithNegativeBase(scale: Int): BigDecimal { TODO() }
 
     override fun _reduceOrNull(other: Expression) = null
 }
