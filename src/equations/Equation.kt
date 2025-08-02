@@ -13,8 +13,8 @@ import utils.replaceAllIndexed
 class Equation (
     val body: ExpressionPair,
     val considerDomain: Boolean = true,
-    val aimChar: Char = body.firstVariable() ?: 'x',
-) { // NOPT
+    val aimChar: Char = body.firstVariable() ?: 'x', // NOPT
+) {
     fun solve(): Rule = _solve().run { if (considerDomain) (first * second).simplify() else first.simplify() }
     private fun _solve(): Pair<Rule, Rule> {
         val domain: Rule

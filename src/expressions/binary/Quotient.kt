@@ -1,5 +1,6 @@
 package expressions.binary
 
+import CONFIDENCE_SCALE
 import equations.Equation
 import expressions.*
 import expressions.longs.Product
@@ -125,7 +126,7 @@ class Quotient (
             var value = BigDecimal.ZERO
             var boundScale = 0
             while (value == BigDecimal.ZERO) {
-                if (boundScale >= 100) throw ApproximationException("The denom seems to be zero")
+                if (boundScale >= CONFIDENCE_SCALE) throw ApproximationException("The denom seems to be zero")
                 boundScale += 2
                 value = denom.lowerBound(boundScale)
             }

@@ -61,8 +61,8 @@ class Rational (
     fun isUnit() = numer == denom
     fun isInteger() = numer % denom == 0
 
-    fun isPositive() = numer * denom > 0
-    fun isNegative() = numer * denom < 0
+    override fun isPositive() = numer * denom > 0
+    override fun isNegative() = numer * denom < 0
 
     operator fun plus(other: Int) = numer + other * denom over denom
     operator fun plus(other: Rational): Rational {

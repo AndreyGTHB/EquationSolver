@@ -1,3 +1,3 @@
 package expressions
 
-class ApproximationException (message: String) : Exception(message)
+class ApproximationException (message: String? = null) : Exception(message)

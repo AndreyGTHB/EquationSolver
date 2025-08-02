@@ -1,5 +1,6 @@
 package expressions
 
+import CONFIDENCE_SCALE
 import console.Colourable
 import expressions.binary.Power
 import expressions.binary.Quotient
@@ -106,11 +107,30 @@ abstract class Expression (
     }
 
     fun upperBound(scale: Int = 0): BigDecimal {
-        return approx(scale + 1).setScale(scale, RoundingMode.DOWN) + BigDecimal.ONE.scaleByPowerOfTen(-scale)
+        return approx(scale + 1).setScale(scale, RoundingMode.FLOOR) + BigDecimal.ONE.scaleByPowerOfTen(-scale)
     }
     fun lowerBound(scale: Int = 0): BigDecimal {
-        return approx(scale + 1).setScale(scale, RoundingMode.UP) - BigDecimal.ONE.scaleByPowerOfTen(-scale)
+        return approx(scale + 1).setScale(scale, RoundingMode.CEILING) - BigDecimal.ONE.scaleByPowerOfTen(-scale)
     }
+
+    infix fun lessThan(other: Expression) = lessThan(other, CONFIDENCE_SCALE)
+    fun lessThan(other: Expression, maxScale: Int): Boolean {
+        assert(this.isNumber && other.isNumber)
+        if (this == other) return false
+
+        var scale = 1
+        var thisApprox: BigDecimal
+        var otherApprox: BigDecimal
+        do {
+            thisApprox = this.approx(scale)
+            otherApprox = other.approx(scale)
+            scale += 3
+        } while (thisApprox == otherApprox && scale <= maxScale)
+        return thisApprox < otherApprox
+    }
+
+    open fun isNegative() = this lessThan zero()
+    open fun isPositive() = zero() lessThan this
     // End
 
     override fun equals(other: Any?): Boolean {

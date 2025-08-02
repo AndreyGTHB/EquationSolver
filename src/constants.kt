@@ -1,0 +1,1 @@
+const val CONFIDENCE_SCALE = 100
