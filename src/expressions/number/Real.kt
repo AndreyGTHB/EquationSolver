@@ -3,6 +3,7 @@ package expressions.number
 import console.Clr
 import console.coloured
 import expressions.Expression
+import expressions.binary.Power
 import expressions.longs.Product
 import expressions.one
 import expressions.unitReal
@@ -10,7 +11,8 @@ import utils.*
 
 class Real (
     override val body: Pair<Int, Rational>,
-) : Expression(final = false) {
+    final: Boolean = false
+) : Expression(final = final) {
     val base = body.first
     val exponent = body.second
 
@@ -95,6 +97,8 @@ class Real (
         val factor2 = (this.base / other.base).power(this.exponent)
         return factor1 * factor2
     }
+
+    override fun _approx(scale: Int) = Power(Rational(base to 1, true) to exponent, true).approx(scale)
 
     override fun toString() = "$base^($exponent)"
     override fun coloured() = "$base^(${exponent.numer}/${exponent.denom})".coloured(Clr.REAL)

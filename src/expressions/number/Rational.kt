@@ -44,10 +44,10 @@ class Rational (
     override fun _reduceOrNull(other: Expression): Rational? = if (other is Rational) this / other
                                                                else                   null
 
-    override fun approx(m: Int): BigDecimal {
+    override fun approx(scale: Int): BigDecimal {
         val numerDec = numer.toBigDecimal()
         val denomDec = denom.toBigDecimal()
-        return numerDec.divide(denomDec, m, RoundingMode.HALF_UP)
+        return numerDec.divide(denomDec, scale, RoundingMode.HALF_UP)
     }
 
     override fun compareTo(other: Expression): Int {

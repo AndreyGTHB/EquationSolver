@@ -11,11 +11,16 @@ import expressions.number.calcDelta
 import expressions.number.min
 import expressions.one
 import expressions.zero
+import utils.numberOfDigits
+import utils.rescale
 import java.math.BigDecimal
+import java.math.MathContext
+import java.math.RoundingMode
 
 class Power (
     body: Pair<Expression, Expression>,
-) : BinaryExpression(body, final=false) {
+    final: Boolean = false
+) : BinaryExpression(body, final=final) {
     val base = body.first
     val exponent = body.second
 
@@ -84,7 +89,7 @@ class Power (
     }
 
     override fun _approx(scale: Int): BigDecimal {
-        return if (base > zero())         approxWithPositiveBase(scale)
+        return if (true)         approxWithPositiveBase(scale) // Realise others
           else if (base.isZeroRational()) approxWithZeroBase(scale)
           else                            approxWithNegativeBase(scale)
     }
@@ -92,12 +97,25 @@ class Power (
     private fun approxWithPositiveBase(scale: Int): BigDecimal {
         val baseB = base.upperBound()
         val expB = exponent.upperBound()
+        val boundPrecision = if (expB >= BigDecimal.ZERO) baseB.toBigIntegerExact().numberOfDigits() * expB.toInt() + 1
+                             else                         scale
+        val thisB = pow(baseB, expB, MathContext(boundPrecision, RoundingMode.DOWN)).rescale()
+        val thisBLength = if (expB >= BigDecimal.ZERO ) thisB.toBigIntegerExact().numberOfDigits()
+                          else                          0
+
         val requiredDelta = calcDelta(scale)
         var subScale = scale
+        val precision = (thisBLength + scale + 2).takeIf { it >= 1 } ?: 1
         do {
+            subScale += 2
             val epsilon = calcDelta(subScale)
-            val currDelta = pow(baseB + epsilon, expB + epsilon, MathContext())
-        }
+            val currDelta = pow(baseB + epsilon, expB + epsilon, MathContext(precision, RoundingMode.UP)) - thisB
+        } while (currDelta >= requiredDelta)
+        return pow(
+            base.approx(subScale),
+            exponent.approx(subScale),
+            MathContext(precision)
+        ).setScale(scale, RoundingMode.HALF_UP)
     }
 
     private fun approxWithZeroBase(scale: Int): BigDecimal {

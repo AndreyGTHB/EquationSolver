@@ -1,6 +1,7 @@
 package parser
 
 import expressions.Expression
+import expressions.Expression.Companion.finalOn
 import expressions.binary.Power
 import expressions.binary.Quotient
 import expressions.longs.Product
@@ -14,6 +15,8 @@ import expressions.zero
 import utils.isInt
 
 const val expressionSigns = "+-*/^"
+
+fun String.parseFinalExpression() = parseExpression().finalOn()
 
 fun String.parseExpression() = standardize()._parseExpression()
 

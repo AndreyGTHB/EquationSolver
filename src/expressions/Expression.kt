@@ -29,7 +29,7 @@ abstract class Expression (
     open val isNumber = false
 
     companion object {
-        internal fun <T : Expression> T.markedFinal() = apply { final = true }
+        internal fun <T : Expression> T.finalOn() = apply { final = true }
 
         private fun <T : Expression> T.applyLoadingDomainFrom(loader: Expression) = apply { domain = loader.domain }
         private fun <T : Expression> T.applyLoadingDomainFrom(vararg loaders: Expression) = apply {
@@ -101,7 +101,7 @@ abstract class Expression (
     // Number expressions` section:
     protected open fun _approx(scale: Int): BigDecimal = throw ApproximationException("Not implemented")
     open fun approx(scale: Int): BigDecimal {
-        assert(final && isNumber)
+        assert(isNumber)
         return _approx(scale)
     }
 
