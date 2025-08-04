@@ -3,15 +3,15 @@ package console
 const val esc = "\u001b["
 
 object Clr {
+    const val DEFAULT = 15
 
     const val RC = "${esc}0m" // Reset foreground and background colors. --> $gnc.gnc.console.console.RC
-
     const val R = "${esc}7m"  // Invert foreground to background
     const val U = "${esc}4m"  // Underline
     const val B = "${esc}1m"  // Bold
     const val I = "${esc}3m"  // Italic
-    const val S = "${esc}9m"  // Strikethrough the text
 
+    const val S = "${esc}9m"  // Strikethrough the text
     const val WHITE = "${esc}38;5;7m"
     const val RED = "${esc}38;5;1m"
     const val GREEN = "${esc}38;5;46m"

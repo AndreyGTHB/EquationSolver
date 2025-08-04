@@ -1,10 +1,12 @@
 package equations
 
 import expressions.*
+import expressions.binary.Power
 import expressions.binary.Quotient
 import expressions.longs.Sum
 import expressions.monomials.raisedTo
 import expressions.number.Rational
+import expressions.number.over
 import rules.*
 import rules.statements.equalsTo
 import utils.fold
@@ -13,7 +15,7 @@ import utils.replaceAllIndexed
 class Equation (
     val body: ExpressionPair,
     val considerDomain: Boolean = true,
-    val aimChar: Char = body.firstVariable() ?: 'x', // NOPT
+    val aim: Char = body.firstVariable() ?: 'x', // NOPT
 ) {
     fun solve(): Rule = _solve().run { if (considerDomain) (first * second).simplify() else first.simplify() }
     private fun _solve(): Pair<Rule, Rule> {
@@ -24,11 +26,11 @@ class Equation (
             currLeft = moveAllToTheLeft().removeQuotients()
         }
 
-        val coefficientsMap = currLeft.calculateCoefficients(aimChar)
-        val solution = when (currLeft.degree(aimChar)) { // NOPT (double degree calculation)
-            zero() -> coefficientsMap.solveAsConstantPolynomial(aimChar) // NOPT (rational keys reinitialisation)
-            one()  -> coefficientsMap.solveAsLinearPolynomial(aimChar)
-            two()  -> ExprEqualsTo(currLeft to zero()) // coefficientsMap.solveAsQuadraticPolynomial(aimChar)
+        val coefficientsMap = currLeft.calculateCoefficients(aim)
+        val solution = when (currLeft.degree(aim)) { // NOPT (double degree calculation)
+            zero() -> coefficientsMap.solveAsConstantPolynomial() // NOPT (rational keys reinitialisation)
+            one()  -> coefficientsMap.solveAsLinearPolynomial()
+            two()  -> coefficientsMap.solveAsQuadraticPolynomial() // coefficientsMap.solveAsQuadraticPolynomial(aimChar)
             else   -> ExprEqualsTo(currLeft to zero())
         }
         return solution to domain
@@ -68,13 +70,13 @@ class Equation (
         val coefficientsMap = mutableMapOf<Rational, Expression>()
         asSum().body.forEach {
             val degree = it.degree(variable) ?: zero()
-            val coeff = it.reduce(aimChar raisedTo degree)
+            val coeff = it.reduce(aim raisedTo degree)
             coefficientsMap[degree] = (coefficientsMap[degree] ?: zero()) + coeff
         }
         return coefficientsMap.mapValues { (_, coeff) -> coeff.simplify() }
     }
 
-    private fun Map<Rational, Expression>.solveAsConstantPolynomial(variable: Char): Rule {
+    private fun Map<Rational, Expression>.solveAsConstantPolynomial(): Rule {
         val a = get(zero())!!
         if (a.isNumber) {
             return if (a.isZeroRational()) Tautology
@@ -83,20 +85,41 @@ class Equation (
         val subEquation = Equation(a to zero(), considerDomain, a.firstVariable()!!)
         return subEquation.solve()
     }
-    private fun Map<Rational, Expression>.solveAsLinearPolynomial(variable: Char): Rule {
+
+    private fun Map<Rational, Expression>.solveAsLinearPolynomial(): Rule {
         val a = get(one())!!
         val b = get(zero()) ?: zero()
-        val firstSolution = run {
-            val aimCondition = aimChar equalsTo (-b) / a
-            val aCondition = -Equation(a to zero(), considerDomain).solve()
+        val linearSolution = run {
+            val aimCondition = aim equalsTo (-b) / a
+            val aCondition = -Equation(a to zero(), false).solve()
             aimCondition * aCondition
         }
-        val secondSolution = run {
-            val aCondition = Equation(a to zero(), considerDomain).solve()
-            val bCondition = Equation(b to zero(), considerDomain).solve()
+        val constantSolution = run {
+            val aCondition = Equation(a to zero(), false).solve()
+            val bCondition = Equation(b to zero(), false).solve()
             aCondition * bCondition
         }
-        return firstSolution + secondSolution
+        return linearSolution + constantSolution
     }
-    private fun Map<Rational, Expression>.solveAsQuadraticPolynomial(variable: Char): Rule = TODO()
+
+    private fun Map<Rational, Expression>.solveAsQuadraticPolynomial(): Rule {
+        val a = get(two())!!
+        val b = get(one()) ?: zero()
+        val c = get(zero()) ?: zero()
+
+        val aEqualsToZero = Equation(a to zero(), false).solve()
+        val quadraticSolution = run {
+            val aCondition = -aEqualsToZero
+            val d = Power(b to two()) - four() * a * c
+            val dCondition = TextRule("$d >= 0") // ToDo: implement inequality
+            val aimCondition1 = aim equalsTo (-b + Power(d to (1 over 2)) / (two() * a))
+            val aimCondition2 = aim equalsTo (-b - Power(d to (1 over 2))) / (two() * a)
+            (aimCondition1 + aimCondition2) * aCondition * dCondition
+        }
+        val linearSolution = run {
+            val aCondition = aEqualsToZero
+            mapOf(one() to b, zero() to c).solveAsLinearPolynomial()
+        }
+        return quadraticSolution + linearSolution
+    }
 }
