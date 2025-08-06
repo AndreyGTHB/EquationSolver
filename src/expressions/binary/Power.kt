@@ -2,15 +2,16 @@ package expressions.binary
 
 import ch.obermuhlner.math.big.BigDecimalMath.pow
 import expressions.Expression
+import expressions.isUnitRational
 import expressions.isZeroRational
 import expressions.longs.Product
+import expressions.longs.Sum
 import expressions.monomials.Monomial
 import expressions.number.Rational
 import expressions.number.Real
 import expressions.number.calcDelta
 import expressions.number.min
 import expressions.one
-import expressions.zero
 import utils.numberOfDigits
 import utils.rescale
 import java.math.BigDecimal
@@ -28,13 +29,22 @@ class Power (
         val sPower = simplifySoftly()
         val (sBase, sExponent) = sPower.body
 
-        if (sBase is Product) {
-            val productBody = sBase.body.map { Power(it to sExponent) }
-            return Product(productBody).simplify()
-        }
-        if (sBase is Quotient) {
-            val quotientBody = Power(sBase.numer to sExponent) to Power(sBase.denom to sExponent)
-            return Quotient(quotientBody).simplify()
+        when (sBase) {
+            is Product -> {
+                val productBody = sBase.body.map { Power(it to sExponent) }
+                return Product(productBody).simplify()
+            }
+            is Quotient -> {
+                val quotientBody = Power(sBase.numer to sExponent) to Power(sBase.denom to sExponent)
+                return Quotient(quotientBody).simplify()
+            }
+            is Sum -> {
+                val (cif, reducedBase) = sBase.separatedWithCommonInternalFactor
+                if (!cif.isUnitRational()) {
+                    val productBody = listOf(cif.raisedTo(sExponent), reducedBase.raisedTo(sExponent))
+                    return Product(productBody).simplify()
+                }
+            }
         }
 
         return if (sExponent is Rational) sPower.simplifyAsRationalPower()
@@ -77,15 +87,40 @@ class Power (
     override fun _substitute(variable: Char, value: Expression) = Power(substituteIntoBody(variable, value))
 
     override fun _commonFactor(other: Expression): Expression? {
-        return if (other is Power) return commonFactorWithPower(other)
-          else                            commonFactor(base, other)
+        return if (exponent !is Rational) takeIf { this == other }
+          else if (other is Power)        commonFactorWithPower(other)
+          else                            commonFactor(base, other).raisedTo(min(one(), exponent))
     }
     private fun commonFactorWithPower(other: Power): Expression? {
-        val cfOfBases = commonFactor(this.base, other.base)
-        return if (this.exponent is Rational && other.exponent is Rational) {
+        exponent as Rational
+        return if (other.exponent is Rational) {
+            val cfOfBases = commonFactor(this.base, other.base)
             Power(cfOfBases to min(this.exponent, other.exponent))
         }
         else null
+    }
+
+    override fun _reduceOrNull(other: Expression): Expression? {
+        return if (exponent !is Rational) null
+               else when (other) {
+            is Power -> reduceByPower(other)
+            else     -> reduceAsRationalPower(other)
+        }
+    }
+
+    private fun reduceByPower(other: Power): Expression? {
+        if (other.exponent !is Rational || this.exponent < other.exponent) return null
+
+        val reducedBase = this.base.reduceOrNull(other.base) ?: return null
+        return reducedBase.raisedTo(exponent) * other.base.raisedTo(this.exponent - other.exponent)
+    }
+
+    private fun reduceAsRationalPower(other: Expression): Expression? {
+        exponent as Rational
+        if (other !is Rational && exponent < one()) return null
+
+        val reducedBase = base.reduceOrNull(other) ?: return null
+        return reducedBase.raisedTo(exponent) * other.raisedTo(exponent - one())
     }
 
     override fun _approx(scale: Int): BigDecimal {
@@ -123,6 +158,4 @@ class Power (
     }
 
     private fun approxWithNegativeBase(scale: Int): BigDecimal { TODO() }
-
-    override fun _reduceOrNull(other: Expression) = null
 }

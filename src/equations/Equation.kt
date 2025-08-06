@@ -82,7 +82,7 @@ class Equation (
             return if (a.isZeroRational()) Tautology
                    else                    Contradiction
         }
-        val subEquation = Equation(a to zero(), considerDomain, a.firstVariable()!!)
+        val subEquation = Equation(a to zero(), false, a.firstVariable()!!)
         return subEquation.solve()
     }
 
@@ -110,15 +110,15 @@ class Equation (
         val aEqualsToZero = Equation(a to zero(), false).solve()
         val quadraticSolution = run {
             val aCondition = -aEqualsToZero
-            val d = Power(b to two()) - four() * a * c
+            val d = (b.raisedTo(two()) - four() * a * c).simplify()
             val dCondition = TextRule("$d >= 0") // ToDo: implement inequality
-            val aimCondition1 = aim equalsTo (-b + Power(d to (1 over 2)) / (two() * a))
-            val aimCondition2 = aim equalsTo (-b - Power(d to (1 over 2))) / (two() * a)
+            val aimCondition1 = aim equalsTo (-b + d.raisedTo(1 over 2)) / (two() * a)
+            val aimCondition2 = aim equalsTo (-b - d.raisedTo(1 over 2)) / (two() * a)
             (aimCondition1 + aimCondition2) * aCondition * dCondition
         }
         val linearSolution = run {
             val aCondition = aEqualsToZero
-            mapOf(one() to b, zero() to c).solveAsLinearPolynomial()
+            mapOf(one() to b, zero() to c).solveAsLinearPolynomial() * aCondition
         }
         return quadraticSolution + linearSolution
     }

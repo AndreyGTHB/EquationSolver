@@ -44,7 +44,6 @@ abstract class Expression (
                 assert(!(a.isZeroRational() && b.isZeroRational()))
                 if (a.isZeroRational()) return b
                 if (b.isZeroRational()) return a
-                println()
                 if (a.isUnitRational() || b.isUnitRational()) return one()
             }
 
@@ -84,10 +83,14 @@ abstract class Expression (
         assert(!other.isZeroRational())
         if (other.isUnitRational() || this.isZeroRational()) return this
 
-        val reduced = _reduceOrNull(other)
+        val reduced = try { _reduceOrNull(other) }
+        catch (e: Throwable) { throw RuntimeException("Cannot reduce $this by $other") }
         return reduced?.simplify()?.applyLoadingDomainFrom(this, other)
     }
-    fun reduce(other: Expression): Expression = reduceOrNull(other)!!
+    fun reduce(other: Expression): Expression {
+        return try { reduceOrNull(other)!! }
+        catch (e: NullPointerException) { throw RuntimeException("$this isn`t reducible by $other") }
+    }
 
     open fun _rationalPart(): Rational = one()
     fun rationalPart() = _rationalPart().applyLoadingDomainFrom(this)

@@ -80,6 +80,7 @@ class Monomial internal constructor (
 
     override fun _reduceOrNull(other: Expression): Expression? {
         return when (other) {
+            is Rational -> other.flip() * this
             is Monomial -> reduceByMonomialOrNull(other)
             else -> null
         }
@@ -101,7 +102,7 @@ class Monomial internal constructor (
         }
         return Monomial(newVarMap)
     }
-    fun power(exp: Rational): Expression {
+    fun power(exp: Rational): Monomial {
         val newVarMap = varMap.mapValues { (_, d) -> (d * exp).simplify() }
         return if (final && exp.isPositive()) Monomial(newVarMap, true)
           else                                Monomial(newVarMap)

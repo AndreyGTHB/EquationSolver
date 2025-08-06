@@ -26,7 +26,7 @@ class EqualsTo(body: Pair<Char, Expression>) : Statement(body) {
     }
 
     override fun toString() = "$variable = $expr"
-    override fun coloured() = toString().coloured(Clr.EQUALITY)
+    override fun coloured() = "$variable = ${expr.coloured()}".coloured(Clr.EQUALITY)
 }
 
 infix fun Char.equalsTo(expr: Expression) = EqualsTo(this to expr)

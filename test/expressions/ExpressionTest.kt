@@ -9,4 +9,10 @@ class ExpressionTest {
         val e1 = "(-5(a + b) + 5b) / ((b + c)^(1/6) * (c + b)^(1/6))".parseExpression()
         e1.simplify()
     }
+
+    @Test
+    fun domain() {
+        val e1 = "(x + 1) / ((x + 1)(x - 1))".parseExpression()
+        e1.simplify().domain.printlnColoured()
+    }
 }

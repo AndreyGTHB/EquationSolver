@@ -1,8 +1,10 @@
 package expressions
 
 import expressions.Expression.Companion.commonFactor
+import expressions.Expression.Companion.finalOn
 import expressions.longs.Sum
 import expressions.monomials.Monomial
+import expressions.number.Rational
 import expressions.number.over
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -17,6 +19,9 @@ class ReducingTest {
         val five = (10 over 1).simplify()
         val twentyFive = (25 over 2).simplify()
         assertEquals((5 over 2), commonFactor(five, twentyFive))
+
+        val e1 = "((1/25)*a + 4b + c)^(1/2)".parseExpression().simplify()
+        assertEquals("5 * (a + 100b + 25c)^(1/2)".parseExpression(), e1.reduce((1 over 25).finalOn()))
     }
 
     @Test

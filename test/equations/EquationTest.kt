@@ -31,7 +31,7 @@ class EquationTest {
         assertEquals(Contradiction, eq4.solve())
 
         val eq5 = "(x + 1) / ((x + 1)(x - 1)) = 0".parseEquation()
-//        println(eq5.solve())
+        eq5.solve().printlnColoured()
     }
 
     @Test
@@ -55,10 +55,19 @@ class EquationTest {
 
 
         val eq3 = "ax - a = 0".parseEquation()
-        println("eq3: ${eq3.solve().coloured()}")
+//        println("eq3: ${eq3.solve().coloured()}")
 
-        val eq5 = "(7^(1/2) - 1)ax + (b/a)x = ax - b/5".parseEquation()
-        println("eq5: ${eq5.solve()}")
+        val eq5 = "(7^(1/2) - 1)ax + (b/a)x = ax - b/5".parseEquation('x')
+//        eq5.solve().printlnColoured()
+    }
+
+    @Test
+    fun `Quadratic equations`() {
+        val eq1 = "x^2 -2x + 1 = 0".parseEquation()
+        val eq2 = "x = 1 + 1/x".parseEquation()
+//        eq2.solve().printlnColoured()
+        val eq3 = "(a)x^2 + bx c = 0".parseEquation('x')
+//        eq3.solve().printlnColoured()
     }
 }
 

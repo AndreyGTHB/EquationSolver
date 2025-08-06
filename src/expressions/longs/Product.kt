@@ -255,9 +255,7 @@ class Product (
     }
 
     override fun _reduceOrNull(other: Expression): Expression? {
-        if (other is Rational) {
-            return this * other.flip()
-        }
+        if (other is Rational) return other.flip() * this
 
         val newBody = emptyBody()
         var currOther = other

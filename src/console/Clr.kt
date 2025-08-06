@@ -3,7 +3,7 @@ package console
 const val esc = "\u001b["
 
 object Clr {
-    const val DEFAULT = 15
+    const val DEFAULT = 7
 
     const val RC = "${esc}0m" // Reset foreground and background colors. --> $gnc.gnc.console.console.RC
     const val R = "${esc}7m"  // Invert foreground to background

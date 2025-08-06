@@ -91,8 +91,8 @@ class Rational (
     override fun _unaryMinus() = -numer over denom
     override fun unaryMinus() = super.unaryMinus() as Rational
 
-    override fun toString() = "$numer/$denom"
-    override fun coloured() = "$numer/$denom".coloured(Clr.RATIONAL)
+    override fun toString() = "$numer" + if (denom != 1) "/$denom" else ""
+    override fun coloured() = toString().coloured(Clr.RATIONAL)
 }
 
 
