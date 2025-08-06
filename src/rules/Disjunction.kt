@@ -1,5 +1,6 @@
 package rules
 
+import utils.allExcept
 import utils.allIndexed
 
 class Disjunction(body: Collection<Rule>) : LongRule(body.toSet()) {
@@ -25,10 +26,16 @@ class Disjunction(body: Collection<Rule>) : LongRule(body.toSet()) {
         it !is Contradiction
     }
 
-    private fun List<Rule>.processPairs(): List<Rule> = filterIndexed { i, rule1 ->
-        when (rule1) {
-//            is Conjunction -> {  }
-            else -> {
+    private fun List<Rule>.processPairs(): List<Rule> = mapIndexedNotNull { i, rule1 ->
+        rule1.let { rule1 ->
+            if (rule1 is Conjunction) {
+                rule1.body
+                    .filter { subRule1 -> allExcept(i) { rule2 -> subRule1 != (-rule2).simplify() } }
+                    .let { Conjunction(it).simplify() }
+            }
+            else rule1
+        }.let { rule1 ->
+            rule1.takeIf {
                 allIndexed { j, rule2 ->
                     if (i < j && rule1 == (-rule2).simplify()) return listOf(Tautology)
                     i == j || !(rule1 implies rule2)

@@ -34,7 +34,7 @@ class Conjunction (body: Collection<Rule>) : LongRule(body.toSet()) {
                 rule1.body
                     .filter { subRule1 -> allExcept(i) { rule2 -> !(subRule1 contradicts rule2) } }
                     .let { Disjunction(it).simplify() }
-                    .apply { forEachExcept(i) { rule2 -> if (rule2 implies rule1) return@map null } }
+                    .also { forEachExcept(i) { rule2 -> if (rule2 implies it) return@map null } }
             }
             else -> {
                 forEachIndexed fr@ { j, rule2 ->
