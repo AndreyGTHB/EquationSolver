@@ -30,14 +30,14 @@ class Disjunction(body: Collection<Rule>) : LongRule(body.toSet()) {
         rule1.let { rule1 ->
             if (rule1 is Conjunction) {
                 rule1.body
-                    .filter { subRule1 -> allExcept(i) { rule2 -> subRule1 != (-rule2).simplify() } }
+                    .filter { subRule1 -> allExcept(i) { rule2 -> (-rule2).simplify() implies subRule1 } }
                     .let { Conjunction(it).simplify() }
             }
             else rule1
         }.let { rule1 ->
             rule1.takeIf {
                 allIndexed { j, rule2 ->
-                    if (i < j && rule1 == (-rule2).simplify()) return listOf(Tautology)
+                    if (i < j && (-rule1).simplify() implies rule2) return listOf(Tautology)
                     i == j || !(rule1 implies rule2)
                 }
             }
