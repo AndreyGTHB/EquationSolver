@@ -11,6 +11,8 @@ class Disjunction(body: Collection<Rule>) : LongRule(body.toSet()) {
             .expandDisjunctions()
             .checkForTautologiesAndContradictions()
             .processPairs()
+            .expandDisjunctions()
+            .checkForTautologiesAndContradictions()
             .toSortedSet()
         return when (newBody.size) {
             0    -> Contradiction
@@ -30,8 +32,9 @@ class Disjunction(body: Collection<Rule>) : LongRule(body.toSet()) {
         rule1.let { rule1 ->
             if (rule1 is Conjunction) {
                 rule1.body
-                    .filter { subRule1 -> allExcept(i) { rule2 -> (-rule2).simplify() implies subRule1 } }
-                    .let { Conjunction(it).simplify() }
+                    .filter { subRule1 -> allExcept(i) { rule2 -> (-subRule1).simplify() implies rule2 } }
+                    .let {
+                        Conjunction(it).simplify() }
             }
             else rule1
         }.let { rule1 ->
