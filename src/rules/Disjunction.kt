@@ -8,11 +8,10 @@ class Disjunction(body: Collection<Rule>) : LongRule(body.toSet()) {
 
     override fun _simplify(): Rule {
         val newBody = simplifyBody()
-            .expandDisjunctions()
-            .checkForTautologiesAndContradictions()
+            .toList()
+            .clean()
             .processPairs()
-            .expandDisjunctions()
-            .checkForTautologiesAndContradictions()
+            .clean()
             .toSortedSet()
         return when (newBody.size) {
             0    -> Contradiction
@@ -21,20 +20,20 @@ class Disjunction(body: Collection<Rule>) : LongRule(body.toSet()) {
         }
     }
 
-    private fun Set<Rule>.expandDisjunctions() = flatMap { if (it is Disjunction) it.body else listOf(it) }.toSet()
-
-    private fun Set<Rule>.checkForTautologiesAndContradictions(): List<Rule> = filter {
-        if (it is Tautology) return listOf(Tautology)
-        it !is Contradiction
-    }
+    private fun List<Rule>.clean() = this
+        .flatMap { if (it is Disjunction) it.body else listOf(it) }
+        .distinct()
+        .filter {
+            if (it is Tautology) return listOf(Tautology)
+            it !is Contradiction
+        }
 
     private fun List<Rule>.processPairs(): List<Rule> = mapIndexedNotNull { i, rule1 ->
         rule1.let { rule1 ->
             if (rule1 is Conjunction) {
                 rule1.body
-                    .filter { subRule1 -> allExcept(i) { rule2 -> (-subRule1).simplify() implies rule2 } }
-                    .let {
-                        Conjunction(it).simplify() }
+                    .filter { subRule1 -> allExcept(i) { rule2 -> !((-subRule1).simplify() implies rule2) } }
+                    .let { if (it.isNotEmpty()) Conjunction(it).simplify() else Tautology }
             }
             else rule1
         }.let { rule1 ->

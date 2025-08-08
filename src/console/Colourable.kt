@@ -1,5 +1,7 @@
 package console
 
+import kotlin.random.Random
+
 interface Colourable {
     fun coloured(): String
     fun printlnColoured() { println(coloured()) }
@@ -7,12 +9,13 @@ interface Colourable {
 
 
 fun Collection<Colourable>.colouredUnder(name: String, nameColour: Int): String {
-    var coloured = "$name:".coloured(nameColour)
+    val rc = Clr.palette[Random.nextInt(Clr.palette.size)]
+    var coloured = "$name:".coloured(rc)
     forEach { element ->
         val subExprString = element.coloured()
             .split("\n")
-            .joinToString("\n") { "  $it" }
-            .run { "\u00b7".coloured(nameColour) + slice(1 .. lastIndex) }
+            .joinToString("\n") { "   ${"│".coloured(rc)}$it" }
+//            .run { "\u00b7".coloured(rc) + slice(1 .. lastIndex) }
         coloured += "\n" + subExprString
     }
     return coloured
