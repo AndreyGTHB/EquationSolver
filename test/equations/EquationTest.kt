@@ -66,7 +66,7 @@ class EquationTest {
         val eq1 = "x^2 -2x + 1 = 0".parseEquation()
         val eq2 = "x = 1 + 1/x".parseEquation()
 //        eq2.solve().printlnColoured()
-        val eq3 = "1/(2 + x) + x = x / 5^(1/2)".parseEquation('x')
+        val eq3 = "(x - 2^(1/2))(x - 3^(1/2)) = 0".parseEquation('x')
         eq3.solve().printlnColoured()
     }
 }

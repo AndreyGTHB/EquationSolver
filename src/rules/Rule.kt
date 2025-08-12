@@ -7,10 +7,12 @@ abstract class Rule : Comparable<Rule>, Colourable {
     var final = false
         private set
 
+    internal fun finalOn() = apply { final = true }
+
     protected abstract fun _simplify(): Rule
     fun simplify(): Rule {
         if (final) return this
-        return _simplify().apply { final = true }
+        return _simplify().finalOn()
     }
 
     protected open fun _intersect(other: Rule): Rule? = if (other is Conjunction) Conjunction(other.body + this)

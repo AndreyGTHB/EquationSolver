@@ -6,12 +6,16 @@ import utils.allIndexed
 class Disjunction(body: Collection<Rule>) : LongRule(body.toSet()) {
     constructor(vararg body: Rule) : this(body.toSet())
 
-    override fun _simplify(): Rule {
+    override fun _simplify() = _simplify(true)
+
+    fun simplifyNotAnalysing(): Rule {
+        return if (final) this else _simplify(false)
+    }
+
+    fun _simplify(analyse: Boolean): Rule {
         val newBody = simplifyBody()
-            .toList()
             .clean()
-            .processPairs()
-            .clean()
+            .let { if (analyse) it.processPairs().clean() else it }
             .toSortedSet()
         return when (newBody.size) {
             0    -> Contradiction
@@ -20,7 +24,7 @@ class Disjunction(body: Collection<Rule>) : LongRule(body.toSet()) {
         }
     }
 
-    private fun List<Rule>.clean() = this
+    private fun Collection<Rule>.clean() = this
         .flatMap { if (it is Disjunction) it.body else listOf(it) }
         .distinct()
         .filter {

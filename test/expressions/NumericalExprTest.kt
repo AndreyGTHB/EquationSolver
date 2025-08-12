@@ -4,6 +4,7 @@ import expressions.binary.Power
 import expressions.number.calcSubScale
 import expressions.number.over
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 import parser.parseExpression
 
@@ -22,6 +23,11 @@ class NumericalExprTest {
         assertEquals("8.8818E-16".toBigDecimal(), "(1/3 + 5/3)^((-100) * (1/3 + 1/6))".parseExpression().approx(20))
 
         println("(1/3 + 5/3)^((-100) * (1/3 + 1/6))".parseExpression().simplify())
+    }
+
+    @Test
+    fun comparison() {
+        assertFalse((100000 over 12312312) lessThan (99999 over 12312312))
     }
 
     @Test

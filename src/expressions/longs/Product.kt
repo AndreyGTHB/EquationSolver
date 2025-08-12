@@ -32,14 +32,14 @@ class Product (
     override fun _substitute(variable: Char, value: Expression) = Product(substituteIntoBody(variable, value))
     override fun degree(variable: Char): Rational = monomial?.degree(variable) ?: zero()
 
-    override fun _simplify(): Expression { simplifySoftly().apply {
+    override fun _simplify(): Expression = simplifySoftly().run {
         val sumsCount = body.countSums()
-        return when (sumsCount) {
+        when (sumsCount) {
             0    -> simplifyIgnoringSums()
             1    -> simplifyWithOneSum()
             else -> expandBrackets().simplify()
         }
-    }}
+    }
 
     private fun simplifyIgnoringSums(): Expression {
         body.forEachIndexed { i, factor -> if (factor is Quotient) {

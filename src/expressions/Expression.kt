@@ -8,6 +8,7 @@ import expressions.longs.Product
 import expressions.longs.Sum
 import expressions.monomials.Monomial
 import expressions.number.Rational
+import parser.parseExpression
 import rules.Contradiction
 import rules.Rule
 import rules.Tautology
@@ -55,13 +56,13 @@ abstract class Expression (
     protected abstract fun _simplify(): Expression
     open fun simplify(): Expression {
         if (final) return this
-        val sThis = _simplify()
+        val sThis = try { _simplify() } catch (e: Throwable) { throw Exception("Cannot simplify $this \n ${e.message}") }
         val sDomain = _fullDomain().simplify()
         return if (sThis == InvalidExpression || sDomain == Contradiction) InvalidExpression
-          else sThis.apply {
-              domain = sDomain
-              final = true
-          }
+               else sThis.apply {
+                   domain = sDomain
+                   final = true
+               }
     }
 
     open fun firstVariable(): Char? = null

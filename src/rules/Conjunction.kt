@@ -63,10 +63,7 @@ class Conjunction (body: Collection<Rule>) : LongRule(body.toSet()) {
     }
 
     private fun contradictsDisjunction(other: Disjunction): Boolean {
-        var contradictions = 0
-        other.body.forEach { rule1 ->
-            if (this.body.any { rule2 -> rule1 contradicts rule2 }) contradictions++
-        }
+        val contradictions = other.body.count { rule1 -> this.body.any { rule2 -> rule1 contradicts rule2 } }
         return contradictions == other.body.size
     }
 }

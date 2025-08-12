@@ -86,7 +86,7 @@ class Real (
     override fun _commonFactor(other: Expression): Real? {
         if (other !is Real) return null
         val commonBaseFactor = gcd(this.base, other.base)
-        return Real(commonBaseFactor to min(this.exponent, other.exponent)).apply { final = true }
+        return Real(commonBaseFactor to min(this.exponent, other.exponent))
     }
 
     override fun _reduceOrNull(other: Expression): Expression? {

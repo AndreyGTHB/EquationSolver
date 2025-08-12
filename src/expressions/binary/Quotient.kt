@@ -102,21 +102,21 @@ class Quotient (
     }
     override fun _nonRationalPart(): Expression {
         assert(final)
-        return Quotient(numer._nonRationalPart() to denom).apply { final = true }
+        return Quotient(numer._nonRationalPart() to denom).finalOn()
     }
     override fun _numericalPart(): Expression {
         assert(final)
         val numerNumPart = numer._numericalPart()
         val denomNumPart = denom._numericalPart()
         return if (denomNumPart.isUnitRational()) numerNumPart
-               else                               Quotient(numerNumPart to denomNumPart).apply { final = true }
+               else                               Quotient(numerNumPart to denomNumPart).finalOn()
     }
     override fun _nonNumericalPart(): Expression {
         assert(final)
         val numerNonNumPart = numer._nonNumericalPart()
         val denomNonNumPart = denom._nonNumericalPart()
         return if (denomNonNumPart.isUnitRational()) numerNonNumPart
-               else                                  Quotient(numerNonNumPart to denomNonNumPart).apply { final = true }
+               else                                  Quotient(numerNonNumPart to denomNonNumPart).finalOn()
     }
 
     override fun _approx(scale: Int): BigDecimal {

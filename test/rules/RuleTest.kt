@@ -1,13 +1,18 @@
 package rules
 
+import expressions.five
+import expressions.four
 import expressions.number.squareRoot
 import expressions.one
 import expressions.three
 import expressions.two
+import expressions.zero
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import parser.parseExpression
 import rules.statements.equalsTo
+import rules.statements.greaterThan
+import rules.statements.lessThan
 import rules.statements.notEqualsTo
 
 class RuleTest {
@@ -55,5 +60,12 @@ class RuleTest {
         val r8 = (a1 + b2 + c3).simplify()
         println(r7 implies r8)
         (r7 * r8).simplify().printlnColoured()
+    }
+
+    @Test
+    fun equalities() {
+        assertTrue('a'.lessThan(four()).finalOn() implies 'a'.lessThan(five()).finalOn())
+        assertFalse('a'.lessThan(four()).finalOn() implies 'a'.lessThan(two()).finalOn())
+        assertTrue('a'.greaterThan(one()).finalOn() implies 'a'.greaterThan(zero()).finalOn())
     }
 }

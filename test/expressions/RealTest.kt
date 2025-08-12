@@ -6,6 +6,12 @@ import parser.parseExpression
 
 class RealTest {
     @Test
+    fun simplify() {
+        "(2^(1/2) + 3^(1/2)) ^ 2".parseExpression().simplify().printlnColoured()
+        "1^(1/2)".parseExpression().simplify().printlnColoured()
+    }
+
+    @Test
     fun `Simplification unambiguity`() {
         val rl1 = "5^(2/3)".parseExpression()
         val rl2 = "25^(1/3)".parseExpression()
