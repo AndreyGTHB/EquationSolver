@@ -12,4 +12,5 @@ object InvalidExpression : Expression(final = true) {
 
     override fun toString() = "IE"
     override fun coloured() = "IE".coloured(Clr.INVALID_EXPR)
+    override fun unparse(covering: Boolean) = "IE"
 }

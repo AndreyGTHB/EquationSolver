@@ -225,4 +225,21 @@ class Sum (
     override fun _minus(other: Expression): Sum {
         return Sum(body + (-other))
     }
+
+    override fun unparse(covering: Boolean): String {
+        if (body.isEmpty()) return ""
+        return buildString {
+            append(body[0].unparse())
+            body.drop(1).forEach fr@ { term ->
+                if (term is Product) {
+                    val firstFactor = term.body[0]
+                    if (firstFactor is Rational && firstFactor.isNegative()){
+                        append(" - " + Product(listOf(-firstFactor) + term.body.drop(1)).unparse())
+                        return@fr
+                    }
+                }
+                append(" + " + term.unparse(term is Sum))
+            }
+        }.let { if (!covering) it else "($it)" }
+    }
 }

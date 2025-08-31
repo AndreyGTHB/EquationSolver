@@ -158,4 +158,8 @@ class Power (
     }
 
     private fun approxWithNegativeBase(scale: Int): BigDecimal { TODO() }
+
+    override fun unparse(covering: Boolean): String {
+        return base.unparse(true) + " ^ " + exponent.unparse(true)
+    }
 }

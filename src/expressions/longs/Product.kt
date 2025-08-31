@@ -1,22 +1,15 @@
 package expressions.longs
 
-import ch.obermuhlner.math.big.BigDecimalMath.log10
 import ch.obermuhlner.math.big.BigDecimalMath.root
 import expressions.*
 import expressions.binary.Power
 import expressions.binary.Quotient
 import expressions.monomials.Monomial
-import expressions.number.Rational
-import expressions.number.Real
-import expressions.number.calcDelta
-import expressions.number.calcSubScale
-import expressions.number.power
-import expressions.number.toRational
+import expressions.number.*
 import utils.power
 import java.math.BigDecimal
 import java.math.MathContext
 import java.math.RoundingMode
-import kotlin.math.absoluteValue
 
 
 class Product (
@@ -330,5 +323,11 @@ class Product (
     override fun _unaryMinus(): Expression {
         if (body.isEmpty()) return -one()
         return Product(listOf(-body[0]) + body.slice(1 .. body.lastIndex))
+    }
+
+    override fun unparse(covering: Boolean): String {
+        return body.joinToString(" * ") { factor ->
+            factor.unparse(factor !is Power && factor !is Monomial)
+        }.let { if (!covering) it else "($it)" }
     }
 }

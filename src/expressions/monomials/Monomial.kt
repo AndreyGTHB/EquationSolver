@@ -3,10 +3,10 @@ package expressions.monomials
 import console.Clr
 import console.coloured
 import expressions.Expression
-import expressions.zero
 import expressions.number.Rational
 import expressions.number.min
 import expressions.one
+import expressions.zero
 
 
 class Monomial internal constructor (
@@ -123,6 +123,12 @@ class Monomial internal constructor (
         }
         str = str.slice(0 until str.length - 2).coloured(Clr.MONOMIAL)
         return str
+    }
+    override fun unparse(covering: Boolean): String {
+        return body
+            .toList()
+            .joinToString(" * ") { (v, d) -> if (!d.isUnit()) "$v^${d.unparse(true)}" else "$v" }
+            .let { if (covering && it.length > 1) "($it)" else it }
     }
 }
 

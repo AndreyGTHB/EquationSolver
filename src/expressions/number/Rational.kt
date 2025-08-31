@@ -2,7 +2,9 @@ package expressions.number
 
 import console.Clr
 import console.coloured
-import expressions.*
+import expressions.Expression
+import expressions.one
+import expressions.zero
 import utils.gcd
 import utils.power
 import java.math.BigDecimal
@@ -93,6 +95,7 @@ class Rational (
 
     override fun toString() = "$numer" + if (denom != 1) "/$denom" else ""
     override fun coloured() = toString().coloured(Clr.RATIONAL)
+    override fun unparse(covering: Boolean) = toString().let { if (covering && denom != 1) "(${toString()})" else toString() }
 }
 
 

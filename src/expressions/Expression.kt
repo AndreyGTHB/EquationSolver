@@ -8,7 +8,6 @@ import expressions.longs.Product
 import expressions.longs.Sum
 import expressions.monomials.Monomial
 import expressions.number.Rational
-import parser.parseExpression
 import rules.Contradiction
 import rules.Rule
 import rules.Tautology
@@ -170,6 +169,7 @@ abstract class Expression (
     infix fun raisedTo(other: Expression) = _raisedTo(other).applyLoadingDomainFrom(this, other)
 
     abstract override fun toString(): String
+    abstract fun unparse(covering: Boolean = false): String
 }
 
 

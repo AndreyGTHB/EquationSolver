@@ -4,12 +4,7 @@ import CONFIDENCE_SCALE
 import equations.Equation
 import expressions.*
 import expressions.longs.Product
-import expressions.number.Rational
-import expressions.number.Real
-import expressions.number.calcDelta
-import expressions.number.calcSubScale
-import expressions.number.power
-import expressions.number.toRational
+import expressions.number.*
 import java.math.BigDecimal
 import java.math.MathContext
 import java.math.RoundingMode
@@ -148,5 +143,9 @@ class Quotient (
 
     override fun unaryMinus(): Quotient {
         return Quotient(-numer to denom)
+    }
+
+    override fun unparse(covering: Boolean): String {
+        return numer.unparse(numer !is Power) +" / " + denom.unparse(denom !is Power)
     }
 }

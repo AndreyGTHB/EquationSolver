@@ -7,7 +7,9 @@ import expressions.binary.Power
 import expressions.longs.Product
 import expressions.one
 import expressions.unitReal
-import utils.*
+import utils.factorise
+import utils.gcd
+import utils.power
 
 class Real (
     override val body: Pair<Int, Rational>,
@@ -100,8 +102,9 @@ class Real (
 
     override fun _approx(scale: Int) = Power(Rational(base to 1, true) to exponent, true).approx(scale)
 
-    override fun toString() = "$base^($exponent)"
-    override fun coloured() = "$base^(${exponent.numer}/${exponent.denom})".coloured(Clr.REAL)
+    override fun toString() = "$base^${exponent.unparse(true)}"
+    override fun coloured() = toString().coloured(Clr.REAL)
+    override fun unparse(covering: Boolean) = toString().let { if (!covering) it else "($it)" }
 }
 
 
